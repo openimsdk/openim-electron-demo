@@ -1,0 +1,223 @@
+.add_cons_modal {
+  .ant-modal-header {
+    padding: 12px 20px;
+    background-color: #f5f6f7;
+    border-bottom: none;
+  }
+  .ant-modal-footer {
+    padding: 8px 20px;
+  }
+  .ant-input {
+    border-radius: 6px;
+  }
+  &_btn {
+    border-radius: 6px !important;
+    padding: 0px 12px !important;
+    height: 30px !important;
+  }
+}
+
+.group_modal {
+  .group_info_item {
+    display: flex;
+    padding: 8px 0;
+    .group_info_label {
+      min-width: 100px;
+    }
+    .group_info_icon {
+      margin-left: 12px;
+      font-size: 12px;
+      color: @activeColor;
+      cursor: pointer;
+    }
+    .select_box {
+      display: flex;
+      width: 100%;
+      height: 44vh;
+      border: 1px solid #c7c7c8;
+      border-radius: 6px;
+      // height: 80%;
+      &_left {
+        flex: 1;
+        padding: 12px;
+        border-right: 1px solid #c7c7c8;
+        overflow: auto;
+        &_title {
+          font-size: 12px;
+          margin-top: 8px;
+          margin-bottom: 4px;
+          .index_tab {
+            color: #c7c7c8;
+            cursor: pointer;
+          }
+        }
+        &_item {
+          @vCenterBox();
+          justify-content: space-between;
+          padding: 6px 0;
+          .left_title {
+            font-size: 12px;
+            @vCenterBox();
+            span {
+              margin-left: 6px;
+            }
+          }
+          .title {
+            display: inline-block;
+            font-size: 12px;
+            margin-left: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-break: break-all;
+            white-space: nowrap;
+            max-width: 120px;
+            transform: translateY(4px);
+          }
+        }
+      }
+      &_right {
+        flex: 1;
+        padding: 12px;
+        overflow: auto;
+        &_title {
+          font-size: 12px;
+          padding-bottom: 12px;
+        }
+        &_item {
+          @vCenterBox();
+          justify-content: space-between;
+          padding-bottom: 10px;
+          .select_info {
+            @vCenterBox();
+            &_title {
+              margin-left: 6px;
+            }
+          }
+        }
+      }
+    }
+  }
+  .group_info_footer {
+    display: flex;
+    justify-content: flex-end;
+    .ant-btn {
+      border-radius: 6px;
+      padding: 0 16px;
+      height: 26px;
+      font-size: 13px;
+    }
+    .ant-btn-primary {
+      margin-left: 12px;
+    }
+  }
+  .ant-input-affix-wrapper {
+    padding: 0;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    .ant-input-prefix {
+      margin: 0 6px;
+    }
+  }
+  .ant-input {
+    border-radius: 4px;
+    height: 28px;
+    font-size: 13px;
+  }
+}
+
+.warning_modal {
+  .ant-modal-content {
+    border-radius: 8px;
+    .ant-btn {
+      padding: 0 22px;
+      border-radius: 6px;
+      height: 28px;
+    }
+  }
+}
+
+.transfer_modal {
+  .gutter_row {
+    max-height: 360px;
+    overflow-y: auto;
+    .member_item {
+      @vCenterBox();
+      flex-direction: column;
+      padding: 12px 0;
+      .member_nick {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        word-break: break-all;
+        overflow: hidden;
+        max-width: 100%;
+      }
+    }
+  }
+}
+
+.mer_modal{
+  height: 70vh;
+  .ant-modal-header{
+    border: none;
+  }
+  .ant-modal-content{
+    height: 100%;
+    border-radius: 4px;
+    .ant-modal-body{
+      padding: 0 0;
+      height: calc(100% - 54px);
+    }
+  }
+}
+
+.card_cons_se{
+  .ant-modal-content{
+    border-radius: 4px;
+  }
+  .ant-modal-header{
+    border: none;
+    border-radius:4px 4px 0 0;
+  }
+  .ant-modal-body{
+    padding: 0;
+    padding-bottom: 4px;
+    .top_ctx{
+      padding: 0 24px;
+      .ant-input-affix-wrapper{
+        padding: 3px 6px;
+        border-radius: 4px;
+      }
+    }
+    .btm_ctx{
+      .title{
+        padding: 12px 24px;
+      }
+      .cons_list{
+        height: 40vh;
+        overflow-y: auto;
+        &_item{
+          @vCenterBox();
+          justify-content: space-between;
+          padding: 8px 24px;
+          &_left{
+            @vCenterBox();
+            .nick{
+              margin-left: 12px;
+              max-width: 160px;
+              white-space: nowrap;
+              word-break: break-all;
+              text-overflow: ellipsis;
+              overflow: hidden;
+            }
+          }
+          .ant-btn{
+            border-radius: 4px;
+          }
+          &:hover{
+            background-color: @focusColor;
+          }
+        }
+      }
+    }
+  }
+}

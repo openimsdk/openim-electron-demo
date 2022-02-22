@@ -1,0 +1,92 @@
+.tool_bar {
+  background-color: @primary-color !important;
+  -webkit-app-region: drag;
+  padding-top: 70px;
+  .left_avatar {
+    margin-bottom: 30px;
+  }
+  .tools {
+    -webkit-app-region: no-drag;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .tool_icon {
+      padding: 14px 22px;
+      &_focus {
+        background-color: #68a2ea;
+      }
+    }
+  }
+}
+.tools_self {
+  font-style: italic;
+}
+.tool_self_title {
+  display: flex;
+  padding: 24px 16px;
+  align-items: center;
+  width: 240px;
+  .tool_self_icon {
+    margin-right: 12px;
+  }
+  .nick_name {
+    color: #fff;
+    font-size: 18px;
+    max-width: 160px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+    word-break:break-all;
+  }
+}
+
+.tool_self_menu {
+  display: flex;
+  flex-direction: column;
+  .tool_self_item {
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    &:hover {
+      background-color: #f0f6fd;
+    }
+    &:last-child {
+      margin-bottom: 36px;
+    }
+  }
+}
+
+:global {
+  .ant-popover-placement-right {
+    top: 52px !important;
+    .ant-popover-title {
+      padding: 0 !important;
+      background-color: #428be5;
+    }
+    .ant-popover-inner-content {
+      padding: 0;
+      padding-top: 8px;
+    }
+  }
+  .ant-dropdown-arrow {
+    border-color: #353940 !important;
+  }
+  .ant-dropdown-menu-title-content {
+    color: #fff;
+  }
+  .ant-dropdown-menu-item {
+    padding: 7px 14px !important;
+    &-active {
+      background-color: #4f545d !important;
+    }
+  }
+}
+
+.btn_menu {
+  background-color: #353940 !important;
+  padding: 0 !important;
+  border-radius: 4px !important;
+  overflow: hidden;
+}

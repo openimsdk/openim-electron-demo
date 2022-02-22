@@ -1,0 +1,192 @@
+.draggable_card {
+  .ant-modal-content {
+    border-radius: 6px;
+    overflow: hidden;
+
+    .ant-modal-header {
+      padding: 24px 20px 24px 36px;
+      background-color: #fff;
+      border-bottom: none;
+
+      .draggable_card_title {
+        @vCenterBox();
+        width: 100%;
+        cursor: move !important;
+        justify-content: space-between;
+
+        .left_info {
+          @colBox();
+          justify-content: space-between;
+
+          &_title {
+            font-size: 18px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-break: break-all;
+            white-space: nowrap;
+            max-width: 170px;
+          }
+          &_subtitle{
+            font-size: 12px;
+            color: #999;
+            .anticon{
+              margin-right: 4px;
+            }
+          }
+
+          &_icon {
+            img {
+              cursor: pointer;
+            }
+          }
+        }
+      }
+    }
+
+    .ant-modal-body {
+      background-color: #f0f5fc;
+      padding: 12px 24px;
+
+      .ant-descriptions-title {
+        font-size: 14px;
+        color: #606872;
+      }
+
+      .ant-descriptions-item {
+        padding-bottom: 12px;
+
+        &-label,
+        &-content {
+          height: 24px;
+          font-size: 12px;
+          color: #606872;
+
+          .ant-typography {
+            margin-bottom: 0;
+
+            &-edit {
+              margin-left: 12px;
+
+              &-content {
+                margin-top: 0;
+                width: 100%;
+
+                textarea.ant-input {
+                  min-height: 20px;
+                  padding: 0;
+                  padding-left: 4px;
+                  border-radius: 6px;
+                }
+
+                &-confirm {
+                  display: none;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .ant-descriptions-item-label {
+        padding-right: 12px;
+      }
+
+      .add_con_btn {
+        width: 100%;
+        height: 28px;
+        border-radius: 6px;
+        padding: 0 15px;
+        margin-top: 8px;
+      }
+
+      .group_card_body {
+        .group_card_title {
+          font-size: 12px;
+          color: #333;
+        }
+
+        .group_card_member {
+          display: flex;
+          padding-top: 6px;
+          padding-bottom: 12px;
+
+          .ant-avatar {
+            margin-right: 4px;
+          }
+
+          .anticon-ellipsis {
+            @centerBox();
+            min-width: 35.3px;
+            font-size: 26px;
+            background-color: #5495ea;
+            color: #fff;
+            border-radius: 6px;
+          }
+        }
+      }
+    }
+  }
+
+  .ant-upload {
+    cursor: pointer;
+  }
+}
+
+.draggable_card_next {
+  .ant-modal-content {
+    background-color: #f2f2f2;
+
+    .ant-modal-header {
+      background-color: #f2f2f2;
+
+      .draggable_card_title {
+        cursor: move;
+      }
+
+      .send_msg_title {
+        @vCenterBox();
+
+        &_text {
+          font-size: 14px;
+        }
+      }
+    }
+
+    .ant-modal-body {
+      padding: 12px 24px;
+
+      .send_card_info {
+        @colBox();
+        padding: 24px 16px;
+        padding-bottom: 16px;
+        border-radius: 4px;
+        background-color: #fff;
+
+        &_row1 {
+          @vCenterBox();
+          justify-content: space-between;
+          padding-bottom: 16px;
+        }
+
+        .ant-form-item {
+          margin-bottom: 0;
+
+          .ant-input {
+            border-radius: 4px;
+            height: 28px;
+            padding-top: 2px;
+            font-size: 13px;
+          }
+        }
+      }
+
+      .add_con_btn {
+        width: 100%;
+        height: 28px;
+        border-radius: 6px;
+        padding: 0 15px;
+        margin-top: 16px;
+      }
+    }
+  }
+}

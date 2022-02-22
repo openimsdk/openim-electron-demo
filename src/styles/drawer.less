@@ -1,0 +1,292 @@
+.ant-drawer-open {
+  margin-right: 42px;
+}
+
+.right_set_drawer {
+  .single_drawer,
+  .group_drawer {
+    @colBox();
+    position: relative;
+    height: 100%;
+    .anticon-right {
+      color: #dedfe0;
+    }
+    &_item {
+      @vCenterBox();
+      justify-content: space-between;
+      margin: 0 24px;
+      padding: 16px 0;
+      font-size: 13px;
+      border-bottom: 1px solid #dedfe0;
+      &_left {
+        @vCenterBox();
+      }
+      &_title {
+        margin-left: 12px;
+      }
+    }
+    &_btn {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      border-radius: 6px;
+      height: 28px;
+      padding: 0 18px;
+    }
+  }
+  .group_drawer {
+    &_item {
+      &_info {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        .group_drawer_item_title {
+          font-weight: 500;
+        }
+        .group_drawer_item_sub {
+          margin-left: 12px;
+          font-size: 12px;
+          color: @activeColor;
+          cursor: pointer;
+        }
+      }
+      &_right {
+        @vCenterBox();
+        .anticon-right {
+          margin-left: 10px;
+        }
+      }
+      .ant-typography {
+        margin-bottom: 0;
+        height: 24px;
+        &-edit-content {
+          margin: 0;
+          textarea.ant-input {
+            min-height: 20px;
+            padding: 0;
+            padding-left: 4px;
+            border-radius: 4px;
+          }
+          &-confirm {
+            display: none;
+          }
+        }
+      }
+      .group_id {
+        color: #999;
+      }
+      &_nbtm {
+        border-bottom: none;
+        .ant-typography{
+          font-size: 12px;
+          line-height: 24px;
+          width: 80%;
+          text-align: right;
+        }
+      }
+    }
+    &_row {
+      display: flex;
+      flex-direction: column;
+      margin: 0 24px;
+      padding: 16px 0;
+      border-bottom: 1px solid #dedfe0;
+      &_title {
+        @vCenterBox();
+        justify-content: space-between;
+        .num_tip {
+          font-size: 12px;
+          color: #999;
+          margin-right: 4px;
+        }
+      }
+      &_input {
+        margin: 12px 0;
+      }
+      &_icon {
+        display: flex;
+        .ant-avatar {
+          margin-right: 2px;
+        }
+        .anticon-plus,
+        .anticon-minus {
+          @centerBox();
+          width: 32.8px;
+          height: 32.8px;
+          min-width: 32.8px;
+          color: #999;
+          border: 1px solid rgb(211, 194, 194);
+          border-radius: 6px;
+        }
+        .anticon-plus {
+          margin-right: 2px;
+        }
+      }
+    }
+    &_btns {
+      position: absolute;
+      bottom: 30px;
+      width: 100%;
+      text-align: center;
+      // left: 50%;
+      // transform: translateX(-50%);
+      &_item {
+        border-radius: 6px;
+        height: 28px;
+        padding: 0 16px;
+        &:first-child {
+          margin-right: 12px;
+        }
+      }
+    }
+  }
+  .group_members {
+    &_search {
+      padding: 16px;
+    }
+    &_list {
+      overflow-y: auto;
+      &_item {
+        @vCenterBox();
+        justify-content: space-between;
+        padding: 6px 16px;
+        .member_info {
+          display: flex;
+          flex-direction: column;
+          margin-left: 12px;
+          .title {
+            @vCenterBox();
+            .owner_tip,
+            .admin_tip {
+              border-radius: 4px;
+              font-size: 12px;
+              transform: scale(0.9);
+              height: 20px;
+              line-height: 20px;
+              padding: 0 4px;
+              margin-left: 12px;
+            }
+            .owner_tip {
+              background-color: #fddfa1;
+              color: #fd9306;
+            }
+            .admin_tip {
+              background-color: #a2c9f8;
+              color: #498fe6;
+            }
+          }
+          .member_status {
+            font-size: 12px;
+            color: #999;
+          }
+        }
+        .anticon-delete {
+          cursor: pointer;
+        }
+        &:hover {
+          background-color: @focusColor;
+        }
+      }
+    }
+  }
+  .group_notice {
+    @colBox();
+    padding: 20px 0;
+    margin: 0 16px;
+    border-bottom: 1px solid #dedfe0;
+    &_title{
+      @vCenterBox();
+      justify-content: space-between;
+      padding-bottom: 6px;
+      .left{
+        @vCenterBox();
+        &_info{
+          display: flex;
+          flex-direction: column;
+          padding-left: 12px;
+          div{
+            &:last-child{
+              font-size: 12px;
+              color: #999;
+            }
+          }
+        }
+      }
+      .anticon{
+        font-size: 18px;
+      }
+    }
+  }
+  .search_message {
+    .ant-tabs{
+      &-nav{
+        padding: 0 24px;
+        .ant-tabs-ink-bar{
+          width: 18px !important;//10
+          height: 3px;
+          border-radius:8px;
+        }
+        &::before{
+          border-bottom:none
+        }
+      }
+      .message_search_input{
+        padding: 0 24px 12px 24px;
+      }
+      .text_message_list{
+        overflow-x: hidden;
+        overflow-y: scroll;
+        .text_item{
+          @vCenterBox();
+          padding: 12px 24px;
+          &_right{
+            @colBox();
+            margin-left:8px;
+            .info{
+              color: #999;
+              .nick{
+                margin-right: 8px;
+              }
+            }
+          }
+          &:hover{
+            background-color: @focusColor;
+          }
+        }
+        &::-webkit-scrollbar {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .ant-drawer-header-title{
+    position: relative;
+    .ant-drawer-close{
+      position: absolute;
+      right: 0;
+      margin-right: 0;
+      padding-right: 0;
+    }
+  }
+  .anticon {
+    color: #999;
+  }
+  .ant-drawer-body {
+    padding: 0;
+  }
+  .ant-drawer-header {
+    padding: 20.5px 24px;
+  }
+  .ant-input-affix-wrapper {
+    padding: 0 11px;
+    border-radius: 6px;
+  }
+  .ant-input {
+    border-radius: 4px;
+    height: 28px;
+    font-size: 13px;
+  }
+}

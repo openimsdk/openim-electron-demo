@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "strict": true,
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "inlineSources": true,
+    "inlineSourceMap": true,
+    "outDir": "../build/electron",
+    "typeRoots": ["node_modules/@types"]
+  },
+  "include": ["./*.ts", "preload/api.ts"]
+}

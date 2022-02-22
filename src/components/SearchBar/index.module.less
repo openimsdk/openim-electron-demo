@@ -1,0 +1,40 @@
+.top_tools {
+  display: flex;
+  padding: 15px 15px 11px;
+  -webkit-app-region: drag;
+
+  :global {
+    .ant-input-affix-wrapper {
+      border-radius: 16px;
+      -webkit-app-region: no-drag;
+    }
+    .ant-btn{
+      -webkit-app-region: no-drag;
+    }
+  }
+}
+
+:global {
+  .ant-dropdown-arrow {
+    border-color: #353940 !important;
+  }
+
+  .ant-dropdown-menu-title-content {
+    color: #fff;
+  }
+
+  .ant-dropdown-menu-item {
+    padding: 7px 14px !important;
+
+    &-active {
+      background-color: #4f545d !important;
+    }
+  }
+}
+
+.btn_menu {
+  background-color: #353940 !important;
+  padding: 0 !important;
+  border-radius: 4px !important;
+  overflow: hidden;
+}
