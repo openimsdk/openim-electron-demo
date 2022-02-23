@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { debounce } from "throttle-debounce";
 import { MyAvatar } from "../../../../components/MyAvatar";
 import { SessionType } from "../../../../constants/messageContentType";
-import { im } from "../../../../utils";
 import { ConversationItem } from "../../../../utils/open_im_sdk/types";
 
 export const SearchMessageDrawer = ({ curCve }: { curCve: ConversationItem }) => {
@@ -69,7 +68,7 @@ const MyTabpane: FC<MyTabpaneProps> = (props) => {
   return (
     <Tabs.TabPane {...props}>
       <div className="message_search_input">
-        <Input onChange={inputOnChange} placeholder={t("Search")} prefix={<SearchOutlined />} />
+        <Input disabled onChange={inputOnChange} placeholder={"开发中~"} prefix={<SearchOutlined />} />
       </div>
       {props.children}
     </Tabs.TabPane>

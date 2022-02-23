@@ -1,4 +1,4 @@
-import { Layout, message, Tooltip } from "antd";
+import { Layout, Tooltip } from "antd";
 import right_file from "@/assets/images/right_file.png";
 import right_file_se from "@/assets/images/right_file_se.png";
 import right_search from "@/assets/images/right_search.png";
@@ -8,8 +8,8 @@ import right_setting_se from "@/assets/images/right_setting_se.png";
 import right_notice from "@/assets/images/right_notice.png";
 import right_notice_se from "@/assets/images/right_notice_se.png";
 import { FC, useEffect, useState } from "react";
-import { events, im, isSingleCve } from "../../../utils";
-import { OPENSINGLEMODAL, TOASSIGNCVE } from "../../../constants/events";
+import { events, isSingleCve } from "../../../utils";
+import { TOASSIGNCVE } from "../../../constants/events";
 import CveRightDrawer from "./CveRightDrawer/CveRightDrawer";
 import { useTranslation } from "react-i18next";
 import { ConversationItem, FriendItem } from "../../../utils/open_im_sdk/types";
@@ -45,8 +45,10 @@ const CveRightBar: FC<CveRightBarProps> = ({ curCve }) => {
   };
 
   const clickItem = (idx: number) => {
-    setCurTool(idx);
-    idx!==2 && setVisibleDrawer(true);
+    if (idx !== 2) {
+      setCurTool(idx);
+      setVisibleDrawer(true);
+    }
   };
 
   const toolIcon = (tool: typeof tools[0]) => {
@@ -76,7 +78,7 @@ const CveRightBar: FC<CveRightBarProps> = ({ curCve }) => {
       idx: 1,
     },
     {
-      tip: t("File"),
+      tip: t("File")+"(开发中~)",
       icon: right_file,
       icon_se: right_file_se,
       method: clickItem,
