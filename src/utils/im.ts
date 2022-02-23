@@ -99,7 +99,7 @@ export const createNotification = (message: MessageItem, click?: (id: string, ty
       body: parseMessageType(message),
       requireInteraction: true,
     });
-    const id = message.sessionType === SessionType.SINGLECVE ? (message.contentType === tipsTypes.FRIENDADDED ? message.recvID : message.sendID) : message.recvID;
+    const id = message.sessionType === SessionType.SINGLECVE ? (message.contentType === tipsTypes.FRIENDADDED ? message.recvID : message.sendID) : message.groupID;
     notification.onclick = () => {
       click && click(id, message.sessionType);
       notification.close();
