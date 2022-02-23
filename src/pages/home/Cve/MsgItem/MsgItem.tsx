@@ -2,10 +2,10 @@ import { LoadingOutlined, ExclamationCircleFilled } from "@ant-design/icons";
 import { Spin, Checkbox } from "antd";
 import { FC, useEffect, useRef, useState } from "react";
 import { MyAvatar } from "../../../../components/MyAvatar";
-import { messageTypes, SessionType } from "../../../../constants/messageContentType";
+import { messageTypes } from "../../../../constants/messageContentType";
 import { events, im, isSingleCve } from "../../../../utils";
 
-import { ATSTATEUPDATE, MUTILMSGCHANGE, OPENSINGLEMODAL } from "../../../../constants/events";
+import { ATSTATEUPDATE, MUTILMSGCHANGE } from "../../../../constants/events";
 import { useInViewport, useLongPress } from "ahooks";
 
 import SwitchMsgType from "./SwitchMsgType/SwitchMsgType";
@@ -31,7 +31,7 @@ const MsgItem: FC<MsgItemProps> = (props) => {
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
   const avaRef = useRef<HTMLDivElement>(null);
   const msgItemRef = useRef<HTMLDivElement>(null);
-  const [ inViewport ] = useInViewport(msgItemRef);
+  const [inViewport] = useInViewport(msgItemRef);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -40,20 +40,19 @@ const MsgItem: FC<MsgItemProps> = (props) => {
     }
   }, [mutilSelect]);
 
-  useEffect(()=>{
-    if(inViewport && curCve.userID===msg.sendID && !msg.isRead){
-      markC2CHasRead(msg.sendID,msg.clientMsgID)
+  useEffect(() => {
+    if (inViewport && curCve.userID === msg.sendID && !msg.isRead) {
+      markC2CHasRead(msg.sendID, msg.clientMsgID);
     }
-  },[inViewport,curCve])
+  }, [inViewport, curCve]);
 
   const isSelf = (sendID: string): boolean => {
     return selfID === sendID;
   };
 
   const markC2CHasRead = (userID: string, msgID: string) => {
-    im.markC2CMessageAsRead({ userID, msgIDList:[msgID] })
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
+    msg.isRead = true;
+    im.markC2CMessageAsRead({ userID, msgIDList: [msgID] });
   };
 
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
