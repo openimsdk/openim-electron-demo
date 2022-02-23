@@ -11,6 +11,7 @@ import CodeBox from "./CodeBox";
 import { useTranslation } from "react-i18next";
 import { Itype } from "../../../@types/open_im";
 import { getCosAuthorization } from "../../../utils/cos";
+import { sendSms } from "../../../api/login";
 
 const { Option } = Select;
 
@@ -30,6 +31,7 @@ type IProps = {
   finish: (values?: FormField | string | InfoField) => void;
   type: Itype | undefined;
   back: () => void;
+  getCodeAgain: () => void;
   loading: boolean;
   num: string;
 };
@@ -48,10 +50,10 @@ const LoginForm: FC<IProps> = (props) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    const tmpBtm = type === "login" || type === "register";
-    setBtm(tmpBtm);
-    const tmpBack = type === "register" || type === "vericode";
-    setBack(tmpBack);
+    const btmShow = ["login","register"]
+    const backShow = ["register","vericode","modifySend","modifycode"]
+    setBtm(btmShow.includes(type!));
+    setBack(backShow.includes(type!));
   }, [type]);
 
   const phoneRules = [
@@ -131,7 +133,7 @@ const LoginForm: FC<IProps> = (props) => {
         </Form.Item>
         {type === "login" ? (
           <Form.Item name="password" label={t("Password")} rules={pwdRules}>
-            <Input.Password style={{ width: "100%" }} bordered={false} placeholder={t("PhoneNumberTip")} allowClear />
+            <Input.Password style={{ width: "100%" }} bordered={false} placeholder={t("PasswordTip")} allowClear />
           </Form.Item>
         ) : null}
         <Form.Item>

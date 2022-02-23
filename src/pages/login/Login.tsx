@@ -57,11 +57,11 @@ const Login = () => {
           .then((res: any) => {
             if (res.errCode === 0) {
               message.success(t("SendSuccessTip"));
+              setNum((values as FormField)?.phoneNo);
+              toggle(isModify ? "modifycode" : "vericode");
             } else if (res.errCode === 10007 || res.errCode === 10008) {
               handleError(res);
             }
-            setNum((values as FormField)?.phoneNo);
-            toggle(isModify ? "modifycode" : "vericode");
           })
           .catch((err) => handleError(err));
         break;
@@ -98,6 +98,16 @@ const Login = () => {
         break;
       default:
         break;
+    }
+  };
+
+  const getCodeAgain = async () => {
+    const isModify = type === "modifycode";
+    const result: any = await sendSms(num, isModify ? UsedFor.Modify : UsedFor.Register);
+    if (result.errCode === 0) {
+      message.success(t("SendSuccessTip"));
+    } else {
+      handleError(result);
     }
   };
 
@@ -193,7 +203,7 @@ const Login = () => {
     if (lastType.current === "success") {
       toggle("login");
     }
-    message.error(switchError(error.errCode) ?? error.errMsg);
+    message.error(switchError(error.errCode) ?? error.errMsg ?? t("AccessFailed"));
   };
 
   const toggle = (mtype: Itype) => {
@@ -216,7 +226,7 @@ const Login = () => {
             <span className="sub_title">{t("LoginSubTitle")}</span>
             <img src={login_bg} />
           </div>
-          <LoginForm loading={loading} back={back} type={lastType.current} finish={finish} num={num} />
+          <LoginForm loading={loading} num={num} type={lastType.current} finish={finish} getCodeAgain={getCodeAgain} back={back} />
         </div>
         {isModalVisible && <IMConfigModal visible={isModalVisible} close={closeModal} />}
       </div>
