@@ -69,6 +69,8 @@ async function createWindow() {
 //   win!.setSize(1050, 700)
 // })
 
+app.setAppUserModelId("OpenIM");
+
 app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {

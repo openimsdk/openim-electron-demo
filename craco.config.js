@@ -1,6 +1,6 @@
 const CracoLessPlugin = require("craco-less");
 const path = require("path");
-const { getPlugin, pluginByName, whenProd } = require("@craco/craco");
+const { whenProd,getPlugin,pluginByName } = require("@craco/craco");
 const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {

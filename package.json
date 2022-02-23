@@ -96,6 +96,10 @@
     "webpack-bundle-analyzer": "^4.5.0",
     "webpackbar": "^5.0.0-3"
   },
+  "resolutions": {
+    "//": "See https://github.com/facebook/create-react-app/issues/11773",
+    "react-error-overlay": "6.0.9"
+  },
   "main": "build/electron/main.js",
   "homepage": ".",
   "build": {
@@ -105,20 +109,20 @@
     ],
     "productName": "OpenIM",
     "win": {
-      "icon": "./build/icons/win.ico"
+      "icon": "./build/icons/logo256x256.ico"
     },
     "mac": {
       "target": "dmg",
-      "icon": "./build/icons/mac.png"
+      "icon": "./build/icons/logo512x512.png"
     },
     "nsis": {
       "oneClick": false,
       "perMachine": true,
       "allowElevation": true,
       "allowToChangeInstallationDirectory": true,
-      "installerIcon": "./build/favicon.ico",
-      "uninstallerIcon": "./build/favicon.ico",
-      "installerHeaderIcon": "./build/favicon.ico",
+      "installerIcon": "./build/icons/logo16x16.ico",
+      "uninstallerIcon": "./build/icons/logo16x16.ico",
+      "installerHeaderIcon": "./build/icons/logo16x16.ico",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "OpenIM"
