@@ -57,11 +57,11 @@ const Login = () => {
           .then((res: any) => {
             if (res.errCode === 0) {
               message.success(t("SendSuccessTip"));
-              setNum((values as FormField)?.phoneNo);
-              toggle(isModify ? "modifycode" : "vericode");
             } else if (res.errCode === 10007 || res.errCode === 10008) {
               handleError(res);
             }
+            setNum((values as FormField)?.phoneNo);
+              toggle(isModify ? "modifycode" : "vericode");
           })
           .catch((err) => handleError(err));
         break;
