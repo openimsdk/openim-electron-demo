@@ -1,4 +1,3 @@
-import { type } from "os";
 import { RequestFunc } from "../constants";
 
 export type InitConfig = {
@@ -219,10 +218,10 @@ export type CreateGroupParams = {
 export type GroupInitInfo = {
   groupType: number;
   groupName: string;
-  introduction: string;
-  notification: string;
-  faceURL: string;
-  ex: string;
+  introduction?: string;
+  notification?: string;
+  faceURL?: string;
+  ex?: string;
 };
 
 export type Member = {

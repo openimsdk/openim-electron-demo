@@ -70,7 +70,7 @@ const CveItem: FC<CveItemProps> = ({ cve, onClick, curCve, curUid, cveList, idx 
 
   const markAsRead = () => {
     if (cve.userID) {
-      im.markSingleMessageHasRead(cve.userID);
+      im.markC2CMessageAsRead({ userID: cve.userID, msgIDList: [] });
     } else {
       im.markGroupMessageHasRead(cve.groupID);
     }
@@ -107,7 +107,7 @@ const CveItem: FC<CveItemProps> = ({ cve, onClick, curCve, curUid, cveList, idx 
   const parseLastMessage = isRecv(cve?.recvMsgOpt)
     ? parseLatestMsg(cve.latestMsg)
     : cve.unreadCount > 0
-    ? `[${cve.unreadCount+t("Piece")}] ${parseLatestMsg(cve.latestMsg)}`
+    ? `[${cve.unreadCount + t("Piece")}] ${parseLatestMsg(cve.latestMsg)}`
     : parseLatestMsg(cve.latestMsg);
 
   return (
@@ -123,7 +123,7 @@ const CveItem: FC<CveItemProps> = ({ cve, onClick, curCve, curUid, cveList, idx 
     >
       <div ref={itemRef} onClick={() => onClick(cve)} className={`cve_item ${curCve?.conversationID === cve.conversationID || cve.isPinned ? "cve_item_focus" : ""}`}>
         <LayLoad forceLoad={idx < 15} targetRef={itemRef} skeletonCmp={<Skeleton.Avatar active={true} size={36} shape="square" />}>
-          <Badge size="small" dot={!isRecv(cve?.recvMsgOpt)&&cve.unreadCount>0} count={isRecv(cve?.recvMsgOpt)?cve.unreadCount:null}>
+          <Badge size="small" dot={!isRecv(cve?.recvMsgOpt) && cve.unreadCount > 0} count={isRecv(cve?.recvMsgOpt) ? cve.unreadCount : null}>
             <MyAvatar shape="square" style={{ minWidth: "36px" }} size={36} icon={<UserOutlined />} src={cve.faceURL} />
           </Badge>
         </LayLoad>

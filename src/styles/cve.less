@@ -122,9 +122,17 @@
         // &_pic{
         //   margin-top: 24px;
         // }
-        // &_video{
-        //   margin-top: 24px;
-        // }
+        &_video{
+          width: 240px;
+          min-height: 120px;
+          border-radius: 4px;
+          overflow: hidden;
+          video{
+            width: 100%;
+            height: 100%;
+          }
+          // margin-top: 24px;
+        }
         &_qute{
           display: flex;
           flex-direction: column;
@@ -226,9 +234,10 @@
           word-break: break-all;
           overflow: hidden;
         }
-        .pic_msg_time{
+        .pic_msg_time,
+        .video_msg_time{
           position: absolute;
-          bottom: 11px;
+          bottom: 6px;
           right: 8px;
           height: 20px;
           line-height: 20px;
@@ -239,6 +248,10 @@
           background-color: rgba(0, 0, 0, 0.4);
           text-align: center;
           border-radius: 4px;
+        }
+        .video_msg_time{
+          bottom:auto;
+          top: 6px;
         }
       }
       &_check {

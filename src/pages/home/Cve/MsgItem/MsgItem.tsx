@@ -111,8 +111,10 @@ const MsgItem: FC<MsgItemProps> = (props) => {
         </div>
       )}
 
-      <div className="cs" ref={avaRef}>
-        <MyAvatar className="chat_bg_msg_icon" shape="square" size={42} src={msg.senderFaceUrl} />
+      <div className="cs">
+        <div ref={avaRef}>
+          <MyAvatar className="chat_bg_msg_icon" shape="square" size={42} src={msg.senderFaceUrl} />
+        </div>
       </div>
 
       <div className="chat_bg_msg_content">

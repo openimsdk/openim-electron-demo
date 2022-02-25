@@ -49,7 +49,6 @@ export default class OpenIMSDK extends Emitter {
   private wsUrl: string = "";
   private lock: boolean = false;
   private logoutFlag: boolean = false;
-  private timer: number | undefined;
   private ws2promise: Record<string, Ws2Promise> = {};
   private onceFlag: boolean = true;
 
@@ -459,19 +458,6 @@ export default class OpenIMSDK extends Emitter {
     });
   };
 
-  markSingleMessageHasRead = (data: string, operationID?: string) => {
-    return new Promise<WsResponse>((resolve, reject) => {
-      const _uuid = operationID || uuid(this.uid as string);
-      const args = {
-        reqFuncName: RequestFunc.MARKSINGLEMESSAGEHASREAD,
-        operationID: _uuid,
-        userID: this.uid,
-        data,
-      };
-      this.wsSend(args, resolve, reject);
-    });
-  };
-
   markGroupMessageHasRead = (data: string, operationID?: string) => {
     return new Promise<WsResponse>((resolve, reject) => {
       const _uuid = operationID || uuid(this.uid as string);
@@ -682,14 +668,14 @@ export default class OpenIMSDK extends Emitter {
     });
   };
 
-  getConversationRecvMessageOpt = (conversationIDList: string[], operationID?: string) => {
+  getConversationRecvMessageOpt = (data: string[], operationID?: string) => {
     return new Promise<WsResponse>((resolve, reject) => {
       const _uuid = operationID || uuid(this.uid as string);
       const args = {
         reqFuncName: RequestFunc.GETCONVERSATIONRECVMESSAGEOPT,
         operationID: _uuid,
         userID: this.uid,
-        data: "",
+        data,
       };
       this.wsSend(args, resolve, reject);
     });
@@ -1154,11 +1140,7 @@ export default class OpenIMSDK extends Emitter {
 
     if (this.platform == "web") {
       this.ws!.send(JSON.stringify(params));
-
-      if (this.onceFlag) {
-        this.ws!.onmessage = handleMessage;
-        this.onceFlag = false;
-      }
+      this.ws!.onmessage = handleMessage;
     } else {
       this.ws!.send({
         //@ts-ignore
@@ -1271,14 +1253,4 @@ export default class OpenIMSDK extends Emitter {
       this.lock = false;
     }, 2000);
   }
-
-  // private resetHeart(){
-  //   clearTimeout(this.timer)
-  // }
-
-  // private startHeart() {
-  //   this.timer = setTimeout(()=>{
-  //     this.ws!.close;
-  //   },60000)
-  // }
 }
