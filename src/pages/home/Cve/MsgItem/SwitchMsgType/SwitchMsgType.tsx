@@ -13,6 +13,7 @@ import other_voice from "@/assets/images/voice_other.png";
 import my_voice from "@/assets/images/voice_my.png";
 import { useTranslation } from "react-i18next";
 import { ConversationItem, MergeElem, MessageItem, PictureElem } from "../../../../../utils/open_im_sdk/types";
+import VideoPlayer from "../../../../../components/VideoPlayer";
 
 type SwitchMsgTypeProps = {
   msg: MessageItem;
@@ -29,6 +30,7 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
   const [sty, setSty] = useState<CSSProperties>({
     paddingRight: "40px",
   });
+  const playerRef = useRef<any>(null);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -121,6 +123,20 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
     audio.current?.play();
   };
 
+
+  const handlePlayerReady = (player:any) => {
+    playerRef.current = player;
+
+    // you can handle player events here
+    player.on('waiting', () => {
+      console.log('player is waiting');
+    });
+
+    player.on('dispose', () => {
+      console.log('player will dispose');
+    });
+  };
+
   const msgType = () => {
     switch (msg.contentType) {
       case messageTypes.TEXTMESSAGE:
@@ -191,10 +207,22 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
           </div>
         );
       case messageTypes.VIDEOMESSAGE:
+        const videoJsOptions = {
+          width:240,
+          controls: true,
+          playbackRates: [0.5, 1, 1.25, 1.5, 2],
+          responsive: true,
+          fluid: true,
+          sources: [{
+            src: msg.videoElem.videoUrl,
+            type: 'video/mp4'
+          }]
+        }
         return (
           <div className={`chat_bg_msg_content_video ${!isSingle ? "nick_magin" : ""}`}>
-            <video controls width={200} src={msg.videoElem.videoUrl} />
-            {timeTip("pic_msg_time")}
+            <VideoPlayer options={videoJsOptions} onReady={handlePlayerReady} />
+            {/* <video className="video-js" data-setup='{}' controls src={msg.videoElem.videoUrl} /> */}
+            {timeTip("video_msg_time")}
           </div>
         );
       case messageTypes.QUOTEMESSAGE:

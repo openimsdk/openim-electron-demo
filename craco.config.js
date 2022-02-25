@@ -53,6 +53,7 @@ module.exports = {
     //       react: "React",
     //       "react-dom": "ReactDOM",
     //       redux: "Redux",
+    //       "video.js":"videojs"
     //     };
 
     //     cdn = {
@@ -60,8 +61,11 @@ module.exports = {
     //         "https://cdn.bootcdn.net/ajax/libs/react/17.0.2/umd/react.production.min.js",
     //         "https://cdn.bootcdn.net/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js",
     //         "https://cdn.bootcdn.net/ajax/libs/redux/4.1.0/redux.min.js",
+    //         "https://unpkg.com/video.js@7.10.2/dist/video.min.js",
     //       ],
-    //       css: [],
+    //       css: [
+    //         "https://unpkg.com/video.js@7.10.2/dist/video-js.min.css"
+    //       ],
     //     };
 
     //     const { isFound, match } = getPlugin(webpackConfig, pluginByName("HtmlWebpackPlugin"));
