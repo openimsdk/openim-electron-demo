@@ -22,7 +22,7 @@ type MsgItemProps = {
   mutilSelect?: boolean;
 };
 
-const canSelectTypes = [messageTypes.TEXTMESSAGE, messageTypes.ATTEXTMESSAGE, messageTypes.PICTUREMESSAGE, messageTypes.CARDMESSAGE];
+const canSelectTypes = [messageTypes.TEXTMESSAGE, messageTypes.ATTEXTMESSAGE, messageTypes.PICTUREMESSAGE,messageTypes.VIDEOMESSAGE,messageTypes.VOICEMESSAGE, messageTypes.CARDMESSAGE,messageTypes.FILEMESSAGE,messageTypes.LOCATIONMESSAGE];
 
 const MsgItem: FC<MsgItemProps> = (props) => {
   const { msg, selfID, curCve, mutilSelect, audio } = props;

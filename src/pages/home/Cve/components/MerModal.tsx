@@ -26,7 +26,7 @@ const MerModal:FC<MerModalProps> = ({close,imgClick,info,visible,curCve}) => {
         <ChatContent
               loadMore={()=>{}}
               loading={false}
-              msgList={info!.multiMessage}
+              msgList={[...info!.multiMessage].reverse()}
               imgClick={imgClick}
               hasMore={false}
               curCve={curCve}

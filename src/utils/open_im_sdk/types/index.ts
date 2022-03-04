@@ -170,9 +170,9 @@ export enum OptType {
 }
 
 export type SearchLocalParams = {
-  sourceID?: string;
-  sessionType?: number;
-  keywordList?: string[];
+  sourceID: string;
+  sessionType: number;
+  keywordList: string[];
   keywordListMatchType?: number;
   senderUserIDList?: string[];
   messageTypeList?: number[];
