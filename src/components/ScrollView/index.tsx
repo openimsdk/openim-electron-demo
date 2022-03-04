@@ -15,15 +15,14 @@ type ScrollViewProps = {
 
 const ScrollView: FC<ScrollViewProps> = ({ data, fetchMoreData, hasMore, children, loading, height, holdHeight }) => {
   const { t } = useTranslation();
+
   const onScroll = async (e: any) => {
     const loadThreshold = 0 - e.target.scrollHeight + e.target.offsetHeight + (holdHeight ?? 30);
 
     if (e.target.scrollTop < loadThreshold && e.target.scrollTop !== 0) {
-      if (loading || !hasMore) {
-        return;
-      }
+      if (loading || !hasMore) return;
 
-      fetchMoreData();
+      requestAnimationFrame(fetchMoreData);
     }
   };
 

@@ -51,7 +51,6 @@ type ReactiveState = {
   historyMsgList: MessageItem[];
   typing: boolean;
   hasMore: boolean;
-  loading: boolean;
   merModal: boolean;
   merData: (MergeElem & { sender: string }) | undefined;
   searchStatus: boolean;
@@ -73,7 +72,6 @@ const Home = () => {
     historyMsgList: [],
     typing: false,
     hasMore: true,
-    loading: false,
     merModal: false,
     merData: undefined,
     searchStatus: false,
@@ -149,8 +147,8 @@ const Home = () => {
 
   const sendForwardHandler = (options: string | MergerMsgParams, type: messageTypes, list: SelectType[]) => {
     list.map(async (s) => {
-      const uid = (s as FriendItem).userID;
-      const gid = (s as GroupItem).groupID;
+      const uid = (s as FriendItem).userID??"";
+      const gid = (s as GroupItem).groupID??"";
       let data;
       if (type === messageTypes.MERGERMESSAGE) {
         data = await im.createMergerMessage(options as MergerMsgParams);
@@ -261,7 +259,7 @@ const Home = () => {
     if (curCve) {
       events.emit(ISSETDRAFT, curCve);
     }
-    rs.historyMsgList.length = 0;
+    rs.historyMsgList = [];
     dispatch(setCurCve(cve));
     rs.hasMore = true;
     getInfo(cve);
@@ -306,8 +304,8 @@ const Home = () => {
   };
 
   const getHistoryMsg = (uid?: string, gid?: string, sMsg?: MessageItem) => {
-    rs.loading = true;
-
+    console.log("getMsg:::");
+    
     const config = {
       userID: uid ?? "",
       groupID: gid ?? "",
@@ -329,7 +327,6 @@ const Home = () => {
     console.log(rs.historyMsgList);
 
     rs.hasMore = !(JSON.parse(res.data).length < 20);
-    rs.loading = false;
   }
 
   const imgClick = (el: PictureElem) => {
