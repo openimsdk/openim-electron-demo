@@ -13,4 +13,5 @@ export type API = {
   setAppCloseAction: (close:boolean) => void;
   addIpcRendererListener: (event:string, listener:(...args:any[]) => void,flag:string) => void;
   removeIpcRendererListener: (flag:string) => void;
+  screenshot: () => void;
 };

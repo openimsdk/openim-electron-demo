@@ -66,6 +66,10 @@ const removeIpcRendererListener = (flag:string) => {
     delete listeners[flag]
 }
 
+const screenshot = () => {
+    ipcRenderer.send("Screenshot")
+}
+
 export const api:API = {
     isMac,
     getLocalWsAddress,
@@ -79,7 +83,8 @@ export const api:API = {
     getAppCloseAction,
     setAppCloseAction,
     addIpcRendererListener,
-    removeIpcRendererListener
+    removeIpcRendererListener,
+    screenshot
 };
 
 

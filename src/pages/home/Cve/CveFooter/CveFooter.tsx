@@ -48,9 +48,11 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
   useEffect(() => {
     events.on(REPLAYMSG, replyHandler);
     events.on(MUTILMSG, mutilHandler);
+    window.electron && window.electron.addIpcRendererListener("ScreenshotData",screenshotHandler,"screenshotListener")
     return () => {
       events.off(REPLAYMSG, replyHandler);
       events.off(MUTILMSG, mutilHandler);
+      window.electron && window.electron.removeIpcRendererListener("screenshotListener");
     };
   }, []);
 
@@ -74,11 +76,14 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
     if (atList.length > 0) {
       setAtList([]);
     }
-
     if (curCve.draftText !== "") {
       parseDrft(curCve.draftText);
     } else {
       setMsgContent("");
+    }
+    setMutilMsg([]);
+    return () => {
+      setDraft(curCve)
     }
   }, [curCve]);
 
@@ -106,6 +111,11 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
       });
     }
   };
+
+  const screenshotHandler = (ev:any,base64:string) => {
+    let img = `<img style="vertical-align:bottom" class="screenshot_el" src="${base64}" alt="" >`;
+    setMsgContent(latestContent.current + img);
+  }
 
   const reParseEmojiFace = (text: string) => {
     faceMap.map((f) => {
@@ -246,10 +256,7 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
     text = parseImg(parseEmojiFace(text));
     text = parseBr(text);
     forEachImgMsg();
-    if (text === "") {
-      reSet();
-      return;
-    }
+    if (text === "") return;
     switch (type) {
       case "text":
         sendTextMsg(text);
@@ -392,13 +399,8 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
     const sortedMsg = mutilMsg.sort((a, b) => a.sendTime - b.sendTime);
 
     let tmm: string[] = [];
-    sortedMsg.map((m) => {
-      const obj = {
-        name: m.senderNickname,
-        content: parseMsg(m),
-      };
-      tmm.push(JSON.stringify(obj));
-    });
+    const tmpArr = sortedMsg.length > 5 ? sortedMsg.slice(0, 4) : sortedMsg;
+    tmpArr.map((m) => tmm.push(`${m.senderNickname}：${parseMsg(m)}`));
 
     const options = {
       messageList: [...sortedMsg],

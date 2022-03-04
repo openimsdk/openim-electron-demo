@@ -3,6 +3,7 @@ import { initLocalWs, killLocalWs } from ".";
 import { win } from "../main";
 import { getApiAddress, getWsAddress, getWsPort, setApiAddress, setWsAddress, setWsPort } from '../store'
 import { setTrayTitle } from "./tray";
+import { screenshot } from "./srcShot"
 
 ipcMain.on("GetIMConfig",(e)=>{
     const config = {
@@ -48,4 +49,8 @@ ipcMain.on("MaxSizeApp",(e)=>{
 
 ipcMain.on("CloseApp",(e)=>{
     app.quit();
+})
+
+ipcMain.on("Screenshot",e=>{
+    e.returnValue = screenshot()
 })
