@@ -1,5 +1,6 @@
 export type APIKey = "electron";
 export type API = {
+  platform: number;
   isMac: boolean;
   getLocalWsAddress: () => string;
   getIMConfig: () => any;

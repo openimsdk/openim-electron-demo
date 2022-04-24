@@ -141,14 +141,9 @@ const Login = () => {
     localStorage.setItem(`lastimuid`, userID);
 
     let url = getIMUrl();
-    let platformID = 5;
+    let platformID = window.electron ? window.electron.platform : 5
     if (window.electron) {
       url = await window.electron.getLocalWsAddress();
-      // if(window.process.platform==="darwin"){
-      //   platformID = 4
-      // }else if(window.process.platform==="win32"){
-      //   platformID = 3
-      // }
     }
     const config: InitConfig = {
       userID,

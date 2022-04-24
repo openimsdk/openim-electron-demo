@@ -11,6 +11,19 @@ const isMac = platform === "darwin"
 
 let listeners:any = {};
 
+const getPlatform = () => {
+    switch (platform) {
+      case "darwin":
+        return 4;
+      case "win32":
+        return 3;
+      case "linux":
+        return 7;
+      default:
+        return 5;
+    }
+  };
+
 const getLocalWsAddress = () => {
     let ips = [];
     const intf = networkInterfaces();
@@ -71,6 +84,7 @@ const screenshot = () => {
 }
 
 export const api:API = {
+    platform: getPlatform(),
     isMac,
     getLocalWsAddress,
     getIMConfig,
