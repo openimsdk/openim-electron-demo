@@ -36,6 +36,7 @@ export const pySegSort = (arr: any[]) => {
       data: [], //数据
     };
     arr.map((v, index) => {
+      if(!v.nickname) return;
       // 特殊字符
       if (pattern.test(v?.nickname[0])) {
         if ((!zh[i - 1] || zh[i - 1].localeCompare(v?.nickname) <= 0) && v?.nickname.localeCompare(zh[i]) == -1) {
