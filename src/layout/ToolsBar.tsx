@@ -167,7 +167,6 @@ const ToolsBar: FC<ToolsBarProps> = ({ userInfo }) => {
     localStorage.setItem("IMAxiosUrl",IMAxiosUrl);
     localStorage.setItem("IMUrl",IMUrl);
     localStorage.setItem("IMAdminUrl",IMAdminUrl);
-    localStorage.setItem("IMAdminUrl",IMAdminUrl);
     localStorage.setItem("lastimuid",LastUid!);
     navigate("/login");
   };

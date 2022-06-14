@@ -93,7 +93,7 @@ export const createNotification = (message: MessageItem, click?: (id: string, ty
     const title = message.contentType === tipsTypes.FRIENDADDED ? t("FriendNotice") : message.senderNickname;
     const notification = new Notification(title, {
       dir: "auto",
-      tag: tag ?? (message.groupID === "" ? message.sendID : message.groupID),
+      tag: tag ?? message.groupID ?? message.sendID,
       renotify: true,
       icon: message.senderFaceUrl,
       body: parseMessageType(message),
