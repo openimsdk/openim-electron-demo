@@ -41,7 +41,6 @@ const LoginForm: FC<IProps> = (props) => {
   const { t } = useTranslation();
   const [btmSts, { set: setBtm }] = useToggle();
   const [backSts, { set: setBack }] = useToggle();
-  const [checkSts, { toggle: toggleCheck }] = useToggle(true);
   const [sInfo, setSInfo] = useState<InfoField>({
     userID: "userID",
     nickname: "",
@@ -50,8 +49,8 @@ const LoginForm: FC<IProps> = (props) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    const btmShow = ["login","register"]
-    const backShow = ["register","vericode","modifySend","modifycode"]
+    const btmShow = ["login", "register"];
+    const backShow = ["register", "vericode", "modifySend", "modifycode"];
     setBtm(btmShow.includes(type!));
     setBack(backShow.includes(type!));
   }, [type]);
@@ -96,11 +95,7 @@ const LoginForm: FC<IProps> = (props) => {
   };
 
   const comfirmEnter = (value: any) => {
-    if (checkSts) {
-      finish(value);
-    } else {
-      message.warn(t("CheckAgreement"));
-    }
+    finish(value);
   };
 
   const switchBtnText = () => {
@@ -257,12 +252,6 @@ const LoginForm: FC<IProps> = (props) => {
 
   const bottomAccess = (
     <div>
-      <Checkbox checked={checkSts} defaultChecked={checkSts} onChange={() => toggleCheck()}>
-        {t("LoginNotice")}
-        <span className="primary">{` ${t("UserAgreement")} `}</span>
-        {t("And")}
-        <span className="primary">{` ${t("PrivacyAgreement")} `}</span>
-      </Checkbox>
       {type === "login" ? (
         <div className="access_bottom">
           <span onClick={() => finish("modifySend")}>{t("MissPwd")}</span>
