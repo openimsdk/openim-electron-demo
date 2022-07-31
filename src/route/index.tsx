@@ -1,6 +1,7 @@
 import { BrowserRouter, HashRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import Mylayout from "../layout/MyLayout";
-import Login from "../pages/login/Login";
+// import Login from "../pages/login/Login";
+import LoginQiulu from "../pages/qiulu-login/Login";
 import Home from "../pages/home/Cve/cve";
 import Contacts from "../pages/home/Contact/contacts";
 import Profile from "../pages/home/Profile/Profile";
@@ -361,7 +362,7 @@ const Auth = () => {
 
   const imLogin = async () => {
     let url = getIMUrl();
-    let platformID = window.electron ? window.electron.platform : 5
+    let platformID = window.electron ? window.electron.platform : 5;
     if (window.electron) {
       url = await window.electron.getLocalWsAddress();
     }
@@ -459,7 +460,8 @@ const MyRoute = () => {
           <Route path="contacts" element={<Contacts />} />
           <Route path="profile" element={<Profile />} />
         </Route>
-        <Route path="/login" element={<Login />} />
+        {/* <Route path="/login" element={<Login />} /> */}
+        <Route path="/login" element={<LoginQiulu />} />
       </Routes>
     </RouterWrapper>
   );
