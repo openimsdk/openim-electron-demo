@@ -46,7 +46,8 @@ const Login = () => {
           toggle(values);
         } else {
           if ((values as FormField).phoneNo == undefined || (values as FormField).password == undefined) return false;
-          toggle("success");
+          // 跳转到身份验证
+          toggle("identity");
           login(values as FormField);
         }
         break;
@@ -153,20 +154,22 @@ const Login = () => {
     };
     im.login(config)
       .then((res) => {
-        dispatch(getSelfInfo());
-        dispatch(getCveList());
-        dispatch(getFriendList());
-        dispatch(getRecvFriendApplicationList());
-        dispatch(getSentFriendApplicationList());
-        dispatch(getGroupList());
-        dispatch(getRecvGroupApplicationList());
-        dispatch(getSentGroupApplicationList());
-        dispatch(getUnReadCount());
-        dispatch(getBlackList());
-        dispatch(getAdminToken());
-        if (lastType.current === "success") {
-          navigate("/", { replace: true });
+        // 先进入身份页面
+        if (lastType.current === "identity") {
+          navigate("/identity", { replace: true });
         }
+
+        // dispatch(getSelfInfo());
+        // dispatch(getCveList());
+        // dispatch(getFriendList());
+        // dispatch(getRecvFriendApplicationList());
+        // dispatch(getSentFriendApplicationList());
+        // dispatch(getGroupList());
+        // dispatch(getRecvGroupApplicationList());
+        // dispatch(getSentGroupApplicationList());
+        // dispatch(getUnReadCount());
+        // dispatch(getBlackList());
+        // dispatch(getAdminToken());
       })
       .catch((err) => handleError(err));
   };

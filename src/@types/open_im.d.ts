@@ -1,7 +1,7 @@
-export type Itype = "login" | "register" | "vericode" | "setPwd" | "setInfo" | "success" | "modifycode" | "modify" | "modifySend";
+export type Itype = "login" | "register" | "vericode" | "setPwd" | "setInfo" | "success" | "modifycode" | "modify" | "modifySend" | "identity";
 
-export type WrapFriendApplicationItem = FriendApplicationItem & { flag?: number }
-export type WrapGroupApplicationItem = GroupApplicationItem & { flag?: number }
+export type WrapFriendApplicationItem = FriendApplicationItem & { flag?: number };
+export type WrapGroupApplicationItem = GroupApplicationItem & { flag?: number };
 // export type Cve = {
 //   conversationID: string;
 //   conversationType: number;
