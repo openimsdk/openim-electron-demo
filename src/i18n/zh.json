@@ -1,7 +1,7 @@
 {
     "LoginTitle":"在线化办公",
     "LoginSubTitle":"多人协作，打造高效办公方式",
-    "LoginFormTitle":"欢迎使用OpenIM",
+    "LoginFormTitle":"口袋学校",
     "PhoneNumber":"手机号码",
     "Password":"密码",
     "PhoneNumberTip":"请输入手机号码",
@@ -112,7 +112,7 @@
     "FriendVerification":"好友验证",
     "SelfInfo":"个人信息",
     "UserInfo":"用户信息",
-    "Nickname":"昵称", 
+    "Nickname":"昵称",
     "Sex":"性别",
     "Age":"年龄",
     "Birthday":"生日",

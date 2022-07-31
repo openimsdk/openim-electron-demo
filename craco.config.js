@@ -1,6 +1,6 @@
 const CracoLessPlugin = require("craco-less");
 const path = require("path");
-const { whenProd,getPlugin,pluginByName } = require("@craco/craco");
+const { whenProd, getPlugin, pluginByName } = require("@craco/craco");
 const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
@@ -89,7 +89,10 @@ module.exports = {
         lessLoaderOptions: {
           lessOptions: {
             modifyVars: {
-              "@primary-color": "#428BE5",
+              // "@font-family": "PingFang SC", // 字体家族
+              // "@primary-color": "rgb(45, 153, 255)",
+              // "@text-color": "rgba(26, 25, 38, 1)", // 主文本色
+              // "@text-color-secondary": "rgba(26, 25, 38, 0.65)", // 次文本色
             },
             javascriptEnabled: true,
           },

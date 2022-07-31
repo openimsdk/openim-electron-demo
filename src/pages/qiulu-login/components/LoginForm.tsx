@@ -111,28 +111,23 @@ const LoginForm: FC<IProps> = (props) => {
 
   const loginAndRegisterForm = (
     <>
-      <div className="form_title">{type === "modifySend" ? t("MissPwd") : t("LoginFormTitle")}</div>
+      <div className="form_logo"></div>
+
+      <div className="form_title mb_gap">{type === "modifySend" ? t("MissPwd") : t("LoginFormTitle")}</div>
+
       <Form onFinish={comfirmEnter} layout="vertical" initialValues={initialValues}>
-        <Form.Item className="no_mb" label={t("PhoneNumber")}>
-          <Input.Group compact>
-            <Form.Item name="areaCode">
-              <Select bordered={false}>
-                <Option value={"86"}>+86</Option>
-                <Option value={"89"}>+89</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item name="phoneNo" rules={phoneRules}>
-              <Input bordered={false} placeholder={t("PhoneNumberTip")} />
-            </Form.Item>
-          </Input.Group>
+        <Form.Item label={t("PhoneNumber")} name="phoneNo" rules={phoneRules} className="mb_gap">
+          <Input placeholder={t("PhoneNumberTip")} className="form_input" />
         </Form.Item>
+
         {type === "login" ? (
-          <Form.Item name="password" label={t("Password")} rules={pwdRules}>
-            <Input.Password style={{ width: "100%" }} bordered={false} placeholder={t("PasswordTip")} allowClear />
+          <Form.Item name="password" label={t("Password")} rules={pwdRules} className="mb_gap">
+            <Input.Password placeholder={t("PasswordTip")} allowClear className="form_input" />
           </Form.Item>
         ) : null}
+
         <Form.Item>
-          <Button loading={loading} htmlType="submit" type="primary">
+          <Button loading={loading} className="form_submit" htmlType="submit" type="primary">
             {switchBtnText()}
           </Button>
         </Form.Item>
