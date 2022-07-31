@@ -2,6 +2,7 @@ import top_mini from "@/assets/images/top_mini.png";
 import top_max from "@/assets/images/top_max.png";
 import top_close from "@/assets/images/top_close.png";
 
+// TopBar的作用是显示 关闭/最小化/最大化的功能栏
 const TopBar = () => {
   const miniSizeApp = () => {
     window.electron && window.electron.miniSizeApp();
