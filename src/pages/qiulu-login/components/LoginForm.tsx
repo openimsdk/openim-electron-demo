@@ -284,7 +284,7 @@ const LoginForm: FC<IProps> = (props) => {
     <div className="login_form">
       {backSts && backIcon}
       {getForm()}
-      {btmSts && bottomAccess}
+      {/* {btmSts && bottomAccess} */}
     </div>
   );
 };
