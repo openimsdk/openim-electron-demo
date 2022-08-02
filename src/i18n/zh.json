@@ -37,6 +37,7 @@
     "PhoneRule":"请输入正确格式手机号",
     "PassWordRule":"请输入正确6-20位字符密码",
     "PassWordRepeat":"两次输入的密码不一致!",
+    "VerifyCodeRule": "请输入正确6位验证码",
     "SendSuccessTip":"验证码已发送！",
     "SendDefaultTip":"后台未正确配置短信服务，请使用超级验证码注册！",
     "CodeExpired":"验证码过期！",

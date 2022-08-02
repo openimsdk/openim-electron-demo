@@ -37,6 +37,7 @@
     "PhoneRule":"Please enter your mobile phone number in correct format",
     "PassWordRule":"Please enter the correct 6-20 character password",
     "PassWordRepeat":"The password entered twice is inconsistent!",
+    "VerifyCodeRule": "Please enter the correct 6 character verify code",
     "SendSuccessTip":"Verification code sent!",
     "SendDefaultTip":"The SMS service is not correctly configured in the background, please use the super verification code to register!",
     "CodeExpired":"Verification code expired!",

@@ -1,8 +1,8 @@
 import { Input, Button, Checkbox, Form, Select, Spin, Upload, message } from "antd";
 import { LeftOutlined } from "@ant-design/icons";
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import { UploadRequestOption } from "rc-upload/lib/interface";
-import { useToggle } from "ahooks";
+import { useToggle, useCountDown } from "ahooks";
 import { findEmptyValue } from "../../../utils/common";
 import { cosUpload } from "../../../utils";
 import { MyAvatar } from "../../../components/MyAvatar";
@@ -11,7 +11,7 @@ import CodeBox from "./CodeBox";
 import { useTranslation } from "react-i18next";
 import { Itype } from "../../../@types/open_im";
 import { getCosAuthorization } from "../../../utils/cos";
-import { sendSms } from "../../../api/login";
+import { sendSms, verifyCode } from "../../../api/login";
 
 const { Option } = Select;
 
@@ -48,6 +48,12 @@ const LoginForm: FC<IProps> = (props) => {
   });
   const [form] = Form.useForm();
 
+  // 验证码的倒计时, = 0 显示获取验证码, > 0 显示倒计时
+  const [targetDate, setTargetDate] = useState<number>();
+  const [countdown] = useCountDown({
+    targetDate,
+  });
+
   useEffect(() => {
     const btmShow = ["login", "register"];
     const backShow = ["register", "vericode", "modifySend", "modifycode"];
@@ -68,6 +74,15 @@ const LoginForm: FC<IProps> = (props) => {
       message: t("PassWordRule"),
       min: 6,
       max: 20,
+      validateTrigger: "onFinish",
+    },
+  ];
+
+  const verifyCodeRules = [
+    {
+      message: t("VerifyCodeRule"),
+      min: 6,
+      max: 6,
       validateTrigger: "onFinish",
     },
   ];
@@ -109,6 +124,15 @@ const LoginForm: FC<IProps> = (props) => {
     }
   };
 
+  const sendVerifyCode = useCallback(() => {
+    // 此处调用接口
+    // 正确做一个提示
+    setTargetDate(Date.now() + 6 * 1000);
+    message.info("验证码已发送");
+    // 错误也做一个提示
+    message.error("服务器发生错误，请联系管理员");
+  }, []);
+
   const loginAndRegisterForm = (
     <>
       <div className="form_logo"></div>
@@ -121,8 +145,16 @@ const LoginForm: FC<IProps> = (props) => {
         </Form.Item>
 
         {type === "login" ? (
-          <Form.Item name="password" label={t("Password")} rules={pwdRules} className="mb_gap">
-            <Input.Password placeholder={t("PasswordTip")} allowClear className="form_input" />
+          <Form.Item label={t("Code")} className="mb_gap">
+            <Input.Group size="large">
+              <Form.Item name="verifyCode" rules={verifyCodeRules} noStyle>
+                <Input style={{ width: "calc(100% - 150px)" }} className="form_input" />
+              </Form.Item>
+
+              <Button type="link" style={{ width: "150px" }} className="form_input" onClick={sendVerifyCode} disabled={countdown > 0}>
+                {countdown === 0 ? "获取验证码" : `${Math.round(countdown / 1000)}秒重新获取`}
+              </Button>
+            </Input.Group>
           </Form.Item>
         ) : null}
 
