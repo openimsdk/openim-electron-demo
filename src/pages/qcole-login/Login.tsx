@@ -26,7 +26,7 @@ import {
 import IMConfigModal from "./components/IMConfigModal";
 import TopBar from "../../components/TopBar";
 import { InitConfig } from "../../utils/open_im_sdk/types";
-import { signin } from "../../api/qcole";
+import { signin } from "@/api/qcole";
 
 const Login = () => {
   const { t } = useTranslation();
@@ -129,7 +129,6 @@ const Login = () => {
   const qcoleLogin = (data: FormField) => {
     signin(data.phoneNo, data.verifyCode)
       .then((res) => {
-        localStorage.clear();
         localStorage.setItem("userToken", res.token);
         // 跳转到身份选择页面
         navigate("/identity", { replace: true });

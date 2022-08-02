@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 import { Itype } from "../../../@types/open_im";
 import { getCosAuthorization } from "../../../utils/cos";
 import { sendSms, verifyCode } from "../../../api/login";
-import { sms_code } from "../../../api/qcole";
+import { sms_code } from "@/api/qcole";
 
 const { Option } = Select;
 

@@ -20,7 +20,11 @@
     "inlineSources": true,
     "inlineSourceMap": true,
     "jsx": "react-jsx",
-    "allowJs": true
+    "allowJs": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": [
     "src"
