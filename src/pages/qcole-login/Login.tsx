@@ -26,6 +26,7 @@ import {
 import IMConfigModal from "./components/IMConfigModal";
 import TopBar from "../../components/TopBar";
 import { InitConfig } from "../../utils/open_im_sdk/types";
+import { signin } from "../../api/qcole";
 
 const Login = () => {
   const { t } = useTranslation();
@@ -45,10 +46,10 @@ const Login = () => {
         if (values === "register" || values === "modifySend") {
           toggle(values);
         } else {
-          if ((values as FormField).phoneNo == undefined || (values as FormField).password == undefined) return false;
-          // 跳转到身份验证
-          toggle("identity");
-          login(values as FormField);
+          if ((values as FormField).phoneNo === undefined || (values as FormField).verifyCode === undefined) return false;
+
+          // 秋炉的登录接口
+          qcoleLogin(values as FormField);
         }
         break;
       case "register":
@@ -122,6 +123,19 @@ const Login = () => {
       .catch((err) => {
         toggle("setInfo");
         message.error(t("SetInfoFailed"));
+      });
+  };
+
+  const qcoleLogin = (data: FormField) => {
+    signin(data.phoneNo, data.verifyCode)
+      .then((res) => {
+        localStorage.clear();
+        localStorage.setItem("userToken", res.token);
+        // 跳转到身份选择页面
+        navigate("/identity", { replace: true });
+      })
+      .catch((err) => {
+        handleError(err);
       });
   };
 

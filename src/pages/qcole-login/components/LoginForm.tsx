@@ -20,6 +20,7 @@ export type FormField = {
   areaCode: string;
   phoneNo: string;
   password?: string;
+  verifyCode: string;
 };
 
 export type InfoField = {

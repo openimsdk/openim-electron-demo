@@ -13,6 +13,8 @@ function handleError(error: AxiosError) {
 
 request.interceptors.request.use(
   (config) => {
+    config.headers.userToken = localStorage.getItem("userToken") || "";
+    config.headers.memberToken = localStorage.getItem("memberToken") || "";
     return config;
   },
   function (error) {
