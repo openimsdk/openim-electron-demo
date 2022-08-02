@@ -12,3 +12,5 @@ export const getIMUrl = () => (localStorage.getItem("IMUrl") ? localStorage.getI
 export const getAxiosUrl = () => (localStorage.getItem("IMAxiosUrl") ? localStorage.getItem("IMAxiosUrl")! : AXIOSURL);
 export const getAdminUrl = () => (localStorage.getItem("IMAdminUrl") ? localStorage.getItem("IMAdminUrl")! : ADMINURL);
 export const getLanguage = () => (localStorage.getItem("IMLanguage") ? localStorage.getItem("IMLanguage")! : LANGUAGE);
+
+export const getQcoleUrl = () => (localStorage.getItem("QcoleUrl") ? localStorage.getItem("QcoleUrl")! : QCOLEURL);

@@ -1,7 +1,7 @@
 import { BrowserRouter, HashRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import Mylayout from "../layout/MyLayout";
 // import Login from "../pages/login/Login";
-import LoginQiulu from "../pages/qiulu-login/Login";
+import LoginQcole from "../pages/qcole-login/Login";
 import Identity from "../pages/identity/Identity";
 import Home from "../pages/home/Cve/cve";
 import Contacts from "../pages/home/Contact/contacts";
@@ -462,7 +462,7 @@ const MyRoute = () => {
           <Route path="profile" element={<Profile />} />
         </Route>
         {/* <Route path="/login" element={<Login />} /> */}
-        <Route path="/login" element={<LoginQiulu />} />
+        <Route path="/login" element={<LoginQcole />} />
         <Route path="/identity" element={<Identity />} />
       </Routes>
     </RouterWrapper>

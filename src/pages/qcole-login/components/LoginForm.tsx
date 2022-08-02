@@ -1,6 +1,6 @@
 import { Input, Button, Checkbox, Form, Select, Spin, Upload, message } from "antd";
 import { LeftOutlined } from "@ant-design/icons";
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import { UploadRequestOption } from "rc-upload/lib/interface";
 import { useToggle, useCountDown } from "ahooks";
 import { findEmptyValue } from "../../../utils/common";
@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { Itype } from "../../../@types/open_im";
 import { getCosAuthorization } from "../../../utils/cos";
 import { sendSms, verifyCode } from "../../../api/login";
+import { sms_code } from "../../../api/qcole";
 
 const { Option } = Select;
 
@@ -125,13 +126,24 @@ const LoginForm: FC<IProps> = (props) => {
   };
 
   const sendVerifyCode = useCallback(() => {
-    // 此处调用接口
-    // 正确做一个提示
-    setTargetDate(Date.now() + 6 * 1000);
-    message.info("验证码已发送");
-    // 错误也做一个提示
-    message.error("服务器发生错误，请联系管理员");
-  }, []);
+    // 对手机号进行校验
+    form
+      .validateFields(["phoneNo"])
+      .then((values) => {
+        console.log(`🚀 ~ file: LoginForm.tsx ~ line 131 ~ form.validateFields ~ values`, values);
+        // 手机号正确就调用接口
+        sms_code(values.phoneNo)
+          .then((response) => {
+            message.info("验证码已发送");
+            setTargetDate(Date.now() + 60 * 1000);
+          })
+          .catch((error) => {
+            message.error("服务器发生错误，请联系管理员");
+          });
+      })
+      // 手机号错误会被拦截
+      .catch((errorInfo) => {});
+  }, [form]);
 
   const loginAndRegisterForm = (
     <>
@@ -139,7 +151,7 @@ const LoginForm: FC<IProps> = (props) => {
 
       <div className="form_title mb_gap">{type === "modifySend" ? t("MissPwd") : t("LoginFormTitle")}</div>
 
-      <Form onFinish={comfirmEnter} layout="vertical" initialValues={initialValues}>
+      <Form form={form} onFinish={comfirmEnter} layout="vertical" initialValues={initialValues}>
         <Form.Item label={t("PhoneNumber")} name="phoneNo" rules={phoneRules} className="mb_gap">
           <Input placeholder={t("PhoneNumberTip")} className="form_input" />
         </Form.Item>

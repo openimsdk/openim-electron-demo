@@ -1,4 +1,5 @@
 import request from "./request";
+import qcoleRequest from "./qcole-request";
 import { cosUpload, cosUploadNomal, cos } from "./cos";
 import events from "./events";
 
@@ -20,4 +21,4 @@ export {
   downloadFileUtil,
 } from "./common";
 
-export { request, cos, events, cosUpload, cosUploadNomal };
+export { request, qcoleRequest, cos, events, cosUpload, cosUploadNomal };
