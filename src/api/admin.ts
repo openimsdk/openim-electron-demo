@@ -19,7 +19,7 @@ export const getAuthToken = (uid?:string,secret?:string) =>
 
 export const getOnline = async (userIDList: string[],token:string, opid?: string):Promise<OnLineResType> =>{
   return request.post(
-      "/manager/get_users_online_status",
+      "/user/get_users_online_status",
       JSON.stringify({
         operationID: opid ?? uuid("uuid"),
         userIDList,
@@ -32,4 +32,4 @@ export const getOnline = async (userIDList: string[],token:string, opid?: string
       }
     );
 }
-   
+
