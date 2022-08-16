@@ -1,3 +1,4 @@
+![avatar](https://github.com/OpenIMSDK/OpenIM-Docs/blob/main/docs/images/WechatIMG20.jpeg)
 # OpenMetaOffice-Electron
 
 ## About us
