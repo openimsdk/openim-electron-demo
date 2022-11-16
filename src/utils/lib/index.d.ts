@@ -1,0 +1,1 @@
+export { getSDK } from './sdk';

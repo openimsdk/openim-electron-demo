@@ -72,6 +72,7 @@ const GroupCard: FC<GroupCardProps> = ({
     const param = {
       groupID: info.groupID!,
       reqMsg:reqMessage,
+      joinSource: 3
     };
     im.joinGroup(param)
       .then((res) => {

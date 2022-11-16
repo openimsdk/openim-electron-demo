@@ -1,10 +1,13 @@
 // import { OpenIMSDK } from 'open-im-sdk'
 import { t } from "i18next";
+// import { getSDK } from "open-im-sdk-wasm-webpack4";
 import { messageTypes, SessionType, tipsTypes } from "../constants/messageContentType";
-import { OpenIMSDK } from "./open_im_sdk";
+import { getSDK } from "./lib";
+// import { OpenIMSDK } from "./open_im_sdk";
 import { ConversationItem, MessageItem } from "./open_im_sdk/types";
 
-export const im = new OpenIMSDK();
+// export const im = new OpenIMSDK();
+export const im = getSDK()
 
 //utils
 export const isSingleCve = (cve: ConversationItem) => {

@@ -7,9 +7,9 @@ import { useHistoryTravel, useLatest } from "ahooks";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import md5 from "md5";
-import { login as loginApi, modify, register, sendSms, UsedFor, verifyCode } from "../../api/login";
+import { login as loginApi, modify, register, reset, sendSms, UsedFor, verifyCode } from "../../api/login";
 import { im } from "../../utils";
-import { getIMUrl, IMURL } from "../../config";
+import { getIMApiUrl, getIMWsUrl, IM_WS_URL } from "../../config";
 import { useDispatch } from "react-redux";
 import { getSelfInfo, getAdminToken, setSelfInfo } from "../../store/actions/user";
 import { getCveList } from "../../store/actions/cve";
@@ -37,6 +37,12 @@ const Login = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { value: type, setValue: setType, back } = useHistoryTravel<Itype>("login");
   const lastType = useLatest(type);
+  const [formData, setFormData] = useState({
+    no: "",
+    code: "",
+    pwd: "",
+    areaCode: "86",
+  });
 
   const finish = (values?: FormField | string | InfoField) => {
     switch (lastType.current) {
@@ -45,7 +51,7 @@ const Login = () => {
         if (values === "register" || values === "modifySend") {
           toggle(values);
         } else {
-          if ((values as FormField).phoneNo == undefined || (values as FormField).password == undefined) return false;
+          if (!(values as FormField).phoneNo || !(values as FormField).password) return false;
           toggle("success");
           login(values as FormField);
         }
@@ -53,42 +59,61 @@ const Login = () => {
       case "register":
       case "modifySend":
         const isModify = lastType.current === "modifySend";
-        sendSms((values as FormField)?.phoneNo as string, isModify ? UsedFor.Modify : UsedFor.Register)
+        sendSms((values as FormField)?.phoneNo as string, (values as FormField)?.areaCode, isModify ? UsedFor.Modify : UsedFor.Register)
           .then((res: any) => {
-            if (res.errCode === 0) {
-              message.success(t("SendSuccessTip"));
-            } else if (res.errCode === 10007 || res.errCode === 10008) {
-              handleError(res);
-            }
-            setNum((values as FormField)?.phoneNo);
-              toggle(isModify ? "modifycode" : "vericode");
+            setFormData({
+              no: (values as FormField)?.phoneNo,
+              pwd: "",
+              code: "",
+              areaCode: (values as FormField)?.areaCode,
+            });
+            toggle(isModify ? "modifycode" : "vericode");
           })
           .catch((err) => handleError(err));
         break;
       case "modifycode":
       case "vericode":
         const isRegister = lastType.current === "vericode";
-        verifyCode(num, values as string, isRegister ? UsedFor.Register : UsedFor.Modify)
+        verifyCode(formData.no, formData.areaCode, values as string, isRegister ? UsedFor.Register : UsedFor.Modify)
           .then((res: any) => {
-            setCode(values as string);
+            setFormData({
+              ...formData,
+              no: formData.no,
+              pwd: "",
+              code: values as string,
+            });
             toggle(isRegister ? "setPwd" : "modify");
           })
           .catch((err) => handleError(err));
         break;
       case "setPwd":
-        register(num, code, md5((values as FormField).password as string))
-          .then((res: any) => {
-            imLogin(res.data.userID, res.data.token);
-            toggle("setInfo");
-          })
-          .catch((err) => handleError(err));
+        setFormData({
+          ...formData,
+          pwd: (values as FormField).password as string,
+        });
+        toggle("setInfo");
         break;
       case "setInfo":
         toggle("success");
-        setIMInfo(values as InfoField);
+        const data = values as InfoField;
+        // setIMInfo(values as InfoField);
+        const options = {
+          phoneNumber: formData.no,
+          areaCode: formData.areaCode,
+          verificationCode: formData.code,
+          password: md5(formData.pwd),
+          faceURL: data.faceURL,
+          nickname: data.nickname,
+        };
+        register(options)
+          .then((res: any) => {
+            localStorage.setItem(`accountProfile-${res.data.userID}`, res.data.chatToken);
+            imLogin(res.data.userID, res.data.imToken);
+          })
+          .catch((err) => handleError(err));
         break;
       case "modify":
-        modify(num, code, md5((values as FormField).password as string))
+        reset(formData.no, formData.areaCode, formData.code, md5((values as FormField).password as string))
           .then(() => {
             message.info(t("ModifyPwdSucTip"));
             toggle("login");
@@ -103,7 +128,7 @@ const Login = () => {
 
   const getCodeAgain = async () => {
     const isModify = type === "modifycode";
-    const result: any = await sendSms(num, isModify ? UsedFor.Modify : UsedFor.Register);
+    const result: any = await sendSms(formData.no, formData.areaCode, isModify ? UsedFor.Modify : UsedFor.Register);
     if (result.errCode === 0) {
       message.success(t("SendSuccessTip"));
     } else {
@@ -125,9 +150,10 @@ const Login = () => {
   };
 
   const login = (data: FormField) => {
-    loginApi(data.phoneNo, md5(data.password as string))
+    localStorage.setItem('IMAccount',data.phoneNo)
+    loginApi(data.phoneNo,data.areaCode, md5(data.password as string))
       .then((res) => {
-        imLogin(res.data.userID, res.data.token);
+        imLogin(res.data.userID, res.data.imToken);
       })
       .catch((err) => {
         handleError(err);
@@ -140,15 +166,12 @@ const Login = () => {
     //pc
     localStorage.setItem(`lastimuid`, userID);
 
-    let url = getIMUrl();
-    let platformID = window.electron ? window.electron.platform : 5
-    if (window.electron) {
-      url = await window.electron.getLocalWsAddress();
-    }
-    const config: InitConfig = {
+    let platformID = window.electron ? window.electron.platform : 5;
+    const config = {
       userID,
       token,
-      url,
+      apiAddress: getIMApiUrl(),
+      wsAddress: getIMWsUrl(),
       platformID,
     };
     im.login(config)
@@ -163,7 +186,6 @@ const Login = () => {
         dispatch(getSentGroupApplicationList());
         dispatch(getUnReadCount());
         dispatch(getBlackList());
-        dispatch(getAdminToken());
         if (lastType.current === "success") {
           navigate("/", { replace: true });
         }
@@ -171,34 +193,51 @@ const Login = () => {
       .catch((err) => handleError(err));
   };
 
-  const switchError = (errCode: number) => {
+  const switchLoginError = (errCode: number) => {
     switch (errCode) {
-      case 10002:
+      case 20001:
         return t("HasRegistered");
-      case 10003:
-        return t("NotRegistered");
-      case 10004:
-        return t("PasswordErr");
-      case 10006:
+      case 20002:
         return t("RepeatSendCode");
-      case 10007:
-        return t("MailSendCodeErr");
-      case 10008:
-        return t("SmsSendCodeErr");
-      case 10009:
-        return t("CodeInvalidOrExpired");
-      case 10010:
-        return t("RegisterFailed");
+      case 20003:
+        return t("InviteCodeError");
+      case 20004:
+        return t("IPLimit");
+      case 30001:
+        return t("CodeError");
+      case 30002:
+        return t("CodeExpired");
+      case 30003:
+        return t("InviteCodeUsed");
+      case 30004:
+        return t("InviteCodeNotFound");
+      case 40001:
+        return t("NotRegistered");
+      case 40002:
+        return t("PasswordErr");
+      case 40003:
+        return t("IPLimit");
+      case 40004:
+        return t("IPForbidden");
+      case 50001:
+        return t("TokenExpired");
+      case 50002:
+        return t("TokenNotFormatted");
+      case 50003:
+        return t("TokenNotValid");
+      case 50004:
+        return t("TokenUnknowError");
+      case 50005:
+        return t("TokenCreationError");
       default:
         return undefined;
     }
   };
-
   const handleError = (error: any) => {
     if (lastType.current === "success") {
       toggle("login");
     }
-    message.error(switchError(error.errCode) ?? error.errMsg ?? t("AccessFailed"));
+    message.error(switchLoginError(error.errCode) ?? error.errMsg ?? t("AccessFailed"));
   };
 
   const toggle = (mtype: Itype) => {

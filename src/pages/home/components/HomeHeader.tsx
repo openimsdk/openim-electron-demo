@@ -32,7 +32,6 @@ const HomeHeader: FC<HeaderProps> = ({ isShowBt, type, title, curCve, typing, gi
   const [onlineNo, setOnlineNo] = useState(0);
   const groupMemberList = useSelector((state: RootState) => state.contacts.groupMemberList, shallowEqual);
   const groupMemberLoading = useSelector((state: RootState) => state.contacts.groupMemberLoading, shallowEqual);
-  const adminToken = useSelector((state: RootState) => state.user.adminToken, shallowEqual);
   const dispatch = useDispatch();
   const lastCve = useRef<ConversationItem | undefined>(undefined);
 
@@ -45,7 +44,7 @@ const HomeHeader: FC<HeaderProps> = ({ isShowBt, type, title, curCve, typing, gi
     lastCve.current = curCve;
     if (type === "chat") {
       if (isSingleCve(curCve!)) {
-        getOnline([curCve!.userID], adminToken).then((res) => {
+        getOnline([curCve!.userID]).then((res) => {
           const statusItem = res.data[0];
           if (statusItem.userID === curCve?.userID) {
             switchOnline(statusItem.status, statusItem.detailPlatformStatus);
@@ -81,12 +80,7 @@ const HomeHeader: FC<HeaderProps> = ({ isShowBt, type, title, curCve, typing, gi
     const total = Math.ceil(tmplist.length / 200);
     let promiseArr: Array<Promise<OnLineResType>> = [];
     for (let i = 0; i < total; i++) {
-      promiseArr.push(
-        getOnline(
-          tmplist.splice(0, 200).map((m) => m.userID),
-          adminToken
-        )
-      );
+      promiseArr.push(getOnline(tmplist.splice(0, 200).map((m) => m.userID)));
     }
 
     Promise.all(promiseArr).then((res) => {

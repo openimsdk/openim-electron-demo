@@ -4,7 +4,7 @@ import { FC, forwardRef, useImperativeHandle } from "react";
 import { UploadRequestOption } from "rc-upload/lib/interface";
 import { cosUpload, getPicInfo, getVideoInfo, im } from "../../../../utils";
 import Upload, { RcFile } from "antd/lib/upload";
-import { PICMESSAGETHUMOPTION } from "../../../../config";
+import { PIC_MESSAGE_THUMOPTION } from "../../../../config";
 import { faceMap } from "../../../../constants/faceType";
 import { messageTypes } from "../../../../constants/messageContentType";
 import send_id_card from "@/assets/images/send_id_card.png";
@@ -39,7 +39,7 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
       size: file.size,
       width: 200,
       height: 200,
-      url: url + PICMESSAGETHUMOPTION,
+      url: url + PIC_MESSAGE_THUMOPTION,
     };
     const imgInfo = {
       sourcePicture,

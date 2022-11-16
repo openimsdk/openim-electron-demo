@@ -17,6 +17,7 @@
     "i18next": "^21.6.5",
     "i18next-browser-languagedetector": "^6.1.2",
     "md5": "^2.3.0",
+    "open-im-sdk-wasm-webpack4": "^0.0.2",
     "react": "^17.0.2",
     "react-amap": "^1.2.8",
     "react-copy-to-clipboard": "^5.0.4",
@@ -52,7 +53,13 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "rules": {
+      "no-undef": "off",
+      "no-restricted-globals": "off",
+      "import/no-webpack-loader-syntax": "off",
+      "no-unused-expressions": "off"
+    }
   },
   "browserslist": {
     "production": [
@@ -97,7 +104,9 @@
     "terser-webpack-plugin": "^4.2.3",
     "wait-on": "^6.0.0",
     "webpack-bundle-analyzer": "^4.5.0",
-    "webpackbar": "^5.0.0-3"
+    "webpackbar": "^5.0.0-3",
+    "worker-loader": "^3.0.8",
+    "worker-plugin": "^5.0.1"
   },
   "resolutions": {
     "//": "See https://github.com/facebook/create-react-app/issues/11773",

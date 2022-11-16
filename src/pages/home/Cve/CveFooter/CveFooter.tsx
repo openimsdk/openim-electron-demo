@@ -1,6 +1,6 @@
 import { CloseCircleFilled, CloseOutlined } from "@ant-design/icons";
 import { Button, Layout, message } from "antd";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, memo, useEffect, useRef, useState } from "react";
 import { base64toFile, contenteditableDivRange, cosUploadNomal, events, im, isSingleCve, move2end } from "../../../../utils";
 import { messageTypes } from "../../../../constants/messageContentType";
 import { ATSTATEUPDATE, FORWARDANDMERMSG, ISSETDRAFT, MUTILMSG, MUTILMSGCHANGE, REPLAYMSG } from "../../../../constants/events";
@@ -467,4 +467,5 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
   );
 };
 
-export default CveFooter;
+export default memo(CveFooter, (p, n) => p.curCve.conversationID === n.curCve.conversationID && p.curCve.showName === n.curCve.showName);
+

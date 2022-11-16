@@ -8,7 +8,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { RootState } from "../store";
 import { events, im } from "../utils";
-import { getIMUrl } from "../config";
+import { getIMApiUrl, getIMWsUrl } from "../config";
 import { message, Modal, Spin } from "antd";
 import { getCveList, setCurCve, setCveList } from "../store/actions/cve";
 import {
@@ -87,6 +87,8 @@ const Auth = () => {
       im.getLoginStatus()
         .then((res) => setGolbalLoading(false))
         .catch((err) => {
+          console.log(err);
+          
           if (token && userID) {
             imLogin();
           }
@@ -273,7 +275,7 @@ const Auth = () => {
   }, [groupList, curCve, groupMemberList]);
 
   useEffect(() => {
-    im.on(CbEvents.ONTOTALUNREADMESSAGECOUNTCHANGED, (data) => {
+    im.on(CbEvents.ONTOTALUNREADMESSAGECOUNTCHANGED, (data:WsResponse) => {
       dispatch(setUnReadCount(Number(data.data)));
     });
   }, []);
@@ -360,22 +362,16 @@ const Auth = () => {
   }, [sentGroupApplicationList, recvGroupApplicationList]);
 
   const imLogin = async () => {
-    let url = getIMUrl();
     let platformID = window.electron ? window.electron.platform : 5
-    if (window.electron) {
-      url = await window.electron.getLocalWsAddress();
-    }
     const config = {
       userID,
       token,
-      url,
+      apiAddress: getIMApiUrl(),
+      wsAddress: getIMWsUrl(),
       platformID,
     };
     im.login(config)
       .then((res) => {
-        if (res.errCode !== 0) {
-          invalid();
-        } else {
           dispatch(getSelfInfo());
           dispatch(getCveList());
           dispatch(getFriendList());
@@ -386,9 +382,7 @@ const Auth = () => {
           dispatch(getSentGroupApplicationList());
           dispatch(getUnReadCount());
           dispatch(getBlackList());
-          dispatch(getAdminToken());
           setGolbalLoading(false);
-        }
       })
       .catch((err) => {
         invalid();

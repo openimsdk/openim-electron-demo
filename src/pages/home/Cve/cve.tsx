@@ -125,12 +125,14 @@ const Home = () => {
     events.on(SENDFORWARDMSG, sendForwardHandler);
     events.on(TOASSIGNCVE, assignHandler);
     im.on(CbEvents.ONRECVNEWMESSAGE, newMsgHandler);
+    im.on(CbEvents.ONRECVNEWMESSAGES, newMsgsHandler);
     return () => {
       events.off(SENDFORWARDMSG, sendForwardHandler);
       events.off(TOASSIGNCVE, assignHandler);
       im.off(CbEvents.ONRECVNEWMESSAGE, newMsgHandler);
+      im.off(CbEvents.ONRECVNEWMESSAGES, newMsgsHandler);
     };
-  }, [curCve]);
+  }, [curCve?.conversationID]);
 
   //  event hander
 
@@ -162,7 +164,19 @@ const Home = () => {
 
   //  im hander
   const newMsgHandler = (data: WsResponse) => {
+    console.log('newMsgHandler');
+    
     const newServerMsg: MessageItem = JSON.parse(data.data);
+    handelMsg(newServerMsg)
+  };
+
+  const newMsgsHandler = (data:WsResponse) => {
+    console.log('newMsgHandler:::');
+    const newServerMsgs: MessageItem[] = JSON.parse(data.data);
+    newServerMsgs.forEach(handelMsg)
+  }
+
+  const handelMsg = (newServerMsg:MessageItem) => {
     if (newServerMsg.contentType !== messageTypes.TYPINGMESSAGE && newServerMsg.sendID !== selfID) {
       createNotification(newServerMsg, (id, sessionType) => {
         assignHandler(id, sessionType);
@@ -183,7 +197,7 @@ const Home = () => {
         }
       }
     }
-  };
+  }
 
   const revokeMsgHandler = (data: WsResponse) => {
     const idx = rs.historyMsgList.findIndex((m) => m.clientMsgID === data.data);
@@ -284,11 +298,7 @@ const Home = () => {
 
   const markCveHasRead = (cve: ConversationItem, type?: number) => {
     if (cve.unreadCount === 0 && !type) return;
-    if (isSingleCve(cve)) {
-      markC2CHasRead(cve.userID, []);
-    } else {
-      im.markGroupMessageHasRead(cve.groupID);
-    }
+    im.markMessageAsReadByConID({conversationID: cve.conversationID,msgIDList: []})
   };
 
   const getOneCve = (sourceID: string, sessionType: number): Promise<ConversationItem> => {
@@ -297,10 +307,6 @@ const Home = () => {
         .then((res) => resolve(JSON.parse(res.data)))
         .catch((err) => reject(err));
     });
-  };
-
-  const markC2CHasRead = (userID: string, msgIDList: string[]) => {
-    im.markC2CMessageAsRead({ userID, msgIDList });
   };
 
   const getHistoryMsg = (uid?: string, gid?: string, sMsg?: MessageItem) => {
