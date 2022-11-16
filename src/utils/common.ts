@@ -8,6 +8,10 @@ import file_zip from "@/assets/images/file_zip.png";
 import { RcFile } from "antd/lib/upload";
 import axios from "axios";
 
+export const uuid = (uid:string):string => {
+  return (Math.random()*36).toString(36).slice(2)+new Date().getTime().toString()+uid;
+}
+
 export const findEmptyValue = (obj: any) => {
   let flag = true;
   for (let key in obj) {
@@ -192,13 +196,43 @@ export const getPicInfo = (file: RcFile): Promise<HTMLImageElement> => {
   });
 };
 
-export const getVideoInfo = (file: RcFile): Promise<number> => {
+export const getVideoInfo = (path: string): Promise<{ duration: number; snapshotUrl: string }> => {
   return new Promise((resolve, reject) => {
-    const Url = URL.createObjectURL(file);
-    const vel = new Audio(Url);
-    vel.onloadedmetadata = function () {
-      resolve(vel.duration);
+    const vel = new Audio(path);
+    vel.onloadedmetadata = async function () {
+      const snapshotUrl = await getVideoSnshot(path);
+      resolve({
+        duration: vel.duration,
+        snapshotUrl,
+      });
     };
+  });
+};
+
+export const getVideoSnshot = (item: string): Promise<string> => {
+  return new Promise((reslove, reject) => {
+    var video = document.createElement("VIDEO");
+    video.setAttribute("autoplay", "autoplay");
+    video.setAttribute("muted", "muted");
+    video.innerHTML = "<source src=" + item + ' type="audio/mp4">';
+    var canvas = document.createElement("canvas");
+    var ctx = canvas.getContext("2d");
+    video.addEventListener("canplay", function () {
+      var anw = document.createAttribute("width");
+      //@ts-ignore
+      anw.nodeValue = 500;
+      var anh = document.createAttribute("height");
+      //@ts-ignore
+      anh.nodeValue = 300;
+      canvas.setAttributeNode(anw);
+      canvas.setAttributeNode(anh);
+      //@ts-ignore
+      ctx.drawImage(video, 0, 0, 500, 300);
+      var base64 = canvas.toDataURL("image/png");
+      //@ts-ignore
+      video.pause();
+      reslove(base64);
+    });
   });
 };
 

@@ -1,4 +1,5 @@
-import { GroupItem } from "../../utils/open_im_sdk/types";
+
+import { GroupItem } from "../../utils/open_im_sdk_wasm/types/entity";
 import { ContactActionTypes, ContactState, SET_BLACK_LIST, SET_FRIEND_LIST, SET_GROUP_INFO, SET_GROUP_LIST, SET_GROUP_MEMBER_LIST, SET_GROUP_MEMBER_LOADING, SET_MEMBER2STATUS, SET_ORIGIN_LIST, SET_RECV_FRIEND_APPLICATION_LIST, SET_RECV_GROUP_APPLICATION_LIST, SET_SENT_FRIEND_APPLICATION_LIST, SET_SENT_GROUP_APPLICATION_LIST, SET_UNREAD_COUNT } from "../types/contacts";
 
 let initialState: ContactState = {

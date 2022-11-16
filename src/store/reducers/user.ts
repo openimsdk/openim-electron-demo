@@ -1,4 +1,5 @@
-import { FullUserItem } from "../../utils/open_im_sdk/types";
+
+import { FullUserItem } from "../../utils/open_im_sdk_wasm/types/entity";
 import { SET_SELF_INFO, SET_SELF_INIT_LOADING, SET_ADMIN_TOKEN, UserActionTypes, UserState } from "../types/user";
 
 let initialState: UserState = {

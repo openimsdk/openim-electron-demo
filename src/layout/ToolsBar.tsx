@@ -16,9 +16,9 @@ import UserCard from "../pages/home/components/UserCard";
 import { shallowEqual, useSelector } from "react-redux";
 import { RootState } from "../store";
 import { useClickAway } from "ahooks";
-import { getAdminUrl, getAxiosUrl, getIMUrl } from "../config";
+import { getIMApiUrl, getIMRegisterUrl, getIMWsUrl } from "../config";
 import { useTranslation } from "react-i18next";
-import { FullUserItem } from "../utils/open_im_sdk/types";
+import { FullUserItem } from "../utils/open_im_sdk_wasm/types/entity";
 
 const { Sider } = Layout;
 
@@ -159,14 +159,14 @@ const ToolsBar: FC<ToolsBarProps> = ({ userInfo }) => {
 
   const logout = () => {
     im.logout();
-    const IMUrl = getIMUrl();
-    const IMAxiosUrl = getAxiosUrl();
-    const IMAdminUrl = getAdminUrl();
+    const IMWsUrl = getIMWsUrl();
+    const IMRegisterUrl = getIMRegisterUrl();
+    const IMApiUrl = getIMApiUrl();
     const LastUid = localStorage.getItem("lastimuid")
     localStorage.clear();
-    localStorage.setItem("IMAxiosUrl",IMAxiosUrl);
-    localStorage.setItem("IMUrl",IMUrl);
-    localStorage.setItem("IMAdminUrl",IMAdminUrl);
+    localStorage.setItem("IMRegisterUrl",IMRegisterUrl);
+    localStorage.setItem("IMWsUrl",IMWsUrl);
+    localStorage.setItem("IMApiUrl",IMApiUrl);
     localStorage.setItem("lastimuid",LastUid!);
     navigate("/login");
   };

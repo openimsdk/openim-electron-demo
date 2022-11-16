@@ -1,7 +1,7 @@
 import { OnLineResType } from "../@types/open_im";
-import { getAdminUrl } from "../config";
+import { getIMApiUrl } from "../config";
 import { request } from "../utils";
-import { uuid } from "../utils/open_im_sdk";
+import { uuid } from "../utils/common";
 
 export const getAuthToken = (uid?:string,secret?:string) =>
   request.post(
@@ -13,11 +13,11 @@ export const getAuthToken = (uid?:string,secret?:string) =>
       OperationID:uuid(uid??"uuid")
     }),
     {
-      baseURL: getAdminUrl(),
+      baseURL: getIMApiUrl(),
     }
   );
 
-export const getOnline = async (userIDList: string[],token:string, opid?: string):Promise<OnLineResType> =>{
+export const getOnline = async (userIDList: string[], opid?: string):Promise<OnLineResType> =>{
   return request.post(
       "/user/get_users_online_status",
       JSON.stringify({
@@ -25,9 +25,9 @@ export const getOnline = async (userIDList: string[],token:string, opid?: string
         userIDList,
       }),
       {
-        baseURL: getAdminUrl(),
+        baseURL: getIMApiUrl(),
         headers:{
-            token
+            token: localStorage.getItem(`improfile`)!
         }
       }
     );

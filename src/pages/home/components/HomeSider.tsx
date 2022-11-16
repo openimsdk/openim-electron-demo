@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import SearchBar, { SearchBarHandle } from "../../../components/SearchBar";
 import { CLEARSEARCHINPUT, FORWARDANDMERMSG, OPENGROUPMODAL, OPENSINGLEMODAL, TOASSIGNCVE } from "../../../constants/events";
 import { events, im } from "../../../utils";
-import { FriendItem, GroupItem, GroupMemberItem, PublicUserItem } from "../../../utils/open_im_sdk/types";
+import { GroupMemberItem, FriendItem, PublicUserItem, GroupItem } from "../../../utils/open_im_sdk_wasm/types/entity";
 import GroupCard from "./GroupCard";
 import GroupOpModal, { ModalType } from "./GroupOpModal";
 import UserCard from "./UserCard";

@@ -246,6 +246,7 @@
     "HasRegistered":"用户已注册！",
     "NotRegistered":"用户未注册！",
     "PasswordErr":"密码错误！",
+    "GetTokenErr":"获取IMtoken错误！",
     "RepeatSendCode":"验证码发送频率过快！",
     "MailSendCodeErr":"发送邮件验证码失败，请使用超级验证码！",
     "SmsSendCodeErr":"发送手机验证码失败，请使用超级验证码！",

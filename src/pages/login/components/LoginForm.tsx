@@ -43,7 +43,7 @@ const LoginForm: FC<IProps> = (props) => {
   const [backSts, { set: setBack }] = useToggle();
   const [checkSts, { toggle: toggleCheck }] = useToggle(true);
   const [sInfo, setSInfo] = useState<InfoField>({
-    userID: "userID",
+    userID: "",
     nickname: "",
     faceURL: `ic_avatar_0${Math.ceil(Math.random() * 6)}`,
   });
@@ -92,7 +92,7 @@ const LoginForm: FC<IProps> = (props) => {
 
   const initialValues = {
     areaCode: "86",
-    phoneNo: type === "login" ? localStorage.getItem("lastimuid") ?? "" : "",
+    phoneNo: type === "login" ? localStorage.getItem("IMAccount") ?? "" : "",
   };
 
   const comfirmEnter = (value: any) => {

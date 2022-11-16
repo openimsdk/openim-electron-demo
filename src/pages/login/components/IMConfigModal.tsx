@@ -1,5 +1,5 @@
 import { Modal, Form, Input, Button } from "antd";
-import { getAxiosUrl, getIMUrl, getAdminUrl } from "../../../config";
+import { getIMRegisterUrl, getIMWsUrl, getIMApiUrl } from "../../../config";
 
 const IMConfigModal = ({ visible, close }: { visible: boolean; close: () => void }) => {
   const [form] = Form.useForm();
@@ -7,27 +7,27 @@ const IMConfigModal = ({ visible, close }: { visible: boolean; close: () => void
   const getIntialValues = () => {
     if (window.electron) {
       return {
-        AxiosUrl: getAxiosUrl(),
-        AdminUrl: getAdminUrl(),
+        AxiosUrl: getIMRegisterUrl(),
+        AdminUrl: getIMApiUrl(),
         ...window.electron.getIMConfig(),
       };
     } else {
       return {
-        AxiosUrl: getAxiosUrl(),
-        IMUrl: getIMUrl(),
-        AdminUrl: getAdminUrl(),
+        AxiosUrl: getIMRegisterUrl(),
+        IMWsUrl: getIMWsUrl(),
+        AdminUrl: getIMApiUrl(),
       };
     }
   };
 
   const setFinish = (values: any) => {
     if (!window.electron) {
-      localStorage.setItem("IMUrl", values.IMUrl);
+      localStorage.setItem("IMWsUrl", values.IMWsUrl);
     }else{
       window.electron.setIMConfig(values);
     }
-    localStorage.setItem("IMAxiosUrl", values.AxiosUrl);
-    localStorage.setItem("IMAdminUrl", values.AdminUrl);
+    localStorage.setItem("IMRegisterUrl", values.AxiosUrl);
+    localStorage.setItem("IMApiUrl", values.AdminUrl);
     
     window.location.reload();
   };
@@ -36,7 +36,7 @@ const IMConfigModal = ({ visible, close }: { visible: boolean; close: () => void
     <Modal footer={null} title="修改配置" visible={visible} onCancel={close}>
       <Form form={form} name="basic" labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} initialValues={getIntialValues()} onFinish={setFinish} autoComplete="off">
         {!window.electron && (
-          <Form.Item label="IMUrl" name="IMUrl" rules={[{ required: true, message: "Please input your IMUrl!" }]}>
+          <Form.Item label="IMWsUrl" name="IMWsUrl" rules={[{ required: true, message: "Please input your IMWsUrl!" }]}>
             <Input />
           </Form.Item>
         )}

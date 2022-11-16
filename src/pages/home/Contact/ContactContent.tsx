@@ -4,11 +4,11 @@ import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import ContactList from "../../../components/ContactList";
 import { APPLICATIONTYPEUPDATE, CLEARSEARCHINPUT, TOASSIGNCVE } from "../../../constants/events";
-import { SessionType } from "../../../constants/messageContentType";
 import { RootState } from "../../../store";
 import { setGroupMemberLoading } from "../../../store/actions/contacts";
 import { events } from "../../../utils";
-import { FriendApplicationItem, FriendItem, GroupApplicationItem, GroupItem } from "../../../utils/open_im_sdk/types";
+import { FriendItem, GroupItem, FriendApplicationItem, GroupApplicationItem } from "../../../utils/open_im_sdk_wasm/types/entity";
+import { SessionType } from "../../../utils/open_im_sdk_wasm/types/enum";
 import { MenuItem } from "./ContactMenuList";
 import GroupList from "./GroupList";
 import NewNotice from "./NewNotice";
@@ -57,12 +57,12 @@ const ContactContent: ForwardRefRenderFunction<ContactContentHandler, ContactCon
   };
 
   const clickListItem = (item: FriendItem | GroupItem, type: SessionType) => {
-    if (type === SessionType.GROUPCVE) {
+    if (type === SessionType.Group || type === SessionType.SuperGroup) {
       dispatch(setGroupMemberLoading(true));
     }
     navigate("/");
     setTimeout(() => {
-      events.emit(TOASSIGNCVE, type === SessionType.SINGLECVE ? (item as FriendItem).userID : (item as GroupItem).groupID, type);
+      events.emit(TOASSIGNCVE, type === SessionType.Single ? (item as FriendItem).userID : (item as GroupItem).groupID, type);
     }, 0);
   };
 

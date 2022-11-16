@@ -1,5 +1,6 @@
 import { MemberMapType } from "../../@types/open_im";
-import { BlackItem, FriendApplicationItem, FriendItem, GroupApplicationItem, GroupItem, GroupMemberItem } from "../../utils/open_im_sdk/types";
+import { FriendItem, GroupItem, BlackItem, FriendApplicationItem, GroupApplicationItem, GroupMemberItem } from "../../utils/open_im_sdk_wasm/types/entity";
+
 
 
 export type ContactState = {

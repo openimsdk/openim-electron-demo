@@ -1,11 +1,11 @@
 import { message } from 'antd'
 import axios, { AxiosError } from 'axios'
-import { AXIOSTIMEOUT, getAxiosUrl } from '../config'
+import { AXIOS_TIMEOUT, getIMRegisterUrl } from '../config'
 
 
 const request = axios.create({
-  timeout: AXIOSTIMEOUT,
-  baseURL: getAxiosUrl(),
+  timeout: AXIOS_TIMEOUT,
+  baseURL: getIMRegisterUrl(),
 })
 
 function handleError(error: AxiosError) {

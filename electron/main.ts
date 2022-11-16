@@ -1,7 +1,7 @@
 import { app, BrowserWindow, Menu, session } from "electron";
 import * as path from "path";
 import * as isDev from "electron-is-dev";
-import { initLocalWs, killLocalWs, setTray } from "./utils";
+import { setTray } from "./utils";
 import "./utils/ipcMain";
 import { setAppStatus } from "./store";
 
@@ -62,7 +62,7 @@ async function createWindow() {
   }
 
   // localWs
-  await initLocalWs();
+  // await initLocalWs();
   setAppStatus(true);
 }
 // ipcMain.on('login-resize',()=>{
@@ -89,5 +89,4 @@ app.on("activate", () => {
 
 app.on("quit", () => {
   setAppStatus(false);
-  killLocalWs();
 });

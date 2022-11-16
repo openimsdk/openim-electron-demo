@@ -1,4 +1,6 @@
-import { MessageItem } from "../../utils/open_im_sdk/types"
+import { MessageItem } from "../../utils/open_im_sdk_wasm/types/entity"
+
+
 
 export type MsgState = {
     historyMsgList:MessageItem[]

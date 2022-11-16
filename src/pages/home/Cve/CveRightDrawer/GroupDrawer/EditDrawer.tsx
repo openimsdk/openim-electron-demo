@@ -8,7 +8,7 @@ import { MyAvatar } from "../../../../../components/MyAvatar";
 import { RootState } from "../../../../../store";
 import { cosUpload, im } from "../../../../../utils";
 import { getCosAuthorization } from "../../../../../utils/cos";
-import { GroupItem } from "../../../../../utils/open_im_sdk/types";
+import { GroupItem } from "../../../../../utils/open_im_sdk_wasm/types/entity";
 
 type EditDrawerProps = {
   

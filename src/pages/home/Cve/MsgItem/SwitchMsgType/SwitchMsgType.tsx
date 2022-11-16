@@ -5,15 +5,15 @@ import { Map, Marker } from "react-amap";
 import { MyAvatar } from "../../../../../components/MyAvatar";
 import { MERMSGMODAL } from "../../../../../constants/events";
 import { faceMap } from "../../../../../constants/faceType";
-import { messageTypes } from "../../../../../constants/messageContentType";
 import { RootState } from "../../../../../store";
 import { formatDate, switchFileIcon, bytesToSize, events, isSingleCve } from "../../../../../utils";
 
 import other_voice from "@/assets/images/voice_other.png";
 import my_voice from "@/assets/images/voice_my.png";
 import { useTranslation } from "react-i18next";
-import { ConversationItem, MergeElem, MessageItem, PictureElem } from "../../../../../utils/open_im_sdk/types";
 import VideoPlayer from "../../../../../components/VideoPlayer";
+import { MessageItem, ConversationItem, PictureElem, MergeElem } from "../../../../../utils/open_im_sdk_wasm/types/entity";
+import { MessageType } from "../../../../../utils/open_im_sdk_wasm/types/enum";
 
 type SwitchMsgTypeProps = {
   msg: MessageItem;
@@ -106,12 +106,12 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
 
   const parseQute = (quMsg: MessageItem) => {
     switch (quMsg.contentType) {
-      case messageTypes.TEXTMESSAGE:
+      case MessageType.TEXTMESSAGE:
         const parsedMsg = parseBr(parseUrl(parseAt(parseEmojiFace(quMsg.content))));
         return <div className="content" dangerouslySetInnerHTML={{ __html: parsedMsg }}></div>;
-      case messageTypes.ATTEXTMESSAGE:
+      case MessageType.ATTEXTMESSAGE:
         return parseAt(quMsg.atElem.text);
-      case messageTypes.PICTUREMESSAGE:
+      case MessageType.PICTUREMESSAGE:
         return <Image width={60} src={quMsg.pictureElem.sourcePicture.url} />;
       default:
         return "";
@@ -138,7 +138,7 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
 
   const msgType = () => {
     switch (msg.contentType) {
-      case messageTypes.TEXTMESSAGE:
+      case MessageType.TEXTMESSAGE:
         let mstr = msg.content;
         mstr = parseEmojiFace(mstr);
         mstr = parseUrl(mstr);
@@ -151,7 +151,7 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
             {timeTip()}
           </>
         );
-      case messageTypes.ATTEXTMESSAGE:
+      case MessageType.ATTEXTMESSAGE:
         let atMsg = msg.atElem.text;
         atMsg = parseEmojiFace(atMsg);
         atMsg = parseAt(atMsg);
@@ -163,7 +163,7 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
             {timeTip()}
           </div>
         );
-      case messageTypes.PICTUREMESSAGE:
+      case MessageType.PICTUREMESSAGE:
         return (
           <div className={`chat_bg_msg_content_pic ${!isSingle ? "nick_magin" : ""}`}>
             <Image
@@ -178,7 +178,7 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
             {timeTip("pic_msg_time")}
           </div>
         );
-      case messageTypes.VOICEMESSAGE:
+      case MessageType.VOICEMESSAGE:
         const isSelfMsg = isSelf(msg.sendID);
         const imgStyle = isSelfMsg ? { paddingLeft: "4px" } : { paddingRight: "4px" };
         const imgSrc = isSelfMsg ? my_voice : other_voice;
@@ -191,7 +191,7 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
             {timeTip()}
           </div>
         );
-      case messageTypes.FILEMESSAGE:
+      case MessageType.FILEMESSAGE:
         const fileEl = msg.fileElem;
         const suffix = fileEl.fileName.slice(fileEl.fileName.lastIndexOf(".") + 1);
         return (
@@ -206,7 +206,7 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
             {timeTip()}
           </div>
         );
-      case messageTypes.VIDEOMESSAGE:
+      case MessageType.VIDEOMESSAGE:
         const videoJsOptions = {
           width: 240,
           controls: true,
@@ -227,11 +227,11 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
             {timeTip("video_msg_time")}
           </div>
         );
-      case messageTypes.QUOTEMESSAGE:
+      case MessageType.QUOTEMESSAGE:
         const quMsg = msg.quoteElem.quoteMessage;
         let replyMsg = msg.quoteElem.text;
 
-        // let quoteMsg = quMsg.contentType === messageTypes.ATTEXTMESSAGE ?  : quMsg.content;
+        // let quoteMsg = quMsg.contentType === MessageType.ATTEXTMESSAGE ?  : quMsg.content;
 
         replyMsg = parseBr(parseUrl(parseEmojiFace(replyMsg)));
         return (
@@ -244,7 +244,7 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
             {timeTip()}
           </div>
         );
-      case messageTypes.MERGERMESSAGE:
+      case MessageType.MERGERMESSAGE:
         const merEl = msg.mergeElem;
         return (
           <div style={sty} onClick={() => merClick(merEl, msg.sendID)} className={`chat_bg_msg_content_text chat_bg_msg_content_mer ${!isSingle ? "nick_magin" : ""}`}>
@@ -257,7 +257,7 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
             {timeTip()}
           </div>
         );
-      case messageTypes.CARDMESSAGE:
+      case MessageType.CARDMESSAGE:
         const ctx = JSON.parse(msg.content);
         return (
           <div onClick={() => window.userClick(ctx.userID)} style={sty} className={`chat_bg_msg_content_text chat_bg_msg_content_card ${!isSingle ? "nick_magin" : ""}`}>
@@ -269,7 +269,7 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
             {timeTip()}
           </div>
         );
-      case messageTypes.LOCATIONMESSAGE:
+      case MessageType.LOCATIONMESSAGE:
         const locationEl = msg.locationElem;
         const postion = { longitude: locationEl.longitude, latitude: locationEl.latitude };
         return (

@@ -8,7 +8,8 @@ import { OPENSINGLEMODAL, RESETCVE } from "../../../../constants/events";
 import { RootState } from "../../../../store";
 import { setCurCve, setCveList } from "../../../../store/actions/cve";
 import { events, im } from "../../../../utils";
-import { ConversationItem, OptType } from "../../../../utils/open_im_sdk/types";
+import { ConversationItem } from "../../../../utils/open_im_sdk_wasm/types/entity";
+import { OptType } from "../../../../utils/open_im_sdk_wasm/types/enum";
 
 type SingleDrawerProps = {
   curCve: ConversationItem;

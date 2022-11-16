@@ -12,10 +12,10 @@ import { UploadRequestOption } from "rc-upload/lib/interface";
 import { getSelfInfo } from "../../../store/actions/user";
 import { getFriendList } from "../../../store/actions/contacts";
 import { TOASSIGNCVE, UPDATEFRIENDCARD } from "../../../constants/events";
-import { SessionType } from "../../../constants/messageContentType";
 import { useTranslation } from "react-i18next";
-import { PublicUserItem, FriendItem, PartialUserItem, FullUserItem } from "../../../utils/open_im_sdk/types";
 import { getCosAuthorization } from "../../../utils/cos";
+import { PublicUserItem, FriendItem, FullUserItem, PartialUserItem } from "../../../utils/open_im_sdk_wasm/types/entity";
+import { SessionType } from "../../../utils/open_im_sdk_wasm/types/enum";
 
 const { Paragraph } = Typography;
 
@@ -99,7 +99,7 @@ const UserCard: FC<UserCardProps> = ({ draggableCardVisible, info, close, type }
 
   const clickBtn = () => {
     if (isFriend) {
-      events.emit(TOASSIGNCVE, info.userID, SessionType.SINGLECVE);
+      events.emit(TOASSIGNCVE, info.userID, SessionType.Single);
       close();
     } else {
       setStep("send");

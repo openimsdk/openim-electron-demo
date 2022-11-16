@@ -7,20 +7,23 @@ import CveFooter from "./CveFooter/CveFooter";
 import CveRightBar from "./CveRightBar";
 import HomeSider from "../components/HomeSider";
 import HomeHeader from "../components/HomeHeader";
-import { createNotification, events, getNotification, im, isSingleCve, parseMessageType } from "../../../utils";
+import { events, getNotification, im, isSingleCve, parseMessageType } from "../../../utils";
 import ChatContent from "./ChatContent";
 import home_bg from "@/assets/images/home_bg.png";
-import { messageTypes, notOssMessageTypes, SessionType, tipsTypes } from "../../../constants/messageContentType";
+import { notOssMessageTypes } from "../../../constants/messageContentType";
 import { useReactive, useRequest } from "ahooks";
-import { CbEvents } from "../../../utils/open_im_sdk";
 import { DELETEMESSAGE, ISSETDRAFT, MERMSGMODAL, MUTILMSG, OPENGROUPMODAL, RESETCVE, REVOKEMSG, SENDFORWARDMSG, TOASSIGNCVE, UPDATEFRIENDCARD } from "../../../constants/events";
 import { animateScroll } from "react-scroll";
 import MerModal from "./components/MerModal";
 import { SelectType } from "../components/MultipleSelectBox";
-import { getGroupInfo, getGroupMemberList, setGroupMemberList } from "../../../store/actions/contacts";
-import { ConversationItem, FriendItem, GroupItem, GroupMemberItem, MergeElem, MergerMsgParams, MessageItem, PictureElem, WsResponse } from "../../../utils/open_im_sdk/types";
+import { getGroupInfo, getGroupMemberList } from "../../../store/actions/contacts";
 import { useTranslation } from "react-i18next";
 import { setCurCve } from "../../../store/actions/cve";
+import { CbEvents } from "open-im-sdk-wasm-webpack4/lib/constant";
+import { MessageItem, MergeElem, ConversationItem, FriendItem, GroupItem, PictureElem, WsResponse } from "../../../utils/open_im_sdk_wasm/types/entity";
+import { MergerMsgParams } from "../../../utils/open_im_sdk_wasm/types/params";
+import { MessageType, SessionType } from "../../../utils/open_im_sdk_wasm/types/enum";
+import { WSEvent } from "../../../utils/open_im_sdk_wasm/types";
 
 const { Content } = Layout;
 
@@ -125,12 +128,14 @@ const Home = () => {
     events.on(SENDFORWARDMSG, sendForwardHandler);
     events.on(TOASSIGNCVE, assignHandler);
     im.on(CbEvents.ONRECVNEWMESSAGE, newMsgHandler);
+    im.on(CbEvents.ONRECVNEWMESSAGES, newMsgsHandler);
     return () => {
       events.off(SENDFORWARDMSG, sendForwardHandler);
       events.off(TOASSIGNCVE, assignHandler);
       im.off(CbEvents.ONRECVNEWMESSAGE, newMsgHandler);
+      im.off(CbEvents.ONRECVNEWMESSAGES, newMsgsHandler);
     };
-  }, [curCve]);
+  }, [curCve?.conversationID]);
 
   //  event hander
 
@@ -145,12 +150,12 @@ const Home = () => {
       .catch((err) => message.error(t("GetCveFailed")));
   };
 
-  const sendForwardHandler = (options: string | MergerMsgParams, type: messageTypes, list: SelectType[]) => {
+  const sendForwardHandler = (options: string | MergerMsgParams, type: MessageType, list: SelectType[]) => {
     list.map(async (s) => {
       const uid = (s as FriendItem).userID??"";
       const gid = (s as GroupItem).groupID??"";
       let data;
-      if (type === messageTypes.MERGERMESSAGE) {
+      if (type === MessageType.MERGERMESSAGE) {
         data = await im.createMergerMessage(options as MergerMsgParams);
       } else {
         data = await im.createForwardMessage(options as string);
@@ -161,20 +166,31 @@ const Home = () => {
   };
 
   //  im hander
-  const newMsgHandler = (data: WsResponse) => {
-    const newServerMsg: MessageItem = JSON.parse(data.data);
-    if (newServerMsg.contentType !== messageTypes.TYPINGMESSAGE && newServerMsg.sendID !== selfID) {
-      createNotification(newServerMsg, (id, sessionType) => {
-        assignHandler(id, sessionType);
-        window.electron ? window.electron.focusHomePage() : window.focus();
-      });
-    }
+  const newMsgHandler = (data: WSEvent) => {
+    console.log('newMsgHandler');
+    
+    const newServerMsg: MessageItem = JSON.parse(data.data as string);
+    handelMsg(newServerMsg)
+  };
+
+  const newMsgsHandler = (data:WSEvent) => {
+    const newServerMsgs: MessageItem[] = JSON.parse(data.data as string);
+    newServerMsgs.forEach(handelMsg)
+  }
+
+  const handelMsg = (newServerMsg:MessageItem) => {
+    // if (newServerMsg.contentType !== MessageType.TYPINGMESSAGE && newServerMsg.sendID !== selfID) {
+    //   createNotification(newServerMsg, (id, sessionType) => {
+    //     assignHandler(id, sessionType);
+    //     window.electron ? window.electron.focusHomePage() : window.focus();
+    //   });
+    // }
     if (curCve) {
       if (inCurCve(newServerMsg)) {
-        if (newServerMsg.contentType === messageTypes.TYPINGMESSAGE) {
+        if (newServerMsg.contentType === MessageType.TYPINGMESSAGE) {
           typingUpdate();
         } else {
-          if (newServerMsg.contentType === messageTypes.REVOKEMESSAGE) {
+          if (newServerMsg.contentType === MessageType.REVOKEMESSAGE) {
             rs.historyMsgList = [newServerMsg, ...rs.historyMsgList.filter((ms) => ms.clientMsgID !== newServerMsg.content)];
           } else {
             rs.historyMsgList = [newServerMsg, ...rs.historyMsgList];
@@ -183,17 +199,17 @@ const Home = () => {
         }
       }
     }
-  };
+  }
 
-  const revokeMsgHandler = (data: WsResponse) => {
+  const revokeMsgHandler = (data: WSEvent) => {
     const idx = rs.historyMsgList.findIndex((m) => m.clientMsgID === data.data);
     if (idx > -1) {
       rs.historyMsgList.splice(idx, 1);
     }
   };
 
-  const c2cMsgHandler = (data: WsResponse) => {
-    JSON.parse(data.data).map((cr: any) => {
+  const c2cMsgHandler = (data: WSEvent) => {
+    JSON.parse(data.data as string).map((cr: any) => {
       cr.msgIDList.map((crt: string) => {
         rs.historyMsgList.find((hism) => {
           if (hism.clientMsgID === crt) {
@@ -223,7 +239,7 @@ const Home = () => {
 
   const inCurCve = (newServerMsg: MessageItem): boolean => {
     const isCurSingle = newServerMsg.sendID === curCve?.userID || (newServerMsg.sendID === selfID && newServerMsg.recvID === curCve?.userID);
-    return newServerMsg.sessionType === SessionType.SINGLECVE ? isCurSingle : newServerMsg.groupID === curCve?.groupID;
+    return newServerMsg.sessionType === SessionType.Single ? isCurSingle : newServerMsg.groupID === curCve?.groupID;
   };
 
   const resetCve = () => {
@@ -242,7 +258,7 @@ const Home = () => {
 
   const revokeMyMsgHandler = (mid: string) => {
     const idx = rs.historyMsgList.findIndex((h) => h.clientMsgID === mid);
-    rs.historyMsgList[idx].contentType = tipsTypes.REVOKEMESSAGE;
+    rs.historyMsgList[idx].contentType = MessageType.REVOKEMESSAGE;
   };
 
   const typingUpdate = () => {
@@ -284,11 +300,7 @@ const Home = () => {
 
   const markCveHasRead = (cve: ConversationItem, type?: number) => {
     if (cve.unreadCount === 0 && !type) return;
-    if (isSingleCve(cve)) {
-      markC2CHasRead(cve.userID, []);
-    } else {
-      im.markGroupMessageHasRead(cve.groupID);
-    }
+    im.markMessageAsReadByConID({conversationID: cve.conversationID,msgIDList: []})
   };
 
   const getOneCve = (sourceID: string, sessionType: number): Promise<ConversationItem> => {
@@ -297,10 +309,6 @@ const Home = () => {
         .then((res) => resolve(JSON.parse(res.data)))
         .catch((err) => reject(err));
     });
-  };
-
-  const markC2CHasRead = (userID: string, msgIDList: string[]) => {
-    im.markC2CMessageAsRead({ userID, msgIDList });
   };
 
   const getHistoryMsg = (uid?: string, gid?: string, sMsg?: MessageItem) => {
@@ -352,7 +360,7 @@ const Home = () => {
     });
   };
 
-  const sendMsg = (nMsg: string, type: messageTypes, uid?: string, gid?: string) => {
+  const sendMsg = (nMsg: string, type: MessageType, uid?: string, gid?: string,fileArrayBuffer?:ArrayBuffer,snpFileArrayBuffer?:ArrayBuffer) => {
     const operationID = uuid();
     if ((uid && curCve?.userID === uid) || (gid && curCve?.groupID === gid) || (!uid && !gid)) {
       const parsedMsg = JSON.parse(nMsg);
@@ -388,10 +396,12 @@ const Home = () => {
       groupID: gid ?? curCve!.groupID,
       offlinePushInfo,
       message: nMsg,
+      fileArrayBuffer,
+      snpFileArrayBuffer,
     };
     nMsgMaps = nMsgMaps.filter((f) => !f.flag);
     if (notOssMessageTypes.includes(type)) {
-      im.sendMessageNotOss(sendOption, operationID)
+      im.sendMessageByBuffer(sendOption, operationID)
         .then((res) => sendMsgCB(res, type))
         .catch((err) => sendMsgCB(err, type, true));
     } else {
@@ -401,7 +411,7 @@ const Home = () => {
     }
   };
 
-  const sendMsgCB = (res: WsResponse, type: messageTypes, err?: boolean) => {
+  const sendMsgCB = (res: WsResponse, type: MessageType, err?: boolean) => {
     nMsgMaps.map((tn) => {
       if (tn.oid === res.operationID) {
         const idx = rs.historyMsgList.findIndex((his) => his.clientMsgID === tn?.mid);
@@ -411,7 +421,7 @@ const Home = () => {
         }
       }
     });
-    if (type === messageTypes.MERGERMESSAGE) message.success(t("ForwardSuccessTip"));
+    if (type === MessageType.MERGERMESSAGE) message.success(t("ForwardSuccessTip"));
   };
 
   const closeMer = () => {

@@ -3,7 +3,7 @@ import { FC } from "react";
 import { useTranslation } from "react-i18next";
 import { shallowEqual, useSelector } from "react-redux";
 import { RootState } from "../../../../store";
-import { ConversationItem } from "../../../../utils/open_im_sdk/types";
+import { ConversationItem } from "../../../../utils/open_im_sdk_wasm/types/entity";
 import CveItem from "./CveItem";
 
 

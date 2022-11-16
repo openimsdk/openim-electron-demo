@@ -2,6 +2,7 @@ const CracoLessPlugin = require("craco-less");
 const path = require("path");
 const { whenProd,getPlugin,pluginByName } = require("@craco/craco");
 const TerserPlugin = require("terser-webpack-plugin");
+const WorkerPlugin = require("worker-plugin");
 
 module.exports = {
   webpack: {
@@ -9,6 +10,7 @@ module.exports = {
       "@": path.join(__dirname, "./src"),
     },
     plugins: [
+      new WorkerPlugin(),
       ...whenProd(
         () => [
           new TerserPlugin({
@@ -28,25 +30,6 @@ module.exports = {
         []
       ),
     ],
-    optimization: {
-      splitChunks: {
-        cacheGroups: {
-          commons: {
-            chunks: "initial",
-            minChunks: 2,
-            maxInitialRequests: 5,
-            minSize: 0,
-          },
-          vendor: {
-            test: /node_modules/,
-            chunks: "initial",
-            name: "vendor",
-            priority: 10,
-            enforce: true,
-          },
-        },
-      },
-    },
     // configure: (webpackConfig, { env, paths }) => {
     //   if (process.env.NODE_ENV === "production") {
     //     webpackConfig.externals = {

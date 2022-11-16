@@ -2,10 +2,10 @@
 import COS from "cos-js-sdk-v5";
 import { UploadRequestOption } from "rc-upload/lib/interface";
 import { request } from ".";
-import { getAdminUrl } from "../config";
+import { getIMApiUrl } from "../config";
 
 export const getCosAuthorization = async () => {
-  const url = `${getAdminUrl()}/third/tencent_cloud_storage_credential`;
+  const url = `${getIMApiUrl()}/third/tencent_cloud_storage_credential`;
   const { data, errCode } = await request.post(
     url,
     {
