@@ -1,13 +1,13 @@
 import { UserOutlined } from "@ant-design/icons";
 import { Empty } from "antd";
 import { MyAvatar } from "../../../components/MyAvatar";
-import { SessionType } from "../../../constants/messageContentType";
-import { FriendItem, GroupItem } from "../../../utils/open_im_sdk/types";
+import { GroupItem, FriendItem } from "../../../utils/open_im_sdk_wasm/types/entity";
+import { GroupType, SessionType } from "../../../utils/open_im_sdk_wasm/types/enum";
 
 const GroupList = ({ groupList, clickItem }: { groupList: GroupItem[]; clickItem: (item: FriendItem | GroupItem, type: SessionType) => void }) => {
   
   const GroupListItem = ({ gp }: { gp: GroupItem }) => (
-    <div onDoubleClick={() => clickItem(gp, SessionType.GROUPCVE)} className="group_item">
+    <div onDoubleClick={() => clickItem(gp, gp.groupType === GroupType.NomalGroup ? SessionType.Group : SessionType.SuperGroup)} className="group_item">
       <MyAvatar shape="square" size={36} src={gp.faceURL} icon={<UserOutlined />} />
       <div className="group_item_info">
         <div className="group_item_title">{gp.groupName}</div>

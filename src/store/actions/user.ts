@@ -1,7 +1,8 @@
 import { Dispatch } from "redux";
 import { getAuthToken } from "../../api/admin";
 import { im } from "../../utils";
-import { FullUserItem, PartialUserItem } from "../../utils/open_im_sdk/types";
+import { PartialUserItem, FullUserItem } from "../../utils/open_im_sdk_wasm/types/entity";
+
 import {
   SET_SELF_INFO,
   SET_SELF_INIT_LOADING,

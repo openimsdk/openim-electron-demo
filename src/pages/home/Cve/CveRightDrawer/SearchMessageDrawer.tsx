@@ -4,8 +4,8 @@ import { FC, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { debounce } from "throttle-debounce";
 import { MyAvatar } from "../../../../components/MyAvatar";
-import { SessionType } from "../../../../constants/messageContentType";
-import { ConversationItem } from "../../../../utils/open_im_sdk/types";
+import { ConversationItem } from "../../../../utils/open_im_sdk_wasm/types/entity";
+import { SessionType } from "../../../../utils/open_im_sdk_wasm/types/enum";
 
 export const SearchMessageDrawer = ({ curCve }: { curCve: ConversationItem }) => {
   const [activeKey, setActiveKey] = useState("1");
@@ -47,7 +47,7 @@ const MyTabpane: FC<MyTabpaneProps> = (props) => {
 
   const searchMessage = (key: string) => {
     const options = {
-      sourceID: props.curCve.conversationType === SessionType.SINGLECVE ? props.curCve.userID : props.curCve.groupID,
+      sourceID: props.curCve.conversationType === SessionType.Single ? props.curCve.userID : props.curCve.groupID,
       sessionType: props.curCve.conversationType,
       keywordList: [key],
       keywordListMatchType: 0,

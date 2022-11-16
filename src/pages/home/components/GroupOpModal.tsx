@@ -8,11 +8,11 @@ import { useReactive } from "ahooks";
 import { UploadRequestOption } from "rc-upload/lib/interface";
 import { cosUpload, events, im } from "../../../utils";
 import { SENDFORWARDMSG } from "../../../constants/events";
-import { messageTypes } from "../../../constants/messageContentType";
 import MultipleSelectBox, { SelectFriendItem, SelectGroupItem, SelectType, SelectMemberItem } from "./MultipleSelectBox";
 import { useTranslation } from "react-i18next";
-import { GroupMemberItem, Member } from "../../../utils/open_im_sdk/types";
 import { getCosAuthorization } from "../../../utils/cos";
+import { GroupMemberItem, Member } from "../../../utils/open_im_sdk_wasm/types/entity";
+import { MessageType } from "../../../utils/open_im_sdk_wasm/types/enum";
 
 type GroupOpModalProps = {
   visible: boolean;
@@ -114,7 +114,7 @@ const GroupOpModal: FC<GroupOpModalProps> = ({ visible, options, modalType, grou
 
   const forwardMsg = () => {
     const parseMsg = JSON.parse(options!);
-    events.emit(SENDFORWARDMSG, parseMsg.contentType ? options : parseMsg, parseMsg.contentType ?? messageTypes.MERGERMESSAGE, rs.selectedList);
+    events.emit(SENDFORWARDMSG, parseMsg.contentType ? options : parseMsg, parseMsg.contentType ?? MessageType.MERGERMESSAGE, rs.selectedList);
     close();
   };
 

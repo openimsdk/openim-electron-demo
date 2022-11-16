@@ -1,13 +1,15 @@
 import { FC, useEffect, useRef, useState } from "react";
 import { useSelector, shallowEqual } from "react-redux";
-import { tipsTypes } from "../../../constants/messageContentType";
+import { TipsType } from "../../../constants/messageContentType";
 import { RootState } from "../../../store";
 import { events, im, isSingleCve } from "../../../utils";
 import ScrollView from "../../../components/ScrollView";
 import { MUTILMSG, OPENSINGLEMODAL } from "../../../constants/events";
 import MsgItem from "./MsgItem/MsgItem";
 import { useTranslation } from "react-i18next";
-import { ConversationItem, MessageItem, PictureElem } from "../../../utils/open_im_sdk/types";
+import { MessageItem, PictureElem, ConversationItem } from "../../../utils/open_im_sdk_wasm/types/entity";
+import { MessageType } from "../../../utils/open_im_sdk_wasm/types/enum";
+
 
 type ChatContentProps = {
   msgList: MessageItem[];
@@ -26,8 +28,6 @@ const ChatContent: FC<ChatContentProps> = ({ merID, msgList, imgClick, loadMore,
   const audioRef = useRef<HTMLAudioElement>(null);
   const { t } = useTranslation();
 
-  const tipList = Object.values(tipsTypes);
-
   useEffect(() => {
     events.on(MUTILMSG, mutilHandler);
     return () => {
@@ -42,7 +42,7 @@ const ChatContent: FC<ChatContentProps> = ({ merID, msgList, imgClick, loadMore,
   const isSelf = (id: string) => id === selfID;
 
   const parseTip = (msg: MessageItem): string | JSX.Element => {
-    if (msg.contentType === tipsTypes.REVOKEMESSAGE) {
+    if (msg.contentType === MessageType.REVOKEMESSAGE || msg.contentType === MessageType.ADVANCEREVOKEMESSAGE) {
       return (
         <>
           <b onClick={() => window.userClick(msg.sendID)}>{isSelf(msg.sendID) ? t("You") : isSingleCve(curCve!) ? curCve?.showName : msg.senderNickname}</b>
@@ -51,9 +51,9 @@ const ChatContent: FC<ChatContentProps> = ({ merID, msgList, imgClick, loadMore,
       );
     }
     switch (msg.contentType) {
-      case tipsTypes.FRIENDADDED:
+      case MessageType.FRIENDADDED:
         return t("AlreadyFriend");
-      case tipsTypes.GROUPCREATED:
+      case MessageType.GROUPCREATED:
         const groupCreatedDetail = JSON.parse(msg.notificationElem.detail);
         const groupCreatedUser = groupCreatedDetail.opUser;
         return (
@@ -62,7 +62,7 @@ const ChatContent: FC<ChatContentProps> = ({ merID, msgList, imgClick, loadMore,
             {t("GroupCreated")}
           </>
         );
-      case tipsTypes.GROUPINFOUPDATED:
+      case MessageType.GROUPINFOUPDATED:
         const groupUpdateDetail = JSON.parse(msg.notificationElem.detail);
         const groupUpdateUser = groupUpdateDetail.opUser;
         return (
@@ -71,7 +71,7 @@ const ChatContent: FC<ChatContentProps> = ({ merID, msgList, imgClick, loadMore,
             {t("ModifiedGroup")}
           </>
         );
-      case tipsTypes.GROUPOWNERTRANSFERRED:
+      case MessageType.GROUPOWNERTRANSFERRED:
         const transferDetails = JSON.parse(msg.notificationElem.detail);
         const transferOpUser = transferDetails.opUser;
         const newOwner = transferDetails.newGroupOwner;
@@ -82,7 +82,7 @@ const ChatContent: FC<ChatContentProps> = ({ merID, msgList, imgClick, loadMore,
             <b onClick={() => window.userClick(newOwner.userID)}>{isSelf(newOwner.userID) ? t("You") : newOwner.nickname}</b>
           </>
         );
-      case tipsTypes.MEMBERQUIT:
+      case MessageType.MEMBERQUIT:
         const quitDetails = JSON.parse(msg.notificationElem.detail);
         const quitUser = quitDetails.quitUser;
         return (
@@ -91,7 +91,7 @@ const ChatContent: FC<ChatContentProps> = ({ merID, msgList, imgClick, loadMore,
             {t("QuitedGroup")}
           </>
         );
-      case tipsTypes.MEMBERINVITED:
+      case MessageType.MEMBERINVITED:
         const inviteDetails = JSON.parse(msg.notificationElem.detail);
         const inviteOpUser = inviteDetails.opUser;
         const invitedUserList = inviteDetails.invitedUserList ?? [];
@@ -111,7 +111,7 @@ const ChatContent: FC<ChatContentProps> = ({ merID, msgList, imgClick, loadMore,
             {t("IntoGroup")}
           </>
         );
-      case tipsTypes.MEMBERKICKED:
+      case MessageType.MEMBERKICKED:
         const kickDetails = JSON.parse(msg.notificationElem.detail);
         const kickOpUser = kickDetails.opUser;
         const kickdUserList = kickDetails.kickedUserList ?? [];
@@ -131,7 +131,7 @@ const ChatContent: FC<ChatContentProps> = ({ merID, msgList, imgClick, loadMore,
             {t("OutGroup")}
           </>
         );
-      case tipsTypes.MEMBERENTER:
+      case MessageType.MEMBERENTER:
         const enterDetails = JSON.parse(msg.notificationElem.detail);
         const enterUser = enterDetails.entrantUser;
         return (
@@ -153,7 +153,7 @@ const ChatContent: FC<ChatContentProps> = ({ merID, msgList, imgClick, loadMore,
     <div className="chat_bg">
       <ScrollView holdHeight={30} loading={loading} data={msgList} fetchMoreData={nextFuc} hasMore={hasMore}>
         {msgList?.map((msg) => {
-          if (tipList.includes(msg.contentType)) {
+          if (TipsType.includes(msg.contentType)) {
             return (
               <div key={msg.clientMsgID} className="chat_bg_tips">
                 {parseTip(msg)}

@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next";
 import { useSelector, shallowEqual } from "react-redux";
 import { debounce } from "throttle-debounce";
 import { RootState } from "../../../../../store";
-import { GroupMemberItem } from "../../../../../utils/open_im_sdk/types";
-import { GroupRole } from "../CveRightDrawer";
+import { GroupMemberItem } from "../../../../../utils/open_im_sdk_wasm/types/entity";
+import { GroupRole } from "../../../../../utils/open_im_sdk_wasm/types/enum";
 import MemberItem from "./MemberItem";
 
 type MemberDrawerProps = {

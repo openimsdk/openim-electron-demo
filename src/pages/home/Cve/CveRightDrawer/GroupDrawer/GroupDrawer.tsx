@@ -5,8 +5,9 @@ import { useTranslation } from "react-i18next";
 import { MyAvatar } from "../../../../../components/MyAvatar";
 import { RESETCVE, OPENGROUPMODAL } from "../../../../../constants/events";
 import { events, im } from "../../../../../utils";
-import { ConversationItem, GroupMemberItem, OptType } from "../../../../../utils/open_im_sdk/types";
-import { DrawerType, GroupRole } from "../CveRightDrawer";
+import { ConversationItem, GroupMemberItem } from "../../../../../utils/open_im_sdk_wasm/types/entity";
+import { GroupRole, OptType } from "../../../../../utils/open_im_sdk_wasm/types/enum";
+import { DrawerType } from "../CveRightDrawer";
 
 const { Paragraph } = Typography;
 
@@ -22,7 +23,7 @@ type GroupDrawerProps = {
 const GroupDrawer: FC<GroupDrawerProps> = ({ curCve, role, groupMembers, changeType, updatePin, updateOpt }) => {
   const { t } = useTranslation();
   const toManage = () => {
-    if (role === GroupRole.OWNER) {
+    if (role === GroupRole.Owner) {
       changeType("group_manage");
     }
   };
@@ -56,7 +57,7 @@ const GroupDrawer: FC<GroupDrawerProps> = ({ curCve, role, groupMembers, changeT
           <MyAvatar size={36} shape="square" src={curCve.faceURL} />
           <div className="group_drawer_item_info">
             <div className="group_drawer_item_title">{curCve.showName}</div>
-            {role !== GroupRole.NOMAL ? (
+            {role !== GroupRole.Nomal ? (
               <div onClick={() => changeType("edit_group_info")} className="group_drawer_item_sub">
                 {t("UpdateGroupInfo")}
               </div>
@@ -79,13 +80,13 @@ const GroupDrawer: FC<GroupDrawerProps> = ({ curCve, role, groupMembers, changeT
         <div className="group_drawer_row_icon">
           {groupMembers!.length > 0
             ? groupMembers!.map((gm, idx) => {
-                if (idx < (role !== GroupRole.NOMAL ? 7 : 6)) {
+                if (idx < (role !== GroupRole.Nomal ? 7 : 6)) {
                   return <MyAvatar key={gm.userID} shape="square" size={32.8} src={gm.faceURL} icon={<UserOutlined />} />;
                 }
               })
             : null}
           <PlusOutlined onClick={inviteToGroup} />
-          {role !== GroupRole.NOMAL && <MinusOutlined onClick={delInGroup} />}
+          {role !== GroupRole.Nomal && <MinusOutlined onClick={delInGroup} />}
         </div>
       </div>
       {/* <div onClick={toManage} className="group_drawer_item">
@@ -123,7 +124,7 @@ const GroupDrawer: FC<GroupDrawerProps> = ({ curCve, role, groupMembers, changeT
         <Button onClick={quitGroup} danger className="group_drawer_btns_item">
           {t("QuitGroup")}
         </Button>
-        {role === GroupRole.OWNER ? (
+        {role === GroupRole.Owner ? (
           <Button  onClick={dissolveGroup} type="primary" danger className="group_drawer_btns_item">
             {t("DissolveGroup")}
           </Button>

@@ -2,7 +2,6 @@ import { LoadingOutlined, ExclamationCircleFilled } from "@ant-design/icons";
 import { Spin, Checkbox } from "antd";
 import { FC, useEffect, useRef, useState } from "react";
 import { MyAvatar } from "../../../../components/MyAvatar";
-import { messageTypes } from "../../../../constants/messageContentType";
 import { events, im, isSingleCve } from "../../../../utils";
 
 import { ATSTATEUPDATE, MUTILMSGCHANGE } from "../../../../constants/events";
@@ -11,7 +10,9 @@ import { useInViewport, useLongPress } from "ahooks";
 import SwitchMsgType from "./SwitchMsgType/SwitchMsgType";
 import MsgMenu from "./MsgMenu/MsgMenu";
 import { useTranslation } from "react-i18next";
-import { ConversationItem, MessageItem, PictureElem } from "../../../../utils/open_im_sdk/types";
+import { MessageItem, PictureElem, ConversationItem } from "../../../../utils/open_im_sdk_wasm/types/entity";
+import { MessageType } from "../../../../utils/open_im_sdk_wasm/types/enum";
+
 
 type MsgItemProps = {
   msg: MessageItem;
@@ -22,7 +23,7 @@ type MsgItemProps = {
   mutilSelect?: boolean;
 };
 
-const canSelectTypes = [messageTypes.TEXTMESSAGE, messageTypes.ATTEXTMESSAGE, messageTypes.PICTUREMESSAGE,messageTypes.VIDEOMESSAGE,messageTypes.VOICEMESSAGE, messageTypes.CARDMESSAGE,messageTypes.FILEMESSAGE,messageTypes.LOCATIONMESSAGE];
+const canSelectTypes = [MessageType.TEXTMESSAGE, MessageType.ATTEXTMESSAGE, MessageType.PICTUREMESSAGE,MessageType.VIDEOMESSAGE,MessageType.VOICEMESSAGE, MessageType.CARDMESSAGE,MessageType.FILEMESSAGE,MessageType.LOCATIONMESSAGE];
 
 const MsgItem: FC<MsgItemProps> = (props) => {
   const { msg, selfID, curCve, mutilSelect, audio } = props;

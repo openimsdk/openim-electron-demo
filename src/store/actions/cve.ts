@@ -1,6 +1,7 @@
 import { Dispatch } from "redux";
 import { im } from "../../utils";
-import { ConversationItem } from "../../utils/open_im_sdk/types";
+import { ConversationItem } from "../../utils/open_im_sdk_wasm/types/entity";
+
 import { CveActionTypes, SET_CUR_CVE, SET_CVE_INIT_LOADING, SET_CVE_LIST } from "../types/cve";
 
 export const setCveList = (value: ConversationItem[]): CveActionTypes => {

@@ -10,7 +10,7 @@ import { FC, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MyAvatar } from "../../../../../components/MyAvatar";
 import { im } from "../../../../../utils";
-import { GroupMemberItem } from "../../../../../utils/open_im_sdk/types";
+import { GroupMemberItem } from "../../../../../utils/open_im_sdk_wasm/types/entity";
 
 type GroupManageProps = {
   adminList: GroupMemberItem[];

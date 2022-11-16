@@ -2,9 +2,9 @@ import { UserOutlined } from "@ant-design/icons";
 import { Empty } from "antd";
 import { FC, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { SessionType } from "../../constants/messageContentType";
 import { pySegSort } from "../../utils/common";
-import { FriendItem } from "../../utils/open_im_sdk/types";
+import { FriendItem } from "../../utils/open_im_sdk_wasm/types/entity";
+import { SessionType } from "../../utils/open_im_sdk_wasm/types/enum";
 import { MyAvatar } from "../MyAvatar";
 import styles from "./contact.module.less";
 
@@ -30,7 +30,7 @@ const ConSection: FC<ConSectionProps> = ({ section, items, clickItem }) => (
 );
 
 const SectionItemComp: FC<SectionItemProps> = ({ item,clickItem }) => (
-  <div onDoubleClick={() => clickItem(item, SessionType.SINGLECVE)} className={styles.cons_section_item}>
+  <div onDoubleClick={() => clickItem(item, SessionType.Single)} className={styles.cons_section_item}>
     <MyAvatar shape="square" size={36} src={item.faceURL} icon={<UserOutlined />} />
     <div className={styles.cons_item_desc}>{item.remark===''?item.nickname:item.remark}</div>
   </div>

@@ -12,8 +12,9 @@ import GroupManage from "./GroupDrawer/GroupManage";
 import { GroupNotice } from "./GroupDrawer/GroupNotice";
 import { useTranslation } from "react-i18next";
 import { setCurCve } from "../../../../store/actions/cve";
-import { ConversationItem, GroupItem, GroupMemberItem, OptType } from "../../../../utils/open_im_sdk/types";
 import { SearchMessageDrawer } from "./SearchMessageDrawer";
+import { ConversationItem, GroupMemberItem, GroupItem } from "../../../../utils/open_im_sdk_wasm/types/entity";
+import { GroupRole, OptType } from "../../../../utils/open_im_sdk_wasm/types/enum";
 
 type CveRightDrawerProps = {
   curCve: ConversationItem;
@@ -24,19 +25,13 @@ type CveRightDrawerProps = {
 
 export type DrawerType = "set" | "edit_group_info" | "member_list" | "group_manage" | "group_notice_list" | "search_message";
 
-export enum GroupRole {
-  NOMAL = 1,
-  OWNER = 2,
-  ADMIN = 3,
-}
-
 const CveRightDrawer: FC<CveRightDrawerProps> = ({ curCve, visible, curTool, onClose }) => {
   const [type, setType] = useState<DrawerType>("set");
   const selfID = useSelector((state: RootState) => state.user.selfInfo.userID, shallowEqual);
   const groupMembers = useSelector((state: RootState) => state.contacts.groupMemberList, shallowEqual);
   const groupInfo = useSelector((state: RootState) => state.contacts.groupInfo, shallowEqual);
   const [adminList, setAdminList] = useState<GroupMemberItem[]>([]);
-  const [role, setRole] = useState<GroupRole>(GroupRole.NOMAL);
+  const [role, setRole] = useState<GroupRole>(GroupRole.Nomal);
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
@@ -70,11 +65,11 @@ const CveRightDrawer: FC<CveRightDrawerProps> = ({ curCve, visible, curTool, onC
     });
     setAdminList(tmpList);
     if (selfID === info.ownerUserID) {
-      setRole(GroupRole.OWNER);
+      setRole(GroupRole.Owner);
     } else if (adminIds.includes(selfID!)) {
-      setRole(GroupRole.ADMIN);
+      setRole(GroupRole.Admin);
     } else {
-      setRole(GroupRole.NOMAL);
+      setRole(GroupRole.Nomal);
     }
   };
 

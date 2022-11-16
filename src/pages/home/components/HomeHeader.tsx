@@ -11,9 +11,10 @@ import { events, im, isSingleCve } from "../../../utils";
 import members from "@/assets/images/members.png";
 import { setMember2Status } from "../../../store/actions/contacts";
 import { useTranslation } from "react-i18next";
-import { ConversationItem, GroupItem } from "../../../utils/open_im_sdk/types";
+
 import { useUpdateEffect } from "ahooks";
 import { APPLICATIONTYPEUPDATE } from "../../../constants/events";
+import { ConversationItem, GroupItem } from "../../../utils/open_im_sdk_wasm/types/entity";
 
 const { Header } = Layout;
 

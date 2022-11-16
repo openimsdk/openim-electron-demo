@@ -4,7 +4,7 @@ import { useSelector, shallowEqual } from "react-redux";
 import { MyAvatar } from "../../../../../components/MyAvatar";
 import { RootState } from "../../../../../store";
 import { im } from "../../../../../utils";
-import { PublicUserItem } from "../../../../../utils/open_im_sdk/types";
+import { PublicUserItem } from "../../../../../utils/open_im_sdk_wasm/types/entity";
 
 export const GroupNotice = () => {
   const groupInfo = useSelector((state: RootState) => state.contacts.groupInfo, shallowEqual);

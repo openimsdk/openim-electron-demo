@@ -18,7 +18,7 @@ import { RootState } from "../store";
 import { useClickAway } from "ahooks";
 import { getIMApiUrl, getIMRegisterUrl, getIMWsUrl } from "../config";
 import { useTranslation } from "react-i18next";
-import { FullUserItem } from "../utils/open_im_sdk/types";
+import { FullUserItem } from "../utils/open_im_sdk_wasm/types/entity";
 
 const { Sider } = Layout;
 

@@ -1,6 +1,6 @@
 import store from "../store";
 import { request } from "../utils";
-import { FullUserItem } from "../utils/open_im_sdk/types";
+import { FullUserItem } from "../utils/open_im_sdk_wasm/types/entity";
 
 export enum UsedFor {
   Register = 1,

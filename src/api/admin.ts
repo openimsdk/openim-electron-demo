@@ -1,7 +1,7 @@
 import { OnLineResType } from "../@types/open_im";
 import { getIMApiUrl } from "../config";
 import { request } from "../utils";
-import { uuid } from "../utils/open_im_sdk";
+import { uuid } from "../utils/common";
 
 export const getAuthToken = (uid?:string,secret?:string) =>
   request.post(

@@ -2,7 +2,6 @@ import { CloseCircleFilled, CloseOutlined } from "@ant-design/icons";
 import { Button, Layout, message } from "antd";
 import { FC, memo, useEffect, useRef, useState } from "react";
 import { base64toFile, contenteditableDivRange, cosUploadNomal, events, im, isSingleCve, move2end } from "../../../../utils";
-import { messageTypes } from "../../../../constants/messageContentType";
 import { ATSTATEUPDATE, FORWARDANDMERMSG, ISSETDRAFT, MUTILMSG, MUTILMSGCHANGE, REPLAYMSG } from "../../../../constants/events";
 import CardMsgModal from "../components/CardMsgModal";
 import { faceMap } from "../../../../constants/faceType";
@@ -13,13 +12,14 @@ import MsgTypeSuffix from "./MsgTypeSuffix";
 import { useTranslation } from "react-i18next";
 import ContentEditable, { ContentEditableEvent } from "../../../../components/EdtableDiv";
 import { useLatest } from "ahooks";
-import { ConversationItem, FriendItem, MessageItem } from "../../../../utils/open_im_sdk/types";
 import { getCosAuthorization } from "../../../../utils/cos";
+import { ConversationItem, FriendItem, MessageItem } from "../../../../utils/open_im_sdk_wasm/types/entity";
+import { MessageType } from "../../../../utils/open_im_sdk_wasm/types/enum";
 
 const { Footer } = Layout;
 
 type CveFooterProps = {
-  sendMsg: (nMsg: string, type: messageTypes) => void;
+  sendMsg: (nMsg: string, type: MessageType) => void;
   curCve: ConversationItem;
 };
 
@@ -212,23 +212,23 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
 
   const parseMsg = (msg: MessageItem) => {
     switch (msg.contentType) {
-      case messageTypes.TEXTMESSAGE:
+      case MessageType.TEXTMESSAGE:
         return msg.content;
-      case messageTypes.ATTEXTMESSAGE:
+      case MessageType.ATTEXTMESSAGE:
         return msg.atElem.text;
-      case messageTypes.PICTUREMESSAGE:
+      case MessageType.PICTUREMESSAGE:
         return t("PictureMessage");
-      case messageTypes.VIDEOMESSAGE:
+      case MessageType.VIDEOMESSAGE:
         return t("VideoMessage");
-      case messageTypes.VOICEMESSAGE:
+      case MessageType.VOICEMESSAGE:
         return t("VoiceMessage");
-      case messageTypes.LOCATIONMESSAGE:
+      case MessageType.LOCATIONMESSAGE:
         return t("LocationMessage");
-      case messageTypes.MERGERMESSAGE:
+      case MessageType.MERGERMESSAGE:
         return t("MergeMessage");
-      case messageTypes.FILEMESSAGE:
+      case MessageType.FILEMESSAGE:
         return t("FileMessage");
-      case messageTypes.QUOTEMESSAGE:
+      case MessageType.QUOTEMESSAGE:
         return t("QuoteMessage");
       default:
         break;
@@ -237,7 +237,7 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
 
   const quoteMsg = async (text: string) => {
     const { data } = await im.createQuoteMessage({ text, message: JSON.stringify(replyMsg) });
-    sendMsg(data, messageTypes.QUOTEMESSAGE);
+    sendMsg(data, MessageType.QUOTEMESSAGE);
     reSet();
   };
 
@@ -334,7 +334,7 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
     //   groupID: curCve.groupID,
     //   sendID: "17396220460",
     // }).then((res) => console.log(JSON.parse(res.data)));
-    sendMsg(data, messageTypes.TEXTMESSAGE);
+    sendMsg(data, MessageType.TEXTMESSAGE);
     reSet();
   };
 
@@ -344,7 +344,7 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
       atUserIDList: atList.map((au) => au.id),
     };
     const { data } = await im.createTextAtMessage(options);
-    sendMsg(data, messageTypes.ATTEXTMESSAGE);
+    sendMsg(data, MessageType.ATTEXTMESSAGE);
     reSet();
   };
 
@@ -417,7 +417,7 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
 
   const sendCardMsg = async (sf: FriendItem) => {
     const { data } = await im.createCardMessage(JSON.stringify(sf));
-    sendMsg(data, messageTypes.CARDMESSAGE);
+    sendMsg(data, MessageType.CARDMESSAGE);
   };
 
   const choseCard = () => {

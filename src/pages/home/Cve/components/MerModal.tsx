@@ -1,6 +1,6 @@
 import { Modal } from "antd"
 import { FC } from "react"
-import { ConversationItem, MergeElem, PictureElem } from "../../../../utils/open_im_sdk/types"
+import { PictureElem, MergeElem, ConversationItem } from "../../../../utils/open_im_sdk_wasm/types/entity";
 import ChatContent from "../ChatContent"
 
 type MerModalProps = {

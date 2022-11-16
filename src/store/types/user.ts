@@ -1,4 +1,5 @@
-import { FullUserItem } from "../../utils/open_im_sdk/types"
+import { FullUserItem } from "../../utils/open_im_sdk_wasm/types/entity"
+
 
 export type UserState = {
     selfInfo:FullUserItem

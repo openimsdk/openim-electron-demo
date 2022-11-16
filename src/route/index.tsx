@@ -32,11 +32,12 @@ import {
   setGroupInfo,
   getGroupMemberList,
 } from "../store/actions/contacts";
-import { getSelfInfo, getAdminToken } from "../store/actions/user";
-import { CbEvents } from "../utils/open_im_sdk";
-import { ConversationItem, FriendApplicationItem, GroupApplicationItem, WsResponse } from "../utils/open_im_sdk/types";
+import { getSelfInfo } from "../store/actions/user";
 import { OPENSINGLEMODAL } from "../constants/events";
 import { cveSort } from "../utils";
+import { CbEvents } from "open-im-sdk-wasm-webpack4/lib/constant";
+import { ConversationItem, FriendApplicationItem, GroupApplicationItem } from "../utils/open_im_sdk_wasm/types/entity";
+import { WSEvent } from "../utils/open_im_sdk_wasm/types";
 
 type GruopHandlerType = "added" | "deleted" | "info" | "memberAdded" | "memberDeleted";
 
@@ -98,10 +99,10 @@ const Auth = () => {
     }
   }, []);
 
-  const conversationChnageHandler = (data: WsResponse) => {
+  const conversationChnageHandler = (data: WSEvent) => {
     let tmpCves = cves;
     let filterArr: ConversationItem[] = [];
-    const changes: ConversationItem[] = JSON.parse(data.data);
+    const changes: ConversationItem[] = JSON.parse(data.data as string);
     const chids = changes.map((ch) => ch.conversationID);
     filterArr = tmpCves.filter((tc) => !chids.includes(tc.conversationID));
     const idx = changes.findIndex((c) => c.conversationID === curCve?.conversationID);
@@ -110,9 +111,9 @@ const Auth = () => {
     dispatch(setCveList(cveSort(result)));
   };
 
-  const newConversationHandler = (data: WsResponse) => {
+  const newConversationHandler = (data: WSEvent) => {
     let tmpCves = cves;
-    const news: ConversationItem[] = JSON.parse(data.data);
+    const news: ConversationItem[] = JSON.parse(data.data as string);
     const result = [...news, ...tmpCves];
     dispatch(setCveList(cveSort(result)));
   };
@@ -126,8 +127,8 @@ const Auth = () => {
     };
   }, [cves, curCve]);
 
-  const friendHandlerTemplate = (data: WsResponse, type: "info" | "added" | "deleted") => {
-    const user = JSON.parse(data.data);
+  const friendHandlerTemplate = (data: WSEvent, type: "info" | "added" | "deleted") => {
+    const user = JSON.parse(data.data as string);
     const tmpArr = [...friendList];
     if (type === "info") {
       const idx = tmpArr.findIndex((f) => f.userID === user.userID);
@@ -141,9 +142,9 @@ const Auth = () => {
     dispatch(setFriendList(tmpArr));
   };
 
-  const friednInfoChangeHandler = (data: WsResponse) => friendHandlerTemplate(data, "info");
-  const friednAddedHandler = (data: WsResponse) => friendHandlerTemplate(data, "added");
-  const friednDeletedHandler = (data: WsResponse) => friendHandlerTemplate(data, "deleted");
+  const friednInfoChangeHandler = (data: WSEvent) => friendHandlerTemplate(data, "info");
+  const friednAddedHandler = (data: WSEvent) => friendHandlerTemplate(data, "added");
+  const friednDeletedHandler = (data: WSEvent) => friendHandlerTemplate(data, "deleted");
 
   useEffect(() => {
     im.on(CbEvents.ONFRIENDINFOCHANGED, friednInfoChangeHandler);
@@ -156,8 +157,8 @@ const Auth = () => {
     };
   }, [friendList]);
 
-  const blackAddedHandler = (data: WsResponse) => {
-    const black = JSON.parse(data.data);
+  const blackAddedHandler = (data: WSEvent) => {
+    const black = JSON.parse(data.data as string);
     const tmpBlackArr = [...blackList];
     const tmpFriendArr = [...friendList];
     const idx = tmpFriendArr.findIndex((f) => f.userID === black.userID);
@@ -166,8 +167,8 @@ const Auth = () => {
     dispatch(setBlackList(tmpBlackArr));
     dispatch(setFriendList(tmpFriendArr));
   };
-  const blackDeletedHandler = async (data: WsResponse) => {
-    const black = JSON.parse(data.data);
+  const blackDeletedHandler = async (data: WSEvent) => {
+    const black = JSON.parse(data.data as string);
     const tmpBlackArr = [...blackList];
     const tmpFriendArr = [...friendList];
     let { data: result } = await im.getDesignatedFriendsInfo([black.userID]);
@@ -192,8 +193,8 @@ const Auth = () => {
 
   const isCurGroup = (gid: string) => curCve?.groupID === gid;
 
-  const groupHandlerTemplate = (data: WsResponse, type: GruopHandlerType) => {
-    const result = JSON.parse(data.data);
+  const groupHandlerTemplate = (data: WSEvent, type: GruopHandlerType) => {
+    const result = JSON.parse(data.data as string);
     const tmpArr = [...groupList];
     const idx = tmpArr.findIndex((f) => f.groupID === result.groupID);
     switch (type) {
@@ -249,15 +250,15 @@ const Auth = () => {
     dispatch(setGroupList(tmpArr));
   };
 
-  const joinedGroupAddedHandler = (data: WsResponse) => groupHandlerTemplate(data, "added");
+  const joinedGroupAddedHandler = (data: WSEvent) => groupHandlerTemplate(data, "added");
 
-  const joinedGroupDeletedHandler = (data: WsResponse) => groupHandlerTemplate(data, "deleted");
+  const joinedGroupDeletedHandler = (data: WSEvent) => groupHandlerTemplate(data, "deleted");
 
-  const groupInfoChangedHandler = (data: WsResponse) => groupHandlerTemplate(data, "info");
+  const groupInfoChangedHandler = (data: WSEvent) => groupHandlerTemplate(data, "info");
 
-  const groupMemberAddedHandler = (data: WsResponse) => groupHandlerTemplate(data, "memberAdded");
+  const groupMemberAddedHandler = (data: WSEvent) => groupHandlerTemplate(data, "memberAdded");
 
-  const groupMemberDeletedHandler = (data: WsResponse) => groupHandlerTemplate(data, "memberDeleted");
+  const groupMemberDeletedHandler = (data: WSEvent) => groupHandlerTemplate(data, "memberDeleted");
 
   useEffect(() => {
     im.on(CbEvents.ONJOINEDGROUPADDED, joinedGroupAddedHandler);
@@ -275,7 +276,7 @@ const Auth = () => {
   }, [groupList, curCve, groupMemberList]);
 
   useEffect(() => {
-    im.on(CbEvents.ONTOTALUNREADMESSAGECOUNTCHANGED, (data:WsResponse) => {
+    im.on(CbEvents.ONTOTALUNREADMESSAGECOUNTCHANGED, (data:WSEvent) => {
       dispatch(setUnReadCount(Number(data.data)));
     });
   }, []);
@@ -311,21 +312,21 @@ const Auth = () => {
   const isReceivedFriendApplication = (fromUserID: string) => fromUserID !== selfInfo.userID;
   const isReceivedGroupApplication = (userID: string) => userID !== selfInfo.userID;
 
-  const friendApplicationAddedHandler = (data: WsResponse) => {
-    const application: FriendApplicationItem = JSON.parse(data.data);
+  const friendApplicationAddedHandler = (data: WSEvent) => {
+    const application: FriendApplicationItem = JSON.parse(data.data as string);
     isReceivedFriendApplication(application.fromUserID) ? applicationHandlerTemplate(data, "fromUserID") : applicationHandlerTemplate(data, "toUserID");
   };
-  const friendApplicationProcessedHandler = (data: WsResponse) => {
-    const application: FriendApplicationItem = JSON.parse(data.data);
+  const friendApplicationProcessedHandler = (data: WSEvent) => {
+    const application: FriendApplicationItem = JSON.parse(data.data as string);
     isReceivedFriendApplication(application.fromUserID) ? applicationHandlerTemplate(data, "fromUserID", true) : applicationHandlerTemplate(data, "toUserID", true);
   };
 
-  const groupApplicationAddedHandler = (data: WsResponse) => {
-    const application: GroupApplicationItem = JSON.parse(data.data);
+  const groupApplicationAddedHandler = (data: WSEvent) => {
+    const application: GroupApplicationItem = JSON.parse(data.data as string);
     isReceivedGroupApplication(application.userID) ? applicationHandlerTemplate(data, "userID") : applicationHandlerTemplate(data, "groupID");
   };
-  const groupApplicationProcessedHandler = (data: WsResponse) => {
-    const application: GroupApplicationItem = JSON.parse(data.data);
+  const groupApplicationProcessedHandler = (data: WSEvent) => {
+    const application: GroupApplicationItem = JSON.parse(data.data as string);
     isReceivedGroupApplication(application.userID) ? applicationHandlerTemplate(data, "userID", true) : applicationHandlerTemplate(data, "groupID", true);
   };
 

@@ -12,7 +12,7 @@ import { events, isSingleCve } from "../../../utils";
 import { TOASSIGNCVE } from "../../../constants/events";
 import CveRightDrawer from "./CveRightDrawer/CveRightDrawer";
 import { useTranslation } from "react-i18next";
-import { ConversationItem, FriendItem } from "../../../utils/open_im_sdk/types";
+import { ConversationItem } from "../../../utils/open_im_sdk_wasm/types/entity";
 
 const { Sider } = Layout;
 

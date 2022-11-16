@@ -25,7 +25,6 @@ import {
 } from "../../store/actions/contacts";
 import IMConfigModal from "./components/IMConfigModal";
 import TopBar from "../../components/TopBar";
-import { InitConfig } from "../../utils/open_im_sdk/types";
 
 const Login = () => {
   const { t } = useTranslation();

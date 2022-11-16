@@ -7,7 +7,8 @@ import LayLoad from "../../../../components/LayLoad";
 import { MyAvatar } from "../../../../components/MyAvatar";
 import { setCveList } from "../../../../store/actions/cve";
 import { formatDate, im, parseMessageType } from "../../../../utils";
-import { ConversationItem, MessageItem, OptType } from "../../../../utils/open_im_sdk/types";
+import { ConversationItem, MessageItem } from "../../../../utils/open_im_sdk_wasm/types/entity";
+import { OptType } from "../../../../utils/open_im_sdk_wasm/types/enum";
 
 type CveItemProps = {
   cve: ConversationItem;

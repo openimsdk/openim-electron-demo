@@ -13,9 +13,9 @@ import { RootState } from "../../../store";
 import { events, im } from "../../../utils";
 import { MyAvatar } from "../../../components/MyAvatar";
 import { TOASSIGNCVE } from "../../../constants/events";
-import { SessionType } from "../../../constants/messageContentType";
 import { useTranslation } from "react-i18next";
-import { GroupItem } from "../../../utils/open_im_sdk/types";
+import { GroupItem } from "../../../utils/open_im_sdk_wasm/types/entity";
+import { GroupType, SessionType } from "../../../utils/open_im_sdk_wasm/types/enum";
 
 type GroupCardProps = {
   draggableCardVisible: boolean;
@@ -97,7 +97,7 @@ const GroupCard: FC<GroupCardProps> = ({
 
   const nextStep = () => {
     if(inGroup){
-      events.emit(TOASSIGNCVE,info.groupID,SessionType.GROUPCVE)
+      events.emit(TOASSIGNCVE,info.groupID,info.groupType === GroupType.NomalGroup? SessionType.Group: SessionType.SuperGroup)
     }else{
       setStep("send")
     }

@@ -1,7 +1,9 @@
 import { Dispatch } from "redux";
 import { MemberMapType } from "../../@types/open_im";
 import { im } from "../../utils";
-import { BlackItem, FriendApplicationItem, FriendItem, GetGroupMemberParams, GroupApplicationItem, GroupItem, GroupMemberItem, TotalUserStruct } from "../../utils/open_im_sdk/types";
+import { FriendItem, GroupItem, BlackItem, FriendApplicationItem, GroupApplicationItem, GroupMemberItem, TotalUserStruct } from "../../utils/open_im_sdk_wasm/types/entity";
+import { GetGroupMemberParams } from "../../utils/open_im_sdk_wasm/types/params";
+
 import {
   ContactActionTypes,
   SET_BLACK_LIST,

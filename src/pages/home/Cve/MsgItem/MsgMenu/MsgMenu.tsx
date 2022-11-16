@@ -12,12 +12,13 @@ import download_msg from "@/assets/images/download_msg.png";
 import { downloadFileUtil, events, im } from "../../../../../utils";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { FORWARDANDMERMSG, MUTILMSG, REPLAYMSG, REVOKEMSG, DELETEMESSAGE } from "../../../../../constants/events";
-import { messageTypes } from "../../../../../constants/messageContentType";
 import { useTranslation } from "react-i18next";
-import { MessageItem } from "../../../../../utils/open_im_sdk/types";
+import { MessageItem } from "../../../../../utils/open_im_sdk_wasm/types/entity";
+import { MessageType } from "../../../../../utils/open_im_sdk_wasm/types/enum";
 
-const canCpTypes = [messageTypes.TEXTMESSAGE, messageTypes.ATTEXTMESSAGE];
-const canDownloadTypes = [messageTypes.PICTUREMESSAGE, messageTypes.VIDEOMESSAGE, messageTypes.FILEMESSAGE];
+
+const canCpTypes = [MessageType.TEXTMESSAGE, MessageType.ATTEXTMESSAGE];
+const canDownloadTypes = [MessageType.PICTUREMESSAGE, MessageType.VIDEOMESSAGE, MessageType.FILEMESSAGE];
 
 type MsgMenuProps = {
   visible: boolean;
@@ -44,11 +45,14 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
   };
 
   const revMsg = () => {
-    im.revokeMessage(JSON.stringify(msg))
+    im.newRevokeMessage(JSON.stringify(msg))
       .then((res) => {
         events.emit(REVOKEMSG, msg.clientMsgID);
       })
-      .catch((err) => message.error(t("RevokeMessageFailed")));
+      .catch((err) =>{
+        console.log(err);
+        message.error(t("RevokeMessageFailed"))
+      });
   };
 
   const delComfirm = () => {
@@ -74,13 +78,13 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
   const downloadFile = () => {
     let downloadUrl = "";
     switch (msg.contentType) {
-      case messageTypes.PICTUREMESSAGE:
+      case MessageType.PICTUREMESSAGE:
         downloadUrl = msg.pictureElem.sourcePicture.url
         break;
-      case messageTypes.VIDEOMESSAGE:
+      case MessageType.VIDEOMESSAGE:
         downloadUrl = msg.videoElem.videoUrl
         break;
-      case messageTypes.FILEMESSAGE:
+      case MessageType.FILEMESSAGE:
         downloadUrl = msg.fileElem.sourceUrl
         break;
       default:
@@ -155,7 +159,7 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
       menu.hidden = true;
     }
     return menu.hidden ? null : menu.title === t("Copy") ? (
-      <CopyToClipboard key={menu.title} onCopy={() => message.success("复制成功！")} text={msg.contentType === messageTypes.ATTEXTMESSAGE ? msg.atElem.text : msg.content}>
+      <CopyToClipboard key={menu.title} onCopy={() => message.success("复制成功！")} text={msg.contentType === MessageType.ATTEXTMESSAGE ? msg.atElem.text : msg.content}>
         <div onClick={menu.method} className="msg_menu_iem">
           <img src={menu.icon} />
           <span>{menu.title}</span>

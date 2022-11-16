@@ -4,8 +4,8 @@ import { FC } from "react";
 import { useTranslation } from "react-i18next";
 import { MyAvatar } from "../../../components/MyAvatar";
 import { im } from "../../../utils";
-import { uuid } from "../../../utils/open_im_sdk";
-import { FriendApplicationItem, GroupApplicationItem } from "../../../utils/open_im_sdk/types";
+import { uuid } from "../../../utils/common";
+import { FriendApplicationItem, GroupApplicationItem } from "../../../utils/open_im_sdk_wasm/types/entity";
 
 type NewNoticeProps = {
   type :number,

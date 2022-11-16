@@ -6,8 +6,8 @@ import { MemberMapType } from "../../../../../@types/open_im";
 import LayLoad from "../../../../../components/LayLoad";
 import { MyAvatar } from "../../../../../components/MyAvatar";
 import { im } from "../../../../../utils";
-import { GroupMemberItem } from "../../../../../utils/open_im_sdk/types";
-import { GroupRole } from "../CveRightDrawer";
+import { GroupMemberItem } from "../../../../../utils/open_im_sdk_wasm/types/entity";
+import { GroupRole } from "../../../../../utils/open_im_sdk_wasm/types/enum";
 
 type MemberItemProps = {
   item: GroupMemberItem;
@@ -75,12 +75,12 @@ const MemberItem: FC<MemberItemProps> = ({ idx, item, member2Status, role, gid, 
   );
 
   const getPermission = (item: GroupMemberItem) => {
-    if (role === GroupRole.OWNER) {
-      if (item.roleLevel !== GroupRole.OWNER) {
+    if (role === GroupRole.Owner) {
+      if (item.roleLevel !== GroupRole.Owner) {
         return <RemoveIcon item={item} />;
       }
-    } else if (role === GroupRole.ADMIN) {
-      if (item.roleLevel !== GroupRole.OWNER && item.roleLevel !== GroupRole.ADMIN) {
+    } else if (role === GroupRole.Admin) {
+      if (item.roleLevel !== GroupRole.Owner && item.roleLevel !== GroupRole.Admin) {
         return <RemoveIcon item={item} />;
       }
     }

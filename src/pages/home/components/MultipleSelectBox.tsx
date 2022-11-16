@@ -8,7 +8,8 @@ import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { useReactive } from "ahooks";
 import { ModalType } from "./GroupOpModal";
 import { useTranslation } from "react-i18next";
-import { FriendItem, GroupItem, GroupMemberItem } from "../../../utils/open_im_sdk/types";
+import { FriendItem, GroupMemberItem, GroupItem } from "../../../utils/open_im_sdk_wasm/types/entity";
+
 
 type MultipleSelectBoxProps = {
   modalType:ModalType;

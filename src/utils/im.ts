@@ -1,12 +1,10 @@
-// import { OpenIMSDK } from 'open-im-sdk'
 import { t } from "i18next";
-// import { getSDK } from "open-im-sdk-wasm-webpack4";
-import { messageTypes, SessionType, tipsTypes } from "../constants/messageContentType";
-import { getSDK } from "./lib";
-// import { OpenIMSDK } from "./open_im_sdk";
-import { ConversationItem, MessageItem } from "./open_im_sdk/types";
+import { getSDK } from "./open_im_sdk_wasm";
+import { ConversationItem, MessageItem } from "./open_im_sdk_wasm/types/entity";
+import { MessageType } from "./open_im_sdk_wasm/types/enum";
 
-// export const im = new OpenIMSDK();
+
+
 export const im = getSDK()
 
 //utils
@@ -18,59 +16,60 @@ export const parseMessageType = (pmsg: MessageItem, curUid?: string): string => 
   const isSelf = (id: string) => id === curUid;
 
   switch (pmsg.contentType) {
-    case messageTypes.TEXTMESSAGE:
+    case MessageType.TEXTMESSAGE:
       return pmsg.content;
-    case messageTypes.ATTEXTMESSAGE:
+    case MessageType.ATTEXTMESSAGE:
       return pmsg.atElem.text;
-    case messageTypes.PICTUREMESSAGE:
+    case MessageType.PICTUREMESSAGE:
       return t("PictureMessage");
-    case messageTypes.VIDEOMESSAGE:
+    case MessageType.VIDEOMESSAGE:
       return t("VideoMessage");
-    case messageTypes.VOICEMESSAGE:
+    case MessageType.VOICEMESSAGE:
       return t("VoiceMessage");
-    case messageTypes.LOCATIONMESSAGE:
+    case MessageType.LOCATIONMESSAGE:
       return t("LocationMessage");
-    case messageTypes.CARDMESSAGE:
+    case MessageType.CARDMESSAGE:
       return t("CardMessage");
-    case messageTypes.MERGERMESSAGE:
+    case MessageType.MERGERMESSAGE:
       return t("MergeMessage");
-    case messageTypes.FILEMESSAGE:
+    case MessageType.FILEMESSAGE:
       return t("FileMessage");
-    case messageTypes.REVOKEMESSAGE:
+    case MessageType.REVOKEMESSAGE:
+    case MessageType.ADVANCEREVOKEMESSAGE:
       return `${isSelf(pmsg.sendID) ? t("You") : pmsg.senderNickname}${t("RevokeMessage")}`;
-    case messageTypes.CUSTOMMESSAGE:
+    case MessageType.CUSTOMMESSAGE:
       return t("CustomMessage");
-    case messageTypes.QUOTEMESSAGE:
+    case MessageType.QUOTEMESSAGE:
       return t("QuoteMessage");
-    case tipsTypes.FRIENDADDED:
+    case MessageType.FRIENDADDED:
       return t("AlreadyFriend");
-    case tipsTypes.MEMBERENTER:
+    case MessageType.MEMBERENTER:
       const enterDetails = JSON.parse(pmsg.notificationElem.detail);
       const enterUser = enterDetails.entrantUser;
       return `${isSelf(enterUser.userID) ? t("You") : enterUser.nickname}${t("JoinedGroup")}`;
-    case tipsTypes.GROUPCREATED:
+    case MessageType.GROUPCREATED:
       const groupCreatedDetail = JSON.parse(pmsg.notificationElem.detail);
       const groupCreatedUser = groupCreatedDetail.opUser;
       return `${isSelf(groupCreatedUser.userID) ? t("You") : groupCreatedUser.nickname}${t("GroupCreated")}`;
-    case tipsTypes.MEMBERINVITED:
+    case MessageType.MEMBERINVITED:
       const inviteDetails = JSON.parse(pmsg.notificationElem.detail);
       const inviteOpUser = inviteDetails.opUser;
       const invitedUserList = inviteDetails.invitedUserList ?? [];
       let inviteStr = "";
       invitedUserList.forEach((user: any) => (inviteStr += (isSelf(user.userID) ? t("You") : user.nickname) + " "));
       return `${isSelf(inviteOpUser.userID) ? t("You") : inviteOpUser.nickname}${t("Invited")}${inviteStr}${t("IntoGroup")}`;
-    case tipsTypes.MEMBERKICKED:
+    case MessageType.MEMBERKICKED:
       const kickDetails = JSON.parse(pmsg.notificationElem.detail);
       const kickOpUser = kickDetails.opUser;
       const kickdUserList = kickDetails.kickedUserList ?? [];
       let kickStr = "";
       kickdUserList.forEach((user: any) => (kickStr += (isSelf(user.userID) ? t("You") : user.nickname) + " "));
       return `${isSelf(kickOpUser.userID) ? t("You") : kickOpUser.nickname}${t("Kicked")}${kickStr}${t("OutGroup")}`;
-    case tipsTypes.MEMBERQUIT:
+    case MessageType.MEMBERQUIT:
       const quitDetails = JSON.parse(pmsg.notificationElem.detail);
       const quitUser = quitDetails.quitUser;
       return `${isSelf(quitUser.userID) ? t("You") : quitUser.nickname}${t("QuitedGroup")}`;
-    case tipsTypes.GROUPINFOUPDATED:
+    case MessageType.GROUPINFOUPDATED:
       const groupUpdateDetail = JSON.parse(pmsg.notificationElem.detail);
       const groupUpdateUser = groupUpdateDetail.opUser;
       return `${isSelf(groupUpdateUser.userID) ? t("You") : groupUpdateUser.nickname}${t("ModifiedGroup")}`;
@@ -91,24 +90,24 @@ export const getNotification = (cb?: () => void) => {
   }
 };
 
-export const createNotification = (message: MessageItem, click?: (id: string, type: SessionType) => void, tag?: string) => {
-  if (Notification && document.hidden) {
-    const title = message.contentType === tipsTypes.FRIENDADDED ? t("FriendNotice") : message.senderNickname;
-    const notification = new Notification(title, {
-      dir: "auto",
-      tag: tag ?? message.groupID ?? message.sendID,
-      renotify: true,
-      icon: message.senderFaceUrl,
-      body: parseMessageType(message),
-      requireInteraction: true,
-    });
-    const id = message.sessionType === SessionType.SINGLECVE ? (message.contentType === tipsTypes.FRIENDADDED ? message.recvID : message.sendID) : message.groupID;
-    notification.onclick = () => {
-      click && click(id, message.sessionType);
-      notification.close();
-    };
-  }
-};
+// export const createNotification = (message: MessageItem, click?: (id: string, type: SessionType) => void, tag?: string) => {
+//   if (Notification && document.hidden) {
+//     const title = message.contentType === MessageType.FRIENDADDED ? t("FriendNotice") : message.senderNickname;
+//     const notification = new Notification(title, {
+//       dir: "auto",
+//       tag: tag ?? message.groupID ?? message.sendID,
+//       renotify: true,
+//       icon: message.senderFaceUrl,
+//       body: parseMessageType(message),
+//       requireInteraction: true,
+//     });
+//     const id = message.sessionType === SessionType.SINGLECVE ? (message.contentType === MessageType.FRIENDADDED ? message.recvID : message.sendID) : message.groupID;
+//     notification.onclick = () => {
+//       click && click(id, message.sessionType);
+//       notification.close();
+//     };
+//   }
+// };
 
 export const cveSort = (cveList: ConversationItem[]) => {
   const arr:string[] = [];

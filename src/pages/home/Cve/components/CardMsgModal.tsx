@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { shallowEqual, useSelector } from "react-redux";
 import { MyAvatar } from "../../../../components/MyAvatar";
 import { RootState } from "../../../../store";
-import { FriendItem } from "../../../../utils/open_im_sdk/types";
+import { FriendItem } from "../../../../utils/open_im_sdk_wasm/types/entity";
 
 type CardMsgModalProps = {
   visible: boolean;
