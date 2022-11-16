@@ -7,11 +7,11 @@ import { useHistoryTravel, useLatest } from "ahooks";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import md5 from "md5";
-import { login as loginApi, modify, register, reset, sendSms, UsedFor, verifyCode } from "../../api/login";
+import { login as loginApi, register, reset, sendSms, UsedFor, verifyCode } from "../../api/login";
 import { im } from "../../utils";
-import { getIMApiUrl, getIMWsUrl, IM_WS_URL } from "../../config";
+import { getIMApiUrl, getIMWsUrl } from "../../config";
 import { useDispatch } from "react-redux";
-import { getSelfInfo, getAdminToken, setSelfInfo } from "../../store/actions/user";
+import { getSelfInfo, setSelfInfo } from "../../store/actions/user";
 import { getCveList } from "../../store/actions/cve";
 import {
   getBlackList,
@@ -135,19 +135,6 @@ const Login = () => {
     }
   };
 
-  const setIMInfo = (values: InfoField) => {
-    values.userID = num;
-    im.setSelfInfo(values)
-      .then((res) => {
-        dispatch(setSelfInfo(values));
-        navigate("/", { replace: true });
-      })
-      .catch((err) => {
-        toggle("setInfo");
-        message.error(t("SetInfoFailed"));
-      });
-  };
-
   const login = (data: FormField) => {
     localStorage.setItem('IMAccount',data.phoneNo)
     loginApi(data.phoneNo,data.areaCode, md5(data.password as string))
@@ -261,7 +248,7 @@ const Login = () => {
           </div>
           <LoginForm loading={loading} num={num} type={lastType.current} finish={finish} getCodeAgain={getCodeAgain} back={back} />
         </div>
-        {isModalVisible && <IMConfigModal visible={isModalVisible} close={closeModal} />}
+        {/* {isModalVisible && <IMConfigModal visible={isModalVisible} close={closeModal} />} */}
       </div>
       <div className="login_bottom"></div>
     </div>
