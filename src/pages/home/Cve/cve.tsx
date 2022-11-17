@@ -19,7 +19,7 @@ import { SelectType } from "../components/MultipleSelectBox";
 import { getGroupInfo, getGroupMemberList } from "../../../store/actions/contacts";
 import { useTranslation } from "react-i18next";
 import { setCurCve } from "../../../store/actions/cve";
-import { CbEvents } from "open-im-sdk-wasm-webpack4/lib/constant";
+import { CbEvents } from "open-im-sdk-wasm/lib/constant";
 import { MessageItem, MergeElem, ConversationItem, FriendItem, GroupItem, PictureElem, WsResponse } from "../../../utils/open_im_sdk_wasm/types/entity";
 import { MergerMsgParams } from "../../../utils/open_im_sdk_wasm/types/params";
 import { MessageType, SessionType } from "../../../utils/open_im_sdk_wasm/types/enum";

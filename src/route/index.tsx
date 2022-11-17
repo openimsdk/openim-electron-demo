@@ -35,7 +35,7 @@ import {
 import { getSelfInfo } from "../store/actions/user";
 import { OPENSINGLEMODAL } from "../constants/events";
 import { cveSort } from "../utils";
-import { CbEvents } from "open-im-sdk-wasm-webpack4/lib/constant";
+import { CbEvents } from "open-im-sdk-wasm/lib/constant";
 import { ConversationItem, FriendApplicationItem, GroupApplicationItem } from "../utils/open_im_sdk_wasm/types/entity";
 import { WSEvent } from "../utils/open_im_sdk_wasm/types";
 
