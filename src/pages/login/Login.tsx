@@ -23,7 +23,6 @@ import {
   getSentFriendApplicationList,
   getSentGroupApplicationList,
 } from "../../store/actions/contacts";
-import IMConfigModal from "./components/IMConfigModal";
 import TopBar from "../../components/TopBar";
 
 const Login = () => {
@@ -31,9 +30,6 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [num, setNum] = useState("");
-  const [code, setCode] = useState("");
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const { value: type, setValue: setType, back } = useHistoryTravel<Itype>("login");
   const lastType = useLatest(type);
   const [formData, setFormData] = useState({
@@ -230,23 +226,19 @@ const Login = () => {
     setType(mtype);
   };
 
-  const closeModal = () => {
-    setIsModalVisible(false);
-  };
-
   return (
     <div className="login_container">
       <TopBar />
       <div className="login_wapper">
         <div className="center_container">
           <div className="left_container">
-            <div onDoubleClick={() => setIsModalVisible(true)} className="title">
+            <div className="title">
               {t("LoginTitle")}
             </div>
             <span className="sub_title">{t("LoginSubTitle")}</span>
             <img src={login_bg} />
           </div>
-          <LoginForm loading={loading} num={num} type={lastType.current} finish={finish} getCodeAgain={getCodeAgain} back={back} />
+          <LoginForm loading={loading} num={formData.no} type={lastType.current} finish={finish} getCodeAgain={getCodeAgain} back={back} />
         </div>
         {/* {isModalVisible && <IMConfigModal visible={isModalVisible} close={closeModal} />} */}
       </div>

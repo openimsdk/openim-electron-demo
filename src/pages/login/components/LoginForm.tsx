@@ -43,7 +43,7 @@ const LoginForm: FC<IProps> = (props) => {
   const [backSts, { set: setBack }] = useToggle();
   const [checkSts, { toggle: toggleCheck }] = useToggle(true);
   const [sInfo, setSInfo] = useState<InfoField>({
-    userID: "",
+    userID: "userID",
     nickname: "",
     faceURL: `ic_avatar_0${Math.ceil(Math.random() * 6)}`,
   });
