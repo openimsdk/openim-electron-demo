@@ -5,7 +5,7 @@ import { MessageType } from "./open_im_sdk_wasm/types/enum";
 
 
 
-export const im = getSDK()
+export const im = getSDK('./openIM.wasm')
 
 //utils
 export const isSingleCve = (cve: ConversationItem) => {

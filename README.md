@@ -36,6 +36,12 @@ Open im includes instant messaging and real-time audio and video server and clie
   ```
 
 - Build (electron)
+> you need update `utils/open_im_sdk_wasm/api/database/instance.js` wasm import path first.
+>
+> ```javascript
+> - SQL = await initSqlJs({ locateFile: () => '/sql-wasm.wasm' });
+> + SQL = await initSqlJs({ locateFile: () => '../../sql-wasm.wasm' });
+> ```
 
   ```bash
   npm run build:main
