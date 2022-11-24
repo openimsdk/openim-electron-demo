@@ -91,7 +91,7 @@ const MsgMenu: FC<MsgMenuProps> = ({ visible, msg, isSelf, visibleChange, childr
         break;
     }
     const idx = downloadUrl.lastIndexOf("/");
-    const fileName = downloadUrl.slice(idx + 1);
+    const fileName = msg.fileElem.fileName; //downloadUrl.slice(idx + 1);
     downloadFileUtil(downloadUrl, fileName);
   };
 
