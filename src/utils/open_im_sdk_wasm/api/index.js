@@ -1,6 +1,7 @@
 import { initBackend } from 'open-absurd-sql/dist/indexeddb-main-thread';
 import { RPCMessageEvent, RPC } from 'rpc-shooter';
 import { DatabaseErrorCode } from '../constant';
+// @ts-ignore
 //  for vite
 // import IMWorker from './worker?worker';
 //  @ts-ignore
@@ -12,9 +13,10 @@ function initWorker() {
     if (typeof window === 'undefined') {
         return;
     }
+    // for webpack4 or vite
     worker = new IMWorker();
     // for webpack5
-    // worker = new Worker(new URL('./worker.js',import.meta.url));
+    // worker = new Worker(new URL('./worker.js', import.meta.url));
     // This is only required because Safari doesn't support nested
     // workers. This installs a handler that will proxy creating web
     // workers through the main thread
@@ -50,7 +52,7 @@ function catchErrorHandle(error) {
     throw error;
 }
 function registeMethodOnWindow(name, realName) {
-    // console.info(`=> (database api) registe ${realName ?? name}`);
+    console.info(`=> (database api) registe ${realName ?? name}`);
     return async (...args) => {
         if (!rpc || !worker) {
             initWorker();
@@ -59,16 +61,16 @@ function registeMethodOnWindow(name, realName) {
             return;
         }
         try {
-            // console.info(
-            //   `=> (invoked by go wasm) run ${
-            //     realName ?? name
-            //   } method with args ${JSON.stringify(args)}`
-            // );
+            console.info(
+              `=> (invoked by go wasm) run ${
+                realName ?? name
+              } method with args ${JSON.stringify(args)}`
+            );
             const response = await rpc.invoke(name, ...args, { timeout: 5000000 });
-            // console.info(
-            //   `=> (invoked by go wasm) run ${realName ?? name} method with response `,
-            //   JSON.stringify(response)
-            // );
+            console.info(
+              `=> (invoked by go wasm) run ${realName ?? name} method with response `,
+              JSON.stringify(response)
+            );
             return JSON.stringify(response);
         }
         catch (error) {
@@ -139,7 +141,7 @@ export function initDatabaseAPI() {
     window.resetAllConversation = registeMethodOnWindow('resetAllConversation');
     window.clearConversation = registeMethodOnWindow('clearConversation');
     window.clearAllConversation = registeMethodOnWindow('clearAllConversation');
-    window.setConversationDraft = registeMethodOnWindow('setConversationDraft');
+    window.setConversationDraftDB = registeMethodOnWindow('setConversationDraft');
     window.removeConversationDraft = registeMethodOnWindow('removeConversationDraft');
     window.unPinConversation = registeMethodOnWindow('unPinConversation');
     // window.updateAllConversation = registeMethodOnWindow('updateAllConversation');
@@ -179,6 +181,8 @@ export function initDatabaseAPI() {
     window.superGroupGetSendingMessageList = registeMethodOnWindow('superGroupGetSendingMessageList');
     window.superGroupUpdateGroupMessageHasRead = registeMethodOnWindow('superGroupUpdateGroupMessageHasRead');
     window.superGroupGetMsgSeqByClientMsgID = registeMethodOnWindow('superGroupGetMsgSeqByClientMsgID');
+    window.superGroupUpdateMsgSenderFaceURLAndSenderNickname =
+        registeMethodOnWindow('superGroupUpdateMsgSenderFaceURLAndSenderNickname');
     // debug
     window.exec = registeMethodOnWindow('exec');
     window.getRowsModified = registeMethodOnWindow('getRowsModified');

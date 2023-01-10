@@ -11,7 +11,7 @@ getJoinedSuperGroupList, getJoinedSuperGroupIDList, getSuperGroupInfoByGroupID, 
 // unread messages
 deleteConversationUnreadMessageList, batchInsertConversationUnreadMessageList, 
 // super group messages
-superGroupGetMessage, superGroupGetMultipleMessage, getSuperGroupNormalMsgSeq, superGroupGetNormalMinSeq, superGroupUpdateMessageTimeAndStatus, superGroupUpdateMessage, superGroupInsertMessage, superGroupBatchInsertMessageList, superGroupGetMessageListNoTime, superGroupGetMessageList, superGroupDeleteAllMessage, superGroupGetMsgSeqByClientMsgID, superGroupGetSendingMessageList, superGroupSearchMessageByContentType, superGroupSearchMessageByKeyword, superGroupSearchMessageByContentTypeAndKeyword, superGroupUpdateGroupMessageHasRead, superGroupUpdateMessageStatusBySourceID, superGroupUpdateColumnsMessage, 
+superGroupGetMessage, superGroupGetMultipleMessage, getSuperGroupNormalMsgSeq, superGroupGetNormalMinSeq, superGroupUpdateMessageTimeAndStatus, superGroupUpdateMessage, superGroupInsertMessage, superGroupBatchInsertMessageList, superGroupGetMessageListNoTime, superGroupGetMessageList, superGroupDeleteAllMessage, superGroupGetMsgSeqByClientMsgID, superGroupGetSendingMessageList, superGroupSearchMessageByContentType, superGroupSearchMessageByKeyword, superGroupSearchMessageByContentTypeAndKeyword, superGroupUpdateGroupMessageHasRead, superGroupUpdateMessageStatusBySourceID, superGroupUpdateColumnsMessage, superGroupUpdateMsgSenderFaceURLAndSenderNickname, 
 // black
 getBlackList, getBlackListUserID, getBlackInfoByBlockUserID, getBlackInfoList, insertBlack, deleteBlack, updateBlack, 
 // friendRequest
@@ -124,6 +124,7 @@ rpc.registerMethod('superGroupUpdateMessageStatusBySourceID', superGroupUpdateMe
 rpc.registerMethod('superGroupGetSendingMessageList', superGroupGetSendingMessageList);
 rpc.registerMethod('superGroupUpdateGroupMessageHasRead', superGroupUpdateGroupMessageHasRead);
 rpc.registerMethod('superGroupGetMsgSeqByClientMsgID', superGroupGetMsgSeqByClientMsgID);
+rpc.registerMethod('superGroupUpdateMsgSenderFaceURLAndSenderNickname', superGroupUpdateMsgSenderFaceURLAndSenderNickname);
 // black
 rpc.registerMethod('getBlackList', getBlackList);
 rpc.registerMethod('getBlackListUserID', getBlackListUserID);

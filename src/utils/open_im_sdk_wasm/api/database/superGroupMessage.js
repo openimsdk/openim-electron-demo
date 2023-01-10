@@ -1,5 +1,5 @@
 import { DatabaseErrorCode } from '../../constant';
-import { superGroupGetMessage as databaseSuperGroupGetMessage, superGroupGetMultipleMessage as databaseSuperGroupGetMultipleMessage, getSuperGroupNormalMsgSeq as databaseGetSuperGroupNormalMsgSeq, superGroupGetNormalMinSeq as databaseSuperGroupGetNormalMinSeq, superGroupUpdateMessageTimeAndStatus as databaseSuperGroupUpdateMessageTimeAndStatus, superGroupUpdateMessage as databaseSuperGroupUpdateMessage, superGroupInsertMessage as databaseSuperGroupInsertMessage, superGroupBatchInsertMessageList as databaseSuperGroupBatchInsertMessageList, superGroupGetMessageListNoTime as databaseSuperGroupGetMessageListNoTime, superGroupGetMessageList as databaseSuperGroupGetMessageList, superGroupDeleteAllMessage as databaseSuperGroupDeleteAllMessage, superGroupSearchMessageByKeyword as databaseSuperGroupSearchMessageByKeyword, superGroupSearchMessageByContentType as databaseSuperGroupSearchMessageByContentType, superGroupSearchMessageByContentTypeAndKeyword as databaseSuperGroupSearchMessageByContentTypeAndKeyword, superGroupUpdateMessageStatusBySourceID as databaseSuperGroupUpdateMessageStatusBySourceID, superGroupGetSendingMessageList as databaseSuperGroupGetSendingMessageList, superGroupUpdateGroupMessageHasRead as databaseSuperGroupUpdateGroupMessageHasRead, superGroupGetMsgSeqByClientMsgID as databaseSuperGroupGetMsgSeqByClientMsgID, } from '../../sqls';
+import { superGroupGetMessage as databaseSuperGroupGetMessage, superGroupGetMultipleMessage as databaseSuperGroupGetMultipleMessage, getSuperGroupNormalMsgSeq as databaseGetSuperGroupNormalMsgSeq, superGroupGetNormalMinSeq as databaseSuperGroupGetNormalMinSeq, superGroupUpdateMessageTimeAndStatus as databaseSuperGroupUpdateMessageTimeAndStatus, superGroupUpdateMessage as databaseSuperGroupUpdateMessage, superGroupInsertMessage as databaseSuperGroupInsertMessage, superGroupBatchInsertMessageList as databaseSuperGroupBatchInsertMessageList, superGroupGetMessageListNoTime as databaseSuperGroupGetMessageListNoTime, superGroupGetMessageList as databaseSuperGroupGetMessageList, superGroupDeleteAllMessage as databaseSuperGroupDeleteAllMessage, superGroupSearchMessageByKeyword as databaseSuperGroupSearchMessageByKeyword, superGroupSearchMessageByContentType as databaseSuperGroupSearchMessageByContentType, superGroupSearchMessageByContentTypeAndKeyword as databaseSuperGroupSearchMessageByContentTypeAndKeyword, superGroupUpdateMessageStatusBySourceID as databaseSuperGroupUpdateMessageStatusBySourceID, superGroupGetSendingMessageList as databaseSuperGroupGetSendingMessageList, superGroupUpdateGroupMessageHasRead as databaseSuperGroupUpdateGroupMessageHasRead, superGroupGetMsgSeqByClientMsgID as databaseSuperGroupGetMsgSeqByClientMsgID, superGroupUpdateMsgSenderFaceURLAndSenderNickname as databaseSuperGroupUpdateMsgSenderFaceURLAndSenderNickname, } from '../../sqls';
 import { converSqlExecResult, convertToSnakeCaseObject, formatResponse, } from '../../utils';
 import { getInstance } from './instance';
 export async function superGroupGetMessage(groupID, messageId) {
@@ -233,6 +233,21 @@ export async function superGroupGetMsgSeqByClientMsgID(clientMsgID, groupID) {
         const db = await getInstance();
         const execResult = databaseSuperGroupGetMsgSeqByClientMsgID(db, clientMsgID, groupID);
         return formatResponse(execResult[0]?.values[0]?.[0]);
+    }
+    catch (e) {
+        console.error(e);
+        return formatResponse(undefined, DatabaseErrorCode.ErrorInit, JSON.stringify(e));
+    }
+}
+export async function superGroupUpdateMsgSenderFaceURLAndSenderNickname(sendID, faceURL, nickname, sessionType, groupID) {
+    try {
+        const db = await getInstance();
+        const execResult = databaseSuperGroupUpdateMsgSenderFaceURLAndSenderNickname(db, sendID, faceURL, nickname, sessionType, groupID);
+        const modifed = db.getRowsModified();
+        if (modifed === 0) {
+            throw 'superGroupUpdateGroupMessageHasRead no record updated';
+        }
+        return formatResponse(execResult);
     }
     catch (e) {
         console.error(e);

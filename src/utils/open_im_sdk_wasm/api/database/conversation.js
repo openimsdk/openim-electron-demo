@@ -133,7 +133,7 @@ export async function getTotalUnreadMsgCount() {
     try {
         const db = await getInstance();
         const execResult = databaseGetTotalUnreadMsgCount(db);
-        return formatResponse(execResult[0]?.values[0]?.[0]);
+        return formatResponse(execResult[0]?.values[0]?.[0]??0);
     }
     catch (e) {
         console.error(e);

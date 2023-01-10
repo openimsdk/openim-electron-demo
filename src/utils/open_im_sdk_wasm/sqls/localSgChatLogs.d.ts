@@ -21,3 +21,4 @@ export declare function superGroupUpdateMessageStatusBySourceID(db: Database, so
 export declare function superGroupGetSendingMessageList(db: Database, groupID: string): QueryExecResult[];
 export declare function superGroupUpdateGroupMessageHasRead(db: Database, msgIDList: string[], groupID: string): QueryExecResult[];
 export declare function superGroupGetMsgSeqByClientMsgID(db: Database, clientMsgID: string, groupID: string): QueryExecResult[];
+export declare function superGroupUpdateMsgSenderFaceURLAndSenderNickname(db: Database, sendID: string, faceURL: string, nickname: string, sessionType: number, groupID: string): QueryExecResult[];

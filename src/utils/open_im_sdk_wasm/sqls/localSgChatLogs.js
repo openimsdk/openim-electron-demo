@@ -56,7 +56,7 @@ export function superGroupUpdateMessage(db, groupID, clientMsgID, message) {
         .update()
         .table(`local_sg_chat_logs_${groupID}`)
         .setFields(message)
-        .where(`client_msg_id = '${clientMsgID}'`)
+        .where(`client_msg_id = "${clientMsgID}"`)
         .toString();
     return db.exec(sql);
 }
@@ -91,11 +91,11 @@ export function superGroupUpdateMessageTimeAndStatus(db, groupID, clientMsgID, s
         update 
             local_sg_chat_logs_${groupID}
         set
-            server_msg_id = '${serverMsgID}',
+            server_msg_id = "${serverMsgID}",
             status = ${status},
             send_time = ${sendTime}
         where
-            client_msg_id = '${clientMsgID}' and seq = 0;
+            client_msg_id = "${clientMsgID}" and seq = 0;
     `);
 }
 export function superGroupGetMessageListNoTime(db, groupID, sessionType, count, isReverse) {
@@ -192,7 +192,7 @@ export function superGroupSearchMessageByContentTypeAndKeyword(db, contentType, 
         }
     });
     return db.exec(`  
-    SELECT * FROM SELECT * FROM local_sg_chat_logs_${groupID} 
+    SELECT * FROM local_sg_chat_logs_${groupID} 
           WHERE send_time between ${startTime} and ${finalEndTime}
           AND status <=3  
           And content_type IN (${values})
@@ -243,5 +243,14 @@ export function superGroupGetMsgSeqByClientMsgID(db, clientMsgID, groupID) {
       FROM local_sg_chat_logs_${groupID}
       WHERE client_msg_id = "${clientMsgID}"
       LIMIT 1
+    `);
+}
+export function superGroupUpdateMsgSenderFaceURLAndSenderNickname(db, sendID, faceURL, nickname, sessionType, groupID) {
+    _initSuperGroupTable(db, groupID);
+    return db.exec(`
+    UPDATE local_sg_chat_logs_${groupID}
+      SET sender_face_url= "${faceURL}" , sender_nick_name = "${nickname}"
+      WHERE send_id = "${sendID}"
+      AND session_type = ${sessionType}
     `);
 }

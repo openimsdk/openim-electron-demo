@@ -16,6 +16,7 @@ export function localConversations(db) {
             'draft_text' text,
             'draft_text_time' integer,
             'is_pinned' numeric,
+            'burn_duration' integer,
             'is_private_chat' numeric,
             'is_not_in_group' numeric,
             'update_unread_count_time' integer,
@@ -192,7 +193,7 @@ export function removeConversationDraft(db, conversationID, draftText) {
     return db.exec(`
   update local_conversations
     set draft_text="${draftText}",
-    draft_text_time=0,
+    draft_text_time=0
     where conversation_id = "${conversationID}"
   `);
 }

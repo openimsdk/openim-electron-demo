@@ -119,7 +119,7 @@ const GroupOpModal: FC<GroupOpModalProps> = ({ visible, options, modalType, grou
   };
 
   const createGroup = () => {
-    if (!rs.groupIcon || !rs.groupName || rs.selectedList.length == 0) {
+    if (!rs.groupName || rs.selectedList.length == 0) {
       message.warning(t("CompleteTip"));
       return;
     }

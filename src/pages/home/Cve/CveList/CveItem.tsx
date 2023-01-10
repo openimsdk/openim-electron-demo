@@ -78,7 +78,7 @@ const CveItem: FC<CveItemProps> = ({ cve, onClick, curCve, curUid, cveList, idx 
   };
 
   const delCve = () => {
-    im.deleteConversation(cve.conversationID)
+    im.deleteConversationFromLocalAndSvr(cve.conversationID)
       .then((res) => {
         const tarray = [...cveList];
         const farray = tarray.filter((c) => c.conversationID !== cve.conversationID);

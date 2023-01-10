@@ -62,7 +62,7 @@ const SingleDrawer: FC<SingleDrawerProps> = ({ curCve, updateOpt, updatePin }) =
   };
 
   const delCve = () => {
-    im.deleteConversation(curCve.conversationID)
+    im.deleteConversationFromLocalAndSvr(curCve.conversationID)
       .then((res) => {
         const tarray = [...cveList];
         const farray = tarray.filter((c) => c.conversationID !== curCve.conversationID);

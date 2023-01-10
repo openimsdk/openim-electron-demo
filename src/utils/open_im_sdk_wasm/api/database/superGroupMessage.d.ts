@@ -17,3 +17,4 @@ export declare function superGroupUpdateMessageStatusBySourceID(sourceID: string
 export declare function superGroupGetSendingMessageList(groupID: string): Promise<string>;
 export declare function superGroupUpdateGroupMessageHasRead(msgIDListStr: string, groupID: string): Promise<string>;
 export declare function superGroupGetMsgSeqByClientMsgID(clientMsgID: string, groupID: string): Promise<string>;
+export declare function superGroupUpdateMsgSenderFaceURLAndSenderNickname(sendID: string, faceURL: string, nickname: string, sessionType: number, groupID: string): Promise<string>;

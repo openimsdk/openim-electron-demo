@@ -26,13 +26,15 @@ class SDK extends Emitter {
     }
     _invoker(functionName, func, args, processor) {
         return new Promise(async (resolve, reject) => {
-            // console.info(
-            //   `SDK => [OperationID:${
-            //     args[0]
-            //   }] (invoked by js) run ${functionName} with args ${JSON.stringify(args)}`
-            // );
+            console.info(
+              `SDK => [OperationID:${
+                args[0]
+              }] (invoked by js) run ${functionName} with args ${JSON.stringify(args)}`
+            );
             let response = {
                 operationID: args[0],
+                event: (functionName.slice(0, 1).toUpperCase() +
+                    functionName.slice(1).toLowerCase()),
             };
             try {
                 if (!getGO() || getGO().exited || this.goExisted) {
@@ -40,13 +42,13 @@ class SDK extends Emitter {
                 }
                 let data = await func(...args);
                 if (processor) {
-                    // console.info(
-                    //   `SDK => [OperationID:${
-                    //     args[0]
-                    //   }] (invoked by js) run ${functionName} with response before processor ${JSON.stringify(
-                    //     data
-                    //   )}`
-                    // );
+                    console.info(
+                      `SDK => [OperationID:${
+                        args[0]
+                      }] (invoked by js) run ${functionName} with response before processor ${JSON.stringify(
+                        data
+                      )}`
+                    );
                     data = processor(data);
                 }
                 response.data = data;
@@ -98,6 +100,7 @@ class SDK extends Emitter {
             api_addr: params.apiAddress,
             ws_addr: params.wsAddress,
             log_level: params.logLevel || 6,
+            is_need_encryption: params.isNeedEncryption || false,
         };
         window.initSDK(operationID, JSON.stringify(config));
         return await window.login(operationID, params.userID, params.token);
@@ -120,7 +123,7 @@ class SDK extends Emitter {
     };
     getHistoryMessageList = (params, operationID = uuidv4()) => {
         return this._invoker('getHistoryMessageList', window.getHistoryMessageList, [operationID, JSON.stringify(params)]);
-    }
+    };
     getGroupsInfo(params, operationID = uuidv4()) {
         return this._invoker('getGroupsInfo', window.getGroupsInfo, [
             operationID,
@@ -262,6 +265,9 @@ class SDK extends Emitter {
     }
     setOneConversationPrivateChat(params, operationID = uuidv4()) {
         return this._invoker('setOneConversationPrivateChat', window.setOneConversationPrivateChat, [operationID, params.conversationID, params.isPrivate]);
+    }
+    setOneConversationBurnDuration(params, operationID = uuidv4()) {
+        return this._invoker('setOneConversationBurnDuration', window.setOneConversationBurnDuration, [operationID, params.conversationID, params.burnDuration]);
     }
     /* ----------------------------------------------新增-------------------------------------------------------- */
     getLoginStatus(operationID = uuidv4()) {
@@ -457,6 +463,7 @@ class SDK extends Emitter {
         return this._invoker('setConversationDraft ', window.setConversationDraft, [
             operationID,
             data.conversationID,
+            data.draftText
         ]);
     }
     pinConversation(data, operationID = uuidv4()) {
@@ -761,6 +768,20 @@ class SDK extends Emitter {
             operationID,
             JSON.stringify(data),
         ]);
+    }
+    wakeUp(operationID = uuidv4()) {
+        return this._invoker('wakeUp', window.wakeUp, [
+            operationID,
+        ]);
+    }
+    signalingGetRoomByGroupID(groupID, operationID = uuidv4()) {
+        return this._invoker('signalingGetRoomByGroupID ', window.signalingGetRoomByGroupID, [operationID, groupID]);
+    }
+    signalingGetTokenByRoomID(roomID, operationID = uuidv4()) {
+        return this._invoker('signalingGetTokenByRoomID ', window.signalingGetTokenByRoomID, [operationID, roomID]);
+    }
+    signalingSendCustomSignal(data, operationID = uuidv4()) {
+        return this._invoker('signalingSendCustomSignal ', window.signalingSendCustomSignal, [operationID, data]);
     }
 }
 let instance;

@@ -9,7 +9,7 @@ let instance;
 let SQL;
 async function InitializeDB(filePath) {
     if (!SQL) {
-        SQL = await initSqlJs({ locateFile: () => '/sql-wasm.wasm' });
+        SQL = await initSqlJs({ locateFile: () => '../../sql-wasm.wasm' });
         const sqlFS = new SQLiteFS(SQL.FS, new IndexedDBBackend());
         SQL.register_for_idb(sqlFS);
         SQL.FS.mkdir('/sql');

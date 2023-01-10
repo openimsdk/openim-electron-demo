@@ -10,6 +10,7 @@ export function localUsers(db) {
             'birth' integer,
             'email' varchar(64),
             'create_time' integer,
+            'birth_time' varchar(64),
             'app_manger_level' integer,
             'ex' varchar(1024),
             'attached_info' varchar(1024),

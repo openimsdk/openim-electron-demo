@@ -63,7 +63,7 @@ export async function updateMessageTimeAndStatus(clientMsgID, serverMsgID, sendT
 export async function updateMessage(clientMsgId, messageStr) {
     try {
         const db = await getInstance();
-        const message = convertToSnakeCaseObject(convertObjectField(JSON.parse(messageStr), { groupName: 'name' }));
+        const message = convertToSnakeCaseObject(convertObjectField(JSON.parse(messageStr)));
         const execResult = databaseUpdateMessage(db, clientMsgId, message);
         const modifed = db.getRowsModified();
         if (modifed === 0) {
@@ -79,7 +79,7 @@ export async function updateMessage(clientMsgId, messageStr) {
 export async function updateColumnsMessage(clientMsgId, messageStr) {
     try {
         const db = await getInstance();
-        const message = convertToSnakeCaseObject(convertObjectField(JSON.parse(messageStr), { groupName: 'name' }));
+        const message = convertToSnakeCaseObject(convertObjectField(JSON.parse(messageStr)));
         const execResult = databaseUpdateMessage(db, clientMsgId, message);
         const modifed = db.getRowsModified();
         if (modifed === 0) {

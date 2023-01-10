@@ -36,8 +36,7 @@ import { getSelfInfo } from "../store/actions/user";
 import { OPENSINGLEMODAL } from "../constants/events";
 import { cveSort } from "../utils";
 import { CbEvents } from "open-im-sdk-wasm/lib/constant";
-import { ConversationItem, FriendApplicationItem, GroupApplicationItem } from "../utils/open_im_sdk_wasm/types/entity";
-import { WSEvent } from "../utils/open_im_sdk_wasm/types";
+import { ConversationItem, FriendApplicationItem, GroupApplicationItem, WSEvent } from "../utils/open_im_sdk_wasm/types/entity";
 
 type GruopHandlerType = "added" | "deleted" | "info" | "memberAdded" | "memberDeleted";
 
