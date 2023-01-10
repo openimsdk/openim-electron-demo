@@ -33,13 +33,17 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
     });
   };
 
+  const getFileType = (name: string) => {
+    const idx = name.lastIndexOf(".");
+    return name.slice(idx + 1);
+  };
+
   const imgMsg = async (file: RcFile) => {
     const fileArrayBuffer = await getFileData(file as Blob)
     const { width, height } = await getPicInfo(file);
       const sourcePicture = {
         uuid: file.uid,
-        type: file.type,
-        // type: '.png',
+        type: getFileType(file.name),
         size: file.size,
         width,
         height,
@@ -51,13 +55,6 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
         bigPicture: sourcePicture,
       };
       const msgStr = (await im.createImageMessage(imgInfo)).data;
-      const offlinePushInfo = {
-        title: "你有一条新消息",
-        desc: "",
-        ex: "",
-        iOSPushSound: "+1",
-        iOSBadgeCount: true,
-      };
     sendMsg(msgStr, MessageType.PICTUREMESSAGE, undefined, undefined, fileArrayBuffer);
   };
 
@@ -70,7 +67,7 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
     const videoInfo = {
       videoPath: "",
       duration: parseInt(info.duration + ""),
-      videoType: file.type,
+      videoType: getFileType(file.name),
       snapshotPath: "",
       videoUUID: file.uid,
       videoUrl: "",
@@ -80,6 +77,7 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
       snapshotUrl: "",
       snapshotWidth: width,
       snapshotHeight: height,
+      snapShotType: "png",
     };
     const { data } = await im.createVideoMessage(videoInfo);
     sendMsg(data, MessageType.VIDEOMESSAGE,undefined,undefined,fileArrayBuffer,snpArrayBuffer);
@@ -93,6 +91,7 @@ const MsgTypeSuffix:FC<MsgTypeSuffixProps> = ({choseCard,faceClick,sendMsg},ref)
       uuid: file.uid,
       sourceUrl: "",
       fileSize: file.size,
+      fileType: getFileType(file.name),
     };
     const { data } = await im.createFileMessage(fileInfo);
     sendMsg(data, MessageType.FILEMESSAGE,undefined,undefined,fileArrayBuffer);
