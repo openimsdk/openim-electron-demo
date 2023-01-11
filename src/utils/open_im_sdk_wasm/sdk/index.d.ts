@@ -1,5 +1,5 @@
 import Emitter from '../utils/emitter';
-import { AccessFriendParams, AccessGroupParams, AddFriendParams, AdvancedMsgParams, AdvancedQuoteMsgParams, AtMsgParams, ChangeGroupMemberMuteParams, ChangeGroupMuteParams, CreateGroupParams, CustomMsgParams, FaceMessageParams, FileMsgFullParams, FileMsgParams, FindMessageParams, GetAdvancedHistoryMsgParams, GetGroupMemberByTimeParams, GetGroupMemberParams, GetHistoryMsgParams, GetOneConversationParams, GetOneCveParams, GetSubDepParams, GroupInfoParams, GroupMsgReadParams, ImageMsgParams, InsertGroupMsgParams, InsertSingleMsgParams, InviteGroupParams, isRecvParams, JoinGroupParams, LocationMsgParams, LoginParam, MarkC2CParams, MarkNotiParams, MemberNameParams, MergerMsgParams, PartialUserItem, PinCveParams, QuoteMsgParams, RemarkFriendParams, RtcActionParams, SearchFriendParams, SearchGroupMemberParams, SearchGroupParams, SearchLocalParams, SendMsgParams, setBurnDurationParams, SetDraftParams, SetGroupRoleParams, SetGroupVerificationParams, SetMemberAuthParams, setPrvParams, SoundMsgParams, SouondMsgFullParams, SplitParams, TransferGroupParams, TypingUpdateParams, VideoMsgFullParams, VideoMsgParams } from '../types/params';
+import { AccessFriendParams, AccessGroupParams, AddFriendParams, AdvancedMsgParams, AdvancedQuoteMsgParams, AtMsgParams, ChangeGroupMemberMuteParams, ChangeGroupMuteParams, CreateGroupParams, CustomMsgParams, CustomSignalParams, FaceMessageParams, FileMsgFullParams, FileMsgParams, FindMessageParams, GetAdvancedHistoryMsgParams, GetGroupMemberByTimeParams, GetGroupMemberParams, GetHistoryMsgParams, GetOneConversationParams, GetOneCveParams, GetSubDepParams, GroupInfoParams, GroupMsgReadParams, ImageMsgParams, InsertGroupMsgParams, InsertSingleMsgParams, InviteGroupParams, isRecvParams, JoinGroupParams, LocationMsgParams, LoginParam, MarkC2CParams, MarkNotiParams, MemberNameParams, MergerMsgParams, PartialUserItem, PinCveParams, QuoteMsgParams, RemarkFriendParams, RtcActionParams, SearchFriendParams, SearchGroupMemberParams, SearchGroupParams, SearchLocalParams, SendMsgParams, setBurnDurationParams, SetDraftParams, SetGroupRoleParams, SetGroupVerificationParams, SetMemberAuthParams, setPrvParams, SoundMsgParams, SouondMsgFullParams, SplitParams, TransferGroupParams, TypingUpdateParams, VideoMsgFullParams, VideoMsgParams } from '../types/params';
 import { RtcInvite, WsResponse } from '../types/entity';
 import { OptType } from '../types/enum';
 declare class SDK extends Emitter {
@@ -7,9 +7,6 @@ declare class SDK extends Emitter {
     private goExitPromise;
     private goExisted;
     constructor(url?: string);
-    emit(event: CbEvents, data: WSEvent): this;
-    on(event: CbEvents, fn: Cbfn): this;
-    off(event: CbEvents, fn: Cbfn): this | undefined;
     _invoker(functionName: string, func: (...args: any[]) => Promise<any>, args: any[], processor?: (data: string) => string): Promise<WsResponse>;
     login(params: LoginParam, operationID?: string): Promise<any>;
     logout(operationID?: string): Promise<WsResponse>;
@@ -136,6 +133,9 @@ declare class SDK extends Emitter {
     newRevokeMessage(data: string, operationID?: string): Promise<WsResponse>;
     findMessageList(data: FindMessageParams, operationID?: string): Promise<WsResponse>;
     wakeUp(operationID?: string): Promise<WsResponse>;
+    signalingGetRoomByGroupID(groupID: string, operationID?: string): Promise<WsResponse>;
+    signalingGetTokenByRoomID(roomID: string, operationID?: string): Promise<WsResponse>;
+    signalingSendCustomSignal(data: CustomSignalParams, operationID?: string): Promise<WsResponse>;
 }
 export declare function getSDK(url?: string): SDK;
 export {};

@@ -16,6 +16,7 @@ export var CbEvents;
     CbEvents["ONRECVNEWMESSAGE"] = "OnRecvNewMessage";
     CbEvents["ONRECVNEWMESSAGES"] = "OnRecvNewMessages";
     CbEvents["ONRECVMESSAGEREVOKED"] = "OnRecvMessageRevoked";
+    CbEvents["ONNEWRECVMESSAGEREVOKED"] = "OnNewRecvMessageRevoked";
     CbEvents["ONRECVC2CREADRECEIPT"] = "OnRecvC2CReadReceipt";
     CbEvents["ONRECVGROUPREADRECEIPT"] = "OnRecvGroupReadReceipt";
     CbEvents["ONCONVERSATIONCHANGED"] = "OnConversationChanged";

@@ -26,11 +26,7 @@ class SDK extends Emitter {
     }
     _invoker(functionName, func, args, processor) {
         return new Promise(async (resolve, reject) => {
-            console.info(
-              `SDK => [OperationID:${
-                args[0]
-              }] (invoked by js) run ${functionName} with args ${JSON.stringify(args)}`
-            );
+            console.info(`SDK => [OperationID:${args[0]}] (invoked by js) run ${functionName} with args ${JSON.stringify(args)}`);
             let response = {
                 operationID: args[0],
                 event: (functionName.slice(0, 1).toUpperCase() +
@@ -42,13 +38,13 @@ class SDK extends Emitter {
                 }
                 let data = await func(...args);
                 if (processor) {
-                    console.info(
-                      `SDK => [OperationID:${
-                        args[0]
-                      }] (invoked by js) run ${functionName} with response before processor ${JSON.stringify(
-                        data
-                      )}`
-                    );
+                    // console.info(
+                    //   `SDK => [OperationID:${
+                    //     args[0]
+                    //   }] (invoked by js) run ${functionName} with response before processor ${JSON.stringify(
+                    //     data
+                    //   )}`
+                    // );
                     data = processor(data);
                 }
                 response.data = data;
@@ -269,20 +265,12 @@ class SDK extends Emitter {
     setOneConversationBurnDuration(params, operationID = uuidv4()) {
         return this._invoker('setOneConversationBurnDuration', window.setOneConversationBurnDuration, [operationID, params.conversationID, params.burnDuration]);
     }
-    /* ----------------------------------------------新增-------------------------------------------------------- */
     getLoginStatus(operationID = uuidv4()) {
         return this._invoker('getLoginStatus', window.getLoginStatus, [operationID], data => {
             // compitable with old version sdk
             return data[0];
         });
     }
-    // iLogin(data: LoginParams, operationID = uuidv4()) {
-    //   return this._invoker('iLogin', window.iLogin, [
-    //     operationID,
-    //     data.token,
-    //     data.userID,
-    //   ]);
-    // }
     getLoginUser(operationID = uuidv4()) {
         return this._invoker('getLoginUser', window.getLoginUser, [operationID]);
     }
@@ -463,7 +451,7 @@ class SDK extends Emitter {
         return this._invoker('setConversationDraft ', window.setConversationDraft, [
             operationID,
             data.conversationID,
-            data.draftText
+            data.draftText,
         ]);
     }
     pinConversation(data, operationID = uuidv4()) {
@@ -564,7 +552,6 @@ class SDK extends Emitter {
             JSON.stringify(data.userIDList),
         ]);
     }
-    /* 、、、、、、、、、、、、、、、、周一问 */
     getGroupMembersInfo(data, operationID = uuidv4()) {
         return this._invoker('getGroupMembersInfo ', window.getGroupMembersInfo, [
             operationID,
@@ -770,9 +757,7 @@ class SDK extends Emitter {
         ]);
     }
     wakeUp(operationID = uuidv4()) {
-        return this._invoker('wakeUp', window.wakeUp, [
-            operationID,
-        ]);
+        return this._invoker('wakeUp', window.wakeUp, [operationID]);
     }
     signalingGetRoomByGroupID(groupID, operationID = uuidv4()) {
         return this._invoker('signalingGetRoomByGroupID ', window.signalingGetRoomByGroupID, [operationID, groupID]);
@@ -781,7 +766,7 @@ class SDK extends Emitter {
         return this._invoker('signalingGetTokenByRoomID ', window.signalingGetTokenByRoomID, [operationID, roomID]);
     }
     signalingSendCustomSignal(data, operationID = uuidv4()) {
-        return this._invoker('signalingSendCustomSignal ', window.signalingSendCustomSignal, [operationID, data]);
+        return this._invoker('signalingSendCustomSignal ', window.signalingSendCustomSignal, [operationID, data.customInfo, data.roomID]);
     }
 }
 let instance;

@@ -19,10 +19,10 @@ import { SelectType } from "../components/MultipleSelectBox";
 import { getGroupInfo, getGroupMemberList } from "../../../store/actions/contacts";
 import { useTranslation } from "react-i18next";
 import { setCurCve } from "../../../store/actions/cve";
-import { CbEvents } from "open-im-sdk-wasm/lib/constant";
 import { MessageItem, MergeElem, ConversationItem, FriendItem, GroupItem, PictureElem, WsResponse, WSEvent } from "../../../utils/open_im_sdk_wasm/types/entity";
 import { MergerMsgParams } from "../../../utils/open_im_sdk_wasm/types/params";
 import { MessageType, SessionType } from "../../../utils/open_im_sdk_wasm/types/enum";
+import { CbEvents } from "../../../utils/open_im_sdk_wasm/constant";
 
 const { Content } = Layout;
 
@@ -99,11 +99,20 @@ const Home = () => {
     };
   }, []);
 
+  const revokeMsgHandler = ({data}: WSEvent) => {
+    const revokeData = JSON.parse(data as string)
+    const idx = rs.historyMsgList.findIndex((m) => m.clientMsgID === revokeData.clientMsgID);
+    if (idx > -1) {
+      rs.historyMsgList[idx].contentType = MessageType.ADVANCEREVOKEMESSAGE;
+      rs.historyMsgList[idx].content = data as string;
+    }
+  };
+
   useEffect(() => {
-    im.on(CbEvents.ONRECVMESSAGEREVOKED, revokeMsgHandler);
+    im.on(CbEvents.ONNEWRECVMESSAGEREVOKED, revokeMsgHandler);
     im.on(CbEvents.ONRECVC2CREADRECEIPT, c2cMsgHandler);
     return () => {
-      im.off(CbEvents.ONRECVMESSAGEREVOKED, revokeMsgHandler);
+      im.off(CbEvents.ONNEWRECVMESSAGEREVOKED, revokeMsgHandler);
       im.off(CbEvents.ONRECVC2CREADRECEIPT, c2cMsgHandler);
     };
   }, []);
@@ -200,12 +209,7 @@ const Home = () => {
     }
   }
 
-  const revokeMsgHandler = (data: WSEvent) => {
-    const idx = rs.historyMsgList.findIndex((m) => m.clientMsgID === data.data);
-    if (idx > -1) {
-      rs.historyMsgList.splice(idx, 1);
-    }
-  };
+  
 
   const c2cMsgHandler = (data: WSEvent) => {
     JSON.parse(data.data as string).map((cr: any) => {
