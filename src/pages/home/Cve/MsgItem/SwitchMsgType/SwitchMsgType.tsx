@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import VideoPlayer from "../../../../../components/VideoPlayer";
 import { MessageItem, ConversationItem, PictureElem, MergeElem } from "../../../../../utils/open_im_sdk_wasm/types/entity";
 import { MessageType } from "../../../../../utils/open_im_sdk_wasm/types/enum";
+import { AMapKey } from "../../../../../config";
 
 type SwitchMsgTypeProps = {
   msg: MessageItem;
@@ -274,7 +275,7 @@ const SwitchMsgType: FC<SwitchMsgTypeProps> = ({ msg, audio, curCve, selfID, img
         const postion = { longitude: locationEl.longitude, latitude: locationEl.latitude };
         return (
           <div className={`chat_bg_msg_content_map ${!isSingle ? "nick_magin" : ""}`}>
-            <Map protocol="https" center={postion} amapkey="dcdc861728801ee3410f67f6a487d3fa">
+            <Map protocol="https" center={postion} amapkey={AMapKey}>
               <Marker position={postion} />
             </Map>
             {timeTip("pic_msg_time")}

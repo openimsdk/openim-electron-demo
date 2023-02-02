@@ -9,6 +9,9 @@ export const IM_REGISTER_URL = "http://121.5.182.23:10008";
 // export const IM_API_URL = "https://web.rentsoft.cn/api"
 // export const IM_REGISTER_URL = "https://web.rentsoft.cn/chat"
 
+// 高德地图 appKey  需自行申请
+export const AMapKey = ''
+
 export const AXIOS_TIMEOUT = 60000;
 export const PIC_MESSAGE_THUMOPTION = "?imageView2/1/w/200/h/200/rq/80";
 export const LANGUAGE = "zh-cn";
