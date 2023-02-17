@@ -314,6 +314,11 @@ export declare type MemberNameParams = {
     userID: string;
     GroupMemberNickname: string;
 };
+export declare type MemberExParams = {
+    groupID: string;
+    userID: string;
+    ex: string;
+};
 export declare type GetSubDepParams = {
     departmentID: string;
     offset: number;

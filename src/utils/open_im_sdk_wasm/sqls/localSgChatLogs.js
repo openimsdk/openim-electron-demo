@@ -1,5 +1,5 @@
 import squel from 'squel';
-const GroupTableMap = {};
+// const GroupTableMap: Record<string, boolean> = {};
 function _initSuperGroupTable(db, groupID) {
     // if (GroupTableMap[groupID]) {
     //   return;
@@ -252,5 +252,11 @@ export function superGroupUpdateMsgSenderFaceURLAndSenderNickname(db, sendID, fa
       SET sender_face_url= "${faceURL}" , sender_nick_name = "${nickname}"
       WHERE send_id = "${sendID}"
       AND session_type = ${sessionType}
+    `);
+}
+export function superGroupSearchAllMessageByContentType(db, groupID, contentType) {
+    _initSuperGroupTable(db, groupID);
+    return db.exec(`
+    SELECT * FROM local_sg_chat_logs_${groupID} WHERE content_type = ${contentType}
     `);
 }

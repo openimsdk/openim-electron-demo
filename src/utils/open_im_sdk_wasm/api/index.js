@@ -52,7 +52,7 @@ function catchErrorHandle(error) {
     throw error;
 }
 function registeMethodOnWindow(name, realName) {
-    // console.info(`=> (database api) registe ${realName ?? name}`);
+    console.info(`=> (database api) registe ${realName ?? name}`);
     return async (...args) => {
         if (!rpc || !worker) {
             initWorker();
@@ -67,10 +67,10 @@ function registeMethodOnWindow(name, realName) {
               } method with args ${JSON.stringify(args)}`
             );
             const response = await rpc.invoke(name, ...args, { timeout: 5000000 });
-            // console.info(
-            //   `=> (invoked by go wasm) run ${realName ?? name} method with response `,
-            //   JSON.stringify(response)
-            // );
+            console.info(
+              `=> (invoked by go wasm) run ${realName ?? name} method with response `,
+              JSON.stringify(response)
+            );
             return JSON.stringify(response);
         }
         catch (error) {
@@ -183,6 +183,7 @@ export function initDatabaseAPI() {
     window.superGroupGetMsgSeqByClientMsgID = registeMethodOnWindow('superGroupGetMsgSeqByClientMsgID');
     window.superGroupUpdateMsgSenderFaceURLAndSenderNickname =
         registeMethodOnWindow('superGroupUpdateMsgSenderFaceURLAndSenderNickname');
+    window.superGroupSearchAllMessageByContentType = registeMethodOnWindow('superGroupSearchAllMessageByContentType');
     // debug
     window.exec = registeMethodOnWindow('exec');
     window.getRowsModified = registeMethodOnWindow('getRowsModified');

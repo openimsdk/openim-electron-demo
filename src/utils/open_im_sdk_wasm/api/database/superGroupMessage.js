@@ -1,5 +1,5 @@
 import { DatabaseErrorCode } from '../../constant';
-import { superGroupGetMessage as databaseSuperGroupGetMessage, superGroupGetMultipleMessage as databaseSuperGroupGetMultipleMessage, getSuperGroupNormalMsgSeq as databaseGetSuperGroupNormalMsgSeq, superGroupGetNormalMinSeq as databaseSuperGroupGetNormalMinSeq, superGroupUpdateMessageTimeAndStatus as databaseSuperGroupUpdateMessageTimeAndStatus, superGroupUpdateMessage as databaseSuperGroupUpdateMessage, superGroupInsertMessage as databaseSuperGroupInsertMessage, superGroupBatchInsertMessageList as databaseSuperGroupBatchInsertMessageList, superGroupGetMessageListNoTime as databaseSuperGroupGetMessageListNoTime, superGroupGetMessageList as databaseSuperGroupGetMessageList, superGroupDeleteAllMessage as databaseSuperGroupDeleteAllMessage, superGroupSearchMessageByKeyword as databaseSuperGroupSearchMessageByKeyword, superGroupSearchMessageByContentType as databaseSuperGroupSearchMessageByContentType, superGroupSearchMessageByContentTypeAndKeyword as databaseSuperGroupSearchMessageByContentTypeAndKeyword, superGroupUpdateMessageStatusBySourceID as databaseSuperGroupUpdateMessageStatusBySourceID, superGroupGetSendingMessageList as databaseSuperGroupGetSendingMessageList, superGroupUpdateGroupMessageHasRead as databaseSuperGroupUpdateGroupMessageHasRead, superGroupGetMsgSeqByClientMsgID as databaseSuperGroupGetMsgSeqByClientMsgID, superGroupUpdateMsgSenderFaceURLAndSenderNickname as databaseSuperGroupUpdateMsgSenderFaceURLAndSenderNickname, } from '../../sqls';
+import { superGroupGetMessage as databaseSuperGroupGetMessage, superGroupGetMultipleMessage as databaseSuperGroupGetMultipleMessage, getSuperGroupNormalMsgSeq as databaseGetSuperGroupNormalMsgSeq, superGroupGetNormalMinSeq as databaseSuperGroupGetNormalMinSeq, superGroupUpdateMessageTimeAndStatus as databaseSuperGroupUpdateMessageTimeAndStatus, superGroupUpdateMessage as databaseSuperGroupUpdateMessage, superGroupInsertMessage as databaseSuperGroupInsertMessage, superGroupBatchInsertMessageList as databaseSuperGroupBatchInsertMessageList, superGroupGetMessageListNoTime as databaseSuperGroupGetMessageListNoTime, superGroupGetMessageList as databaseSuperGroupGetMessageList, superGroupDeleteAllMessage as databaseSuperGroupDeleteAllMessage, superGroupSearchMessageByKeyword as databaseSuperGroupSearchMessageByKeyword, superGroupSearchMessageByContentType as databaseSuperGroupSearchMessageByContentType, superGroupSearchMessageByContentTypeAndKeyword as databaseSuperGroupSearchMessageByContentTypeAndKeyword, superGroupUpdateMessageStatusBySourceID as databaseSuperGroupUpdateMessageStatusBySourceID, superGroupGetSendingMessageList as databaseSuperGroupGetSendingMessageList, superGroupUpdateGroupMessageHasRead as databaseSuperGroupUpdateGroupMessageHasRead, superGroupGetMsgSeqByClientMsgID as databaseSuperGroupGetMsgSeqByClientMsgID, superGroupUpdateMsgSenderFaceURLAndSenderNickname as databaseSuperGroupUpdateMsgSenderFaceURLAndSenderNickname, superGroupSearchAllMessageByContentType as databaseSuperGroupSearchAllMessageByContentType, } from '../../sqls';
 import { converSqlExecResult, convertToSnakeCaseObject, formatResponse, } from '../../utils';
 import { getInstance } from './instance';
 export async function superGroupGetMessage(groupID, messageId) {
@@ -248,6 +248,17 @@ export async function superGroupUpdateMsgSenderFaceURLAndSenderNickname(sendID, 
             throw 'superGroupUpdateGroupMessageHasRead no record updated';
         }
         return formatResponse(execResult);
+    }
+    catch (e) {
+        console.error(e);
+        return formatResponse(undefined, DatabaseErrorCode.ErrorInit, JSON.stringify(e));
+    }
+}
+export async function superGroupSearchAllMessageByContentType(groupID, contentType) {
+    try {
+        const db = await getInstance();
+        const execResult = databaseSuperGroupSearchAllMessageByContentType(db, groupID, contentType);
+        return formatResponse(converSqlExecResult(execResult[0], 'CamelCase', ['isRead']));
     }
     catch (e) {
         console.error(e);
