@@ -1,5 +1,5 @@
 import { OnLineResType } from "../@types/open_im";
-import { getIMApiUrl } from "../config";
+import { getIMApiUrl, getIMConfigUrl } from "../config";
 import { request } from "../utils";
 import { uuid } from "../utils/common";
 
@@ -33,3 +33,13 @@ export const getOnline = async (userIDList: string[], opid?: string):Promise<OnL
     );
 }
 
+export const getAppConfig = () =>
+  request.post(
+    "/admin/init/get_client_config",
+    JSON.stringify({
+      OperationID: uuid("uuid"),
+    }),
+    {
+      baseURL: getIMConfigUrl(),
+    }
+  );

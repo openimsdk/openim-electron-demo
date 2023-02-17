@@ -5,11 +5,23 @@ export type UserState = {
     selfInfo:FullUserItem
     adminToken:string
     selfInitLoading:boolean
+    appConfig:AppGlobalConfig
 }
+
+export type AppGlobalConfig = {
+    discoverPageURL: string;
+    adminURL: string;
+    allowSendMsgNotFriend: number;
+    ordinaryUserAddFriend: number;
+    needInvitationCodeRegister: number;
+    bossUserID: string;
+    robots: string[];
+  }
 
 export const SET_SELF_INFO = 'SET_SELF_INFO'
 export const SET_ADMIN_TOKEN = 'SET_ADMIN_TOKEN'
 export const SET_SELF_INIT_LOADING = 'SET_SELF_INIT_LOADING'
+export const SET_APP_CONFIG = "SET_APP_CONFIG";
 
 type SetSelfInfo = {
     type: typeof SET_SELF_INFO
@@ -26,5 +38,10 @@ type SetSelfInitLoading = {
     payload: boolean
 }
 
+type SetAppConfig = {
+    type: typeof SET_APP_CONFIG;
+    payload: AppGlobalConfig;
+  };
 
-export type UserActionTypes = SetSelfInfo | SetSelfToken | SetSelfInitLoading
+
+export type UserActionTypes = SetSelfInfo | SetSelfToken | SetSelfInitLoading | SetAppConfig

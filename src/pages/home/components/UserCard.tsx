@@ -97,8 +97,8 @@ const UserCard: FC<UserCardProps> = ({ draggableCardVisible, info, close, type }
       });
   };
 
-  const clickBtn = () => {
-    if (isFriend) {
+  const clickBtn = (isSendMessage = false) => {
+    if (isSendMessage) {
       events.emit(TOASSIGNCVE, info.userID, SessionType.Single);
       close();
     } else {
@@ -270,8 +270,11 @@ const UserCard: FC<UserCardProps> = ({ draggableCardVisible, info, close, type }
         <Descriptions.Item label="ID">{info.userID!}</Descriptions.Item>
         {/* <Descriptions.Item label="手机号">{info.mobile}</Descriptions.Item> */}
       </Descriptions>
-      <Button onClick={clickBtn} className="add_con_btn" type="primary">
-        {isFriend ? t("SendMessage") : t("AddFriend")}
+    {!isFriend && <Button onClick={()=>clickBtn()} className="add_con_btn" type="primary">
+        {t("AddFriend")}
+      </Button>}
+      <Button onClick={()=>clickBtn(true)} className="add_con_btn" type="primary">
+        {t("SendMessage")}
       </Button>
     </>
   );

@@ -1,6 +1,6 @@
 import { CloseCircleFilled, CloseOutlined } from "@ant-design/icons";
 import { Button, Layout, message } from "antd";
-import { FC, memo, useEffect, useRef, useState } from "react";
+import { FC, forwardRef, ForwardRefRenderFunction, memo, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { base64toFile, contenteditableDivRange, cosUploadNomal, events, im, isSingleCve, move2end } from "../../../../utils";
 import { ATSTATEUPDATE, FORWARDANDMERMSG, ISSETDRAFT, MUTILMSG, MUTILMSGCHANGE, REPLAYMSG } from "../../../../constants/events";
 import CardMsgModal from "../components/CardMsgModal";
@@ -29,7 +29,7 @@ type AtItem = {
   tag: string;
 };
 
-const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
+const CveFooter: ForwardRefRenderFunction<any,CveFooterProps> = ({ sendMsg, curCve },ref) => {
   const inputRef = useRef<any>(null);
   const [msgContent, setMsgContent] = useState<string>("");
   const latestContent = useLatest(msgContent);
@@ -42,8 +42,12 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
   const [mutilMsg, setMutilMsg] = useState<MessageItem[]>([]);
   const [atList, setAtList] = useState<AtItem[]>([]);
   const groupMemberList = useSelector((state: RootState) => state.contacts.groupMemberList, shallowEqual);
+  const appConfig = useSelector((state: RootState) => state.user.appConfig, shallowEqual);
   const { t, i18n } = useTranslation();
   const suffixRef = useRef<any>(null);
+  const watingTimer = useRef<NodeJS.Timeout>();
+
+  const [watingFlag,setWatingFlag] = useState(false);
 
   useEffect(() => {
     events.on(REPLAYMSG, replyHandler);
@@ -442,6 +446,24 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
     typing();
   };
 
+  const setWatingCounter = (timeGap = 60000) => {
+    if(watingTimer.current){
+      clearTimeout(watingTimer.current);
+    }
+    setWatingFlag(true)
+    watingTimer.current = setTimeout(()=>{
+      setWatingFlag(false)
+    },timeGap)
+  }
+
+  const updateWatingFlag = (flag:boolean) => {
+    if(flag !== watingFlag){
+      setWatingFlag(flag)
+    }
+  }
+
+  useImperativeHandle(ref, () => ({ setWatingCounter, updateWatingFlag }));
+
   return (
     <Footer className="chat_footer">
       {mutilSelect ? (
@@ -451,7 +473,8 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
           <ContentEditable
             className="input_div"
             style={{ paddingTop: replyMsg ? "32px" : "4px" }}
-            placeholder={`${t("SendTo")} ${curCve.showName}`}
+            placeholder={!watingFlag ? `${t("SendTo")} ${curCve.showName}`: '等待回复...' }
+            disabled={watingFlag}
             ref={inputRef}
             html={msgContent}
             onChange={onChange}
@@ -459,7 +482,7 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
             onPaste={textInit}
           />
           <ReplyPrefix />
-          <MsgTypeSuffix ref={suffixRef} choseCard={choseCard} faceClick={faceClick} sendMsg={sendMsg} />
+         {!appConfig.robots.includes(curCve.userID) && <MsgTypeSuffix ref={suffixRef} choseCard={choseCard} faceClick={faceClick} sendMsg={sendMsg} />}
         </div>
       )}
       {crardSeVis && <CardMsgModal cb={sendCardMsg} visible={crardSeVis} close={close} />}
@@ -467,5 +490,5 @@ const CveFooter: FC<CveFooterProps> = ({ sendMsg, curCve }) => {
   );
 };
 
-export default memo(CveFooter, (p, n) => p.curCve.conversationID === n.curCve.conversationID && p.curCve.showName === n.curCve.showName);
+export default memo(forwardRef(CveFooter), (p, n) => p.curCve.conversationID === n.curCve.conversationID && p.curCve.showName === n.curCve.showName);
 

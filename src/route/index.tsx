@@ -32,7 +32,7 @@ import {
   setGroupInfo,
   getGroupMemberList,
 } from "../store/actions/contacts";
-import { getSelfInfo } from "../store/actions/user";
+import { getAppGlobalConfig, getSelfInfo } from "../store/actions/user";
 import { OPENSINGLEMODAL } from "../constants/events";
 import { cveSort } from "../utils";
 import { CbEvents } from "open-im-sdk-wasm/lib/constant";
@@ -78,6 +78,7 @@ const Auth = () => {
       }
       window.open(url, "_blank");
     };
+    dispatch(getAppGlobalConfig())
   }, [selfInfo]);
 
   useEffect(() => {

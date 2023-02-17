@@ -69,6 +69,7 @@ const Home = () => {
   const selfID = useSelector((state: RootState) => state.user.selfInfo.userID, shallowEqual);
   const curCve = useSelector((state: RootState) => state.cve.curCve, shallowEqual);
   const groupInfo = useSelector((state: RootState) => state.contacts.groupInfo, shallowEqual);
+  const appConfig = useSelector((state: RootState) => state.user.appConfig, shallowEqual);
   const dispatch = useDispatch();
   const rs = useReactive<ReactiveState>({
     historyMsgList: [],
@@ -79,6 +80,7 @@ const Home = () => {
     searchStatus: false,
     searchCve: [],
   });
+  const footerRef = useRef<any>()
   const timer = useRef<NodeJS.Timeout | null>(null);
   const {
     loading,
@@ -99,8 +101,8 @@ const Home = () => {
     };
   }, []);
 
-  const revokeMsgHandler = ({data}: WSEvent) => {
-    const revokeData = JSON.parse(data as string)
+  const revokeMsgHandler = ({ data }: WSEvent) => {
+    const revokeData = JSON.parse(data as string);
     const idx = rs.historyMsgList.findIndex((m) => m.clientMsgID === revokeData.clientMsgID);
     if (idx > -1) {
       rs.historyMsgList[idx].contentType = MessageType.ADVANCEREVOKEMESSAGE;
@@ -160,8 +162,8 @@ const Home = () => {
 
   const sendForwardHandler = (options: string | MergerMsgParams, type: MessageType, list: SelectType[]) => {
     list.map(async (s) => {
-      const uid = (s as FriendItem).userID??"";
-      const gid = (s as GroupItem).groupID??"";
+      const uid = (s as FriendItem).userID ?? "";
+      const gid = (s as GroupItem).groupID ?? "";
       let data;
       if (type === MessageType.MERGERMESSAGE) {
         data = await im.createMergerMessage(options as MergerMsgParams);
@@ -175,18 +177,18 @@ const Home = () => {
 
   //  im hander
   const newMsgHandler = (data: WSEvent) => {
-    console.log('newMsgHandler');
-    
+    console.log("newMsgHandler");
+
     const newServerMsg: MessageItem = JSON.parse(data.data as string);
-    handelMsg(newServerMsg)
+    handelMsg(newServerMsg);
   };
 
-  const newMsgsHandler = (data:WSEvent) => {
+  const newMsgsHandler = (data: WSEvent) => {
     const newServerMsgs: MessageItem[] = JSON.parse(data.data as string);
-    newServerMsgs.forEach(handelMsg)
-  }
+    newServerMsgs.forEach(handelMsg);
+  };
 
-  const handelMsg = (newServerMsg:MessageItem) => {
+  const handelMsg = (newServerMsg: MessageItem) => {
     // if (newServerMsg.contentType !== MessageType.TYPINGMESSAGE && newServerMsg.sendID !== selfID) {
     //   createNotification(newServerMsg, (id, sessionType) => {
     //     assignHandler(id, sessionType);
@@ -202,14 +204,13 @@ const Home = () => {
             rs.historyMsgList = [newServerMsg, ...rs.historyMsgList.filter((ms) => ms.clientMsgID !== newServerMsg.content)];
           } else {
             rs.historyMsgList = [newServerMsg, ...rs.historyMsgList];
+            footerRef.current.updateWatingFlag(false)
           }
           markCveHasRead(curCve, 1);
         }
       }
     }
-  }
-
-  
+  };
 
   const c2cMsgHandler = (data: WSEvent) => {
     JSON.parse(data.data as string).map((cr: any) => {
@@ -279,6 +280,7 @@ const Home = () => {
       events.emit(ISSETDRAFT, curCve);
     }
     rs.historyMsgList = [];
+    footerRef.current?.updateWatingFlag(false)
     dispatch(setCurCve(cve));
     rs.hasMore = true;
     getInfo(cve);
@@ -286,7 +288,23 @@ const Home = () => {
     setImgGroup([]);
     getHistoryMsg(cve.userID, cve.groupID);
     markCveHasRead(cve);
+    robotCheck(cve);
   };
+
+  const robotCheck = (cve: ConversationItem) => {
+    let message:MessageItem
+    try {
+      message = JSON.parse(cve.latestMsg)
+    } catch (error) {
+      return;
+    }
+    const isRobotMsg = message.sendID === cve?.userID
+      const gapTime = Date.now() - message.sendTime
+      const isTimeout = gapTime >= 60000
+    if(appConfig.robots.includes(cve?.userID??'') && !isRobotMsg && !isTimeout) {
+      setTimeout(() =>footerRef.current.setWatingCounter(gapTime))
+    }
+  }
 
   const getInfo = (cve: ConversationItem) => {
     if (!isSingleCve(cve)) {
@@ -303,7 +321,7 @@ const Home = () => {
 
   const markCveHasRead = (cve: ConversationItem, type?: number) => {
     if (cve.unreadCount === 0 && !type) return;
-    im.markMessageAsReadByConID({conversationID: cve.conversationID,msgIDList: []})
+    im.markMessageAsReadByConID({ conversationID: cve.conversationID, msgIDList: [] });
   };
 
   const getOneCve = (sourceID: string, sessionType: number): Promise<ConversationItem> => {
@@ -316,7 +334,7 @@ const Home = () => {
 
   const getHistoryMsg = (uid?: string, gid?: string, sMsg?: MessageItem) => {
     console.log("getMsg:::");
-    
+
     const config = {
       userID: uid ?? "",
       groupID: gid ?? "",
@@ -335,9 +353,9 @@ const Home = () => {
       rs.historyMsgList.pop();
     }
     rs.historyMsgList = [...rs.historyMsgList, ...JSON.parse(res.data).reverse()];
-    console.log(rs.historyMsgList);
-
     rs.hasMore = !(JSON.parse(res.data).length < 20);
+    console.log( rs.historyMsgList);
+    
   }
 
   const imgClick = (el: PictureElem) => {
@@ -363,7 +381,7 @@ const Home = () => {
     });
   };
 
-  const sendMsg = (nMsg: string, type: MessageType, uid?: string, gid?: string,fileArrayBuffer?:ArrayBuffer,snpFileArrayBuffer?:ArrayBuffer) => {
+  const sendMsg = (nMsg: string, type: MessageType, uid?: string, gid?: string, fileArrayBuffer?: ArrayBuffer, snpFileArrayBuffer?: ArrayBuffer) => {
     const operationID = uuid();
     if ((uid && curCve?.userID === uid) || (gid && curCve?.groupID === gid) || (!uid && !gid)) {
       const parsedMsg = JSON.parse(nMsg);
@@ -409,7 +427,12 @@ const Home = () => {
         .catch((err) => sendMsgCB(err, type, true));
     } else {
       im.sendMessage(sendOption, operationID)
-        .then((res) => sendMsgCB(res, type))
+        .then((res) => {
+          if(appConfig.robots.includes(sendOption.recvID)){
+            footerRef.current.setWatingCounter();
+          }
+          sendMsgCB(res, type);
+        })
         .catch((err) => sendMsgCB(err, type, true));
     }
   };
@@ -471,7 +494,7 @@ const Home = () => {
           {rs.merModal && <MerModal visible={rs.merModal} close={closeMer} curCve={curCve!} imgClick={imgClick} info={rs.merData!} />}
         </Content>
 
-        {curCve && <CveFooter curCve={curCve} sendMsg={sendMsg} />}
+        {curCve && <CveFooter ref={footerRef} curCve={curCve} sendMsg={sendMsg} />}
       </Layout>
       {curCve && <CveRightBar curCve={curCve} />}
     </>

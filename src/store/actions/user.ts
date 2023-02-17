@@ -1,5 +1,5 @@
 import { Dispatch } from "redux";
-import { getAuthToken } from "../../api/admin";
+import { getAppConfig, getAuthToken } from "../../api/admin";
 import { im } from "../../utils";
 import { PartialUserItem, FullUserItem } from "../../utils/open_im_sdk_wasm/types/entity";
 
@@ -8,6 +8,8 @@ import {
   SET_SELF_INIT_LOADING,
   SET_ADMIN_TOKEN,
   UserActionTypes,
+  AppGlobalConfig,
+  SET_APP_CONFIG,
 } from "../types/user";
 
 export const setSelfInfo = (value: PartialUserItem): UserActionTypes => {
@@ -31,6 +33,13 @@ export const setSelfInitLoading = (value: boolean): UserActionTypes => {
   };
 };
 
+export const setAppGlobalConfig = (value: AppGlobalConfig): UserActionTypes => {
+  return {
+    type: SET_APP_CONFIG,
+    payload: value,
+  };
+};
+
 export const getSelfInfo = () => {
   return (dispatch: Dispatch) => {
     dispatch(setSelfInitLoading(true));
@@ -48,3 +57,14 @@ export const getAdminToken = (uid?:string,secret?:string) => {
     })
   }
 }
+
+export const getAppGlobalConfig = () => {
+  return (dispatch: Dispatch) => {
+    getAppConfig().then(({ data }) => {
+      if(!data.robots){
+        data.robots = []
+      }
+      dispatch(setAppGlobalConfig(data));
+    });
+  };
+};
