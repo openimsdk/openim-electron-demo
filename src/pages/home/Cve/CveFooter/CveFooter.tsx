@@ -1,6 +1,6 @@
 import { CloseCircleFilled, CloseOutlined } from "@ant-design/icons";
 import { Button, Layout, message } from "antd";
-import { FC, forwardRef, ForwardRefRenderFunction, memo, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { FC, forwardRef, ForwardRefRenderFunction, memo, useEffect, useRef, useState } from "react";
 import { base64toFile, contenteditableDivRange, cosUploadNomal, events, im, isSingleCve, move2end } from "../../../../utils";
 import { ATSTATEUPDATE, FORWARDANDMERMSG, ISSETDRAFT, MUTILMSG, MUTILMSGCHANGE, REPLAYMSG } from "../../../../constants/events";
 import CardMsgModal from "../components/CardMsgModal";
@@ -46,9 +46,8 @@ const CveFooter: ForwardRefRenderFunction<any, CveFooterProps> = ({ sendMsg, cur
   const appConfig = useSelector((state: RootState) => state.user.appConfig, shallowEqual);
   const { t, i18n } = useTranslation();
   const suffixRef = useRef<any>(null);
-  const watingTimer = useRef<NodeJS.Timeout>();
 
-  const [watingFlag, setWatingFlag] = useState(false);
+  const latestCurcve = useLatest(curCve);
 
   useEffect(() => {
     events.on(REPLAYMSG, replyHandler);
@@ -87,29 +86,26 @@ const CveFooter: ForwardRefRenderFunction<any, CveFooterProps> = ({ sendMsg, cur
       setMsgContent("");
     }
     setMutilMsg([]);
-    robotCheck();
     return () => {
       setDraft(curCve);
     };
-  }, [curCve.conversationID, curCve.draftText,appConfig.robots]);
+  }, [curCve.conversationID, curCve.draftText]);
 
-  const robotCheck = () => {
+  const robotWaitCheck = () => {
     let message: MessageItem | undefined = undefined;
     try {
-      message = JSON.parse(curCve.latestMsg);
+      message = JSON.parse(latestCurcve.current.latestMsg);
     } catch (error) {}
     if (!message || TipsType.includes(message.contentType)) {
-      updateWatingFlag(false)
-      return;
+      return false;
     }
-
     const isRobotMsg = appConfig.robots.includes(message.sendID);
     const gapTime = Date.now() - message.sendTime;
     const isTimeout = gapTime >= 60000;
     if (!isRobotMsg && !isTimeout) {
-      setWatingCounter(60000 - gapTime);
+      return true;
     } else {
-      updateWatingFlag(false)
+      return false;
     }
   };
 
@@ -397,6 +393,11 @@ const CveFooter: ForwardRefRenderFunction<any, CveFooterProps> = ({ sendMsg, cur
     }
     if (e.key === "Enter" && !e.ctrlKey) {
       e.preventDefault();
+
+      if (robotWaitCheck()) {
+        message.info("等待回复中...");
+        return;
+      }
       if (latestContent.current && !latestFlag.current) {
         setFlag(true);
         switchMessage(replyMsg ? "quote" : atList.length > 0 ? "at" : "text");
@@ -468,24 +469,6 @@ const CveFooter: ForwardRefRenderFunction<any, CveFooterProps> = ({ sendMsg, cur
     typing();
   };
 
-  const setWatingCounter = (timeGap = 60000) => {
-    if (watingTimer.current) {
-      clearTimeout(watingTimer.current);
-    }
-    setWatingFlag(true);
-    watingTimer.current = setTimeout(() => {
-      setWatingFlag(false);
-    }, timeGap);
-  };
-
-  const updateWatingFlag = (flag: boolean) => {
-    if (flag !== watingFlag) {
-      setWatingFlag(flag);
-    }
-  };
-
-  useImperativeHandle(ref, () => ({ setWatingCounter, updateWatingFlag }));
-
   return (
     <Footer className="chat_footer">
       {mutilSelect ? (
@@ -495,8 +478,7 @@ const CveFooter: ForwardRefRenderFunction<any, CveFooterProps> = ({ sendMsg, cur
           <ContentEditable
             className="input_div"
             style={{ paddingTop: replyMsg ? "32px" : "4px" }}
-            placeholder={!watingFlag ? `${t("SendTo")} ${curCve.showName}` : "等待回复..."}
-            disabled={watingFlag}
+            placeholder={`${t("SendTo")} ${curCve.showName}`}
             ref={inputRef}
             html={msgContent}
             onChange={onChange}
@@ -512,4 +494,4 @@ const CveFooter: ForwardRefRenderFunction<any, CveFooterProps> = ({ sendMsg, cur
   );
 };
 
-export default memo(forwardRef(CveFooter), (p, n) => p.curCve.conversationID === n.curCve.conversationID && p.curCve.showName === n.curCve.showName);
+export default memo(forwardRef(CveFooter), (p, n) => p.curCve.conversationID === n.curCve.conversationID && p.curCve.showName === n.curCve.showName && p.curCve.latestMsg === n.curCve.latestMsg);

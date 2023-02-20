@@ -80,7 +80,6 @@ const Home = () => {
     searchStatus: false,
     searchCve: [],
   });
-  const footerRef = useRef<any>()
   const timer = useRef<NodeJS.Timeout | null>(null);
   const {
     loading,
@@ -204,7 +203,6 @@ const Home = () => {
             rs.historyMsgList = [newServerMsg, ...rs.historyMsgList.filter((ms) => ms.clientMsgID !== newServerMsg.content)];
           } else {
             rs.historyMsgList = [newServerMsg, ...rs.historyMsgList];
-            footerRef.current.updateWatingFlag(false)
           }
           markCveHasRead(curCve, 1);
         }
@@ -411,9 +409,6 @@ const Home = () => {
     } else {
       im.sendMessage(sendOption, operationID)
         .then((res) => {
-          if(appConfig.robots.includes(sendOption.recvID)){
-            footerRef.current.setWatingCounter();
-          }
           sendMsgCB(res, type);
         })
         .catch((err) => sendMsgCB(err, type, true));
@@ -477,7 +472,7 @@ const Home = () => {
           {rs.merModal && <MerModal visible={rs.merModal} close={closeMer} curCve={curCve!} imgClick={imgClick} info={rs.merData!} />}
         </Content>
 
-        {curCve && <CveFooter ref={footerRef} curCve={curCve} sendMsg={sendMsg} />}
+        {curCve && <CveFooter curCve={curCve} sendMsg={sendMsg} />}
       </Layout>
       {curCve && <CveRightBar curCve={curCve} />}
     </>
