@@ -280,7 +280,6 @@ const Home = () => {
       events.emit(ISSETDRAFT, curCve);
     }
     rs.historyMsgList = [];
-    footerRef.current?.updateWatingFlag(false)
     dispatch(setCurCve(cve));
     rs.hasMore = true;
     getInfo(cve);
@@ -288,23 +287,7 @@ const Home = () => {
     setImgGroup([]);
     getHistoryMsg(cve.userID, cve.groupID);
     markCveHasRead(cve);
-    robotCheck(cve);
   };
-
-  const robotCheck = (cve: ConversationItem) => {
-    let message:MessageItem
-    try {
-      message = JSON.parse(cve.latestMsg)
-    } catch (error) {
-      return;
-    }
-    const isRobotMsg = message.sendID === cve?.userID
-      const gapTime = Date.now() - message.sendTime
-      const isTimeout = gapTime >= 60000
-    if(appConfig.robots.includes(cve?.userID??'') && !isRobotMsg && !isTimeout) {
-      setTimeout(() =>footerRef.current.setWatingCounter(gapTime))
-    }
-  }
 
   const getInfo = (cve: ConversationItem) => {
     if (!isSingleCve(cve)) {

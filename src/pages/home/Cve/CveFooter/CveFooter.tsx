@@ -15,6 +15,7 @@ import { useLatest } from "ahooks";
 import { getCosAuthorization } from "../../../../utils/cos";
 import { ConversationItem, FriendItem, MessageItem } from "../../../../utils/open_im_sdk_wasm/types/entity";
 import { MessageType } from "../../../../utils/open_im_sdk_wasm/types/enum";
+import { TipsType } from "../../../../constants/messageContentType";
 
 const { Footer } = Layout;
 
@@ -29,7 +30,7 @@ type AtItem = {
   tag: string;
 };
 
-const CveFooter: ForwardRefRenderFunction<any,CveFooterProps> = ({ sendMsg, curCve },ref) => {
+const CveFooter: ForwardRefRenderFunction<any, CveFooterProps> = ({ sendMsg, curCve }, ref) => {
   const inputRef = useRef<any>(null);
   const [msgContent, setMsgContent] = useState<string>("");
   const latestContent = useLatest(msgContent);
@@ -47,12 +48,12 @@ const CveFooter: ForwardRefRenderFunction<any,CveFooterProps> = ({ sendMsg, curC
   const suffixRef = useRef<any>(null);
   const watingTimer = useRef<NodeJS.Timeout>();
 
-  const [watingFlag,setWatingFlag] = useState(false);
+  const [watingFlag, setWatingFlag] = useState(false);
 
   useEffect(() => {
     events.on(REPLAYMSG, replyHandler);
     events.on(MUTILMSG, mutilHandler);
-    window.electron && window.electron.addIpcRendererListener("ScreenshotData",screenshotHandler,"screenshotListener")
+    window.electron && window.electron.addIpcRendererListener("ScreenshotData", screenshotHandler, "screenshotListener");
     return () => {
       events.off(REPLAYMSG, replyHandler);
       events.off(MUTILMSG, mutilHandler);
@@ -86,10 +87,31 @@ const CveFooter: ForwardRefRenderFunction<any,CveFooterProps> = ({ sendMsg, curC
       setMsgContent("");
     }
     setMutilMsg([]);
+    robotCheck();
     return () => {
-      setDraft(curCve)
+      setDraft(curCve);
+    };
+  }, [curCve.conversationID, curCve.draftText,appConfig.robots]);
+
+  const robotCheck = () => {
+    let message: MessageItem | undefined = undefined;
+    try {
+      message = JSON.parse(curCve.latestMsg);
+    } catch (error) {}
+    if (!message || TipsType.includes(message.contentType)) {
+      updateWatingFlag(false)
+      return;
     }
-  }, [curCve]);
+
+    const isRobotMsg = appConfig.robots.includes(message.sendID);
+    const gapTime = Date.now() - message.sendTime;
+    const isTimeout = gapTime >= 60000;
+    if (!isRobotMsg && !isTimeout) {
+      setWatingCounter(60000 - gapTime);
+    } else {
+      updateWatingFlag(false)
+    }
+  };
 
   const blobToDataURL = (blob: File, cb: (base64: string) => void) => {
     let reader = new FileReader();
@@ -116,10 +138,10 @@ const CveFooter: ForwardRefRenderFunction<any,CveFooterProps> = ({ sendMsg, curC
     }
   };
 
-  const screenshotHandler = (ev:any,base64:string) => {
+  const screenshotHandler = (ev: any, base64: string) => {
     let img = `<img style="vertical-align:bottom" class="screenshot_el" src="${base64}" alt="" >`;
     setMsgContent(latestContent.current + img);
-  }
+  };
 
   const reParseEmojiFace = (text: string) => {
     faceMap.map((f) => {
@@ -447,20 +469,20 @@ const CveFooter: ForwardRefRenderFunction<any,CveFooterProps> = ({ sendMsg, curC
   };
 
   const setWatingCounter = (timeGap = 60000) => {
-    if(watingTimer.current){
+    if (watingTimer.current) {
       clearTimeout(watingTimer.current);
     }
-    setWatingFlag(true)
-    watingTimer.current = setTimeout(()=>{
-      setWatingFlag(false)
-    },timeGap)
-  }
+    setWatingFlag(true);
+    watingTimer.current = setTimeout(() => {
+      setWatingFlag(false);
+    }, timeGap);
+  };
 
-  const updateWatingFlag = (flag:boolean) => {
-    if(flag !== watingFlag){
-      setWatingFlag(flag)
+  const updateWatingFlag = (flag: boolean) => {
+    if (flag !== watingFlag) {
+      setWatingFlag(flag);
     }
-  }
+  };
 
   useImperativeHandle(ref, () => ({ setWatingCounter, updateWatingFlag }));
 
@@ -473,7 +495,7 @@ const CveFooter: ForwardRefRenderFunction<any,CveFooterProps> = ({ sendMsg, curC
           <ContentEditable
             className="input_div"
             style={{ paddingTop: replyMsg ? "32px" : "4px" }}
-            placeholder={!watingFlag ? `${t("SendTo")} ${curCve.showName}`: '等待回复...' }
+            placeholder={!watingFlag ? `${t("SendTo")} ${curCve.showName}` : "等待回复..."}
             disabled={watingFlag}
             ref={inputRef}
             html={msgContent}
@@ -482,7 +504,7 @@ const CveFooter: ForwardRefRenderFunction<any,CveFooterProps> = ({ sendMsg, curC
             onPaste={textInit}
           />
           <ReplyPrefix />
-         {!appConfig.robots.includes(curCve.userID) && <MsgTypeSuffix ref={suffixRef} choseCard={choseCard} faceClick={faceClick} sendMsg={sendMsg} />}
+          {!appConfig.robots.includes(curCve.userID) && <MsgTypeSuffix ref={suffixRef} choseCard={choseCard} faceClick={faceClick} sendMsg={sendMsg} />}
         </div>
       )}
       {crardSeVis && <CardMsgModal cb={sendCardMsg} visible={crardSeVis} close={close} />}
@@ -491,4 +513,3 @@ const CveFooter: ForwardRefRenderFunction<any,CveFooterProps> = ({ sendMsg, curC
 };
 
 export default memo(forwardRef(CveFooter), (p, n) => p.curCve.conversationID === n.curCve.conversationID && p.curCve.showName === n.curCve.showName);
-
