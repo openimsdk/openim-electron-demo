@@ -92,6 +92,9 @@ const CveFooter: ForwardRefRenderFunction<any, CveFooterProps> = ({ sendMsg, cur
   }, [curCve.conversationID, curCve.draftText]);
 
   const robotWaitCheck = () => {
+    if(!appConfig.robots.includes(latestCurcve.current.userID)){
+      return false
+    }
     let message: MessageItem | undefined = undefined;
     try {
       message = JSON.parse(latestCurcve.current.latestMsg);
