@@ -1,0 +1,22 @@
+.sider_resize {
+  width: 300px;
+  min-width: 240px;
+  max-width: 45vw;
+  resize: horizontal;
+  overflow: scroll;
+  height: 100%;
+  opacity: 0;
+
+  &::-webkit-scrollbar {
+    height: calc(100vh - 40px);
+  }
+}
+
+.sider_bar {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid #e8eaef;
+  pointer-events: none;
+}

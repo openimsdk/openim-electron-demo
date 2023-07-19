@@ -1,0 +1,9 @@
+{
+  "toast": {
+    "accessSuccess": "操作成功！",
+    "accessFailed": "操作失败！",
+    "getConversationFailed": "获取会话列表失败！",
+    "getGroupInfoFailed": "获取群信息失败！",
+    "getGroupMemberFailed": "获取群成员信息失败！"
+  }
+}

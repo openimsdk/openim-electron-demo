@@ -1,0 +1,18 @@
+.conversation-item {
+  @apply relative my-1 flex items-center rounded-md p-3 hover:bg-[var(--primary-active)];
+
+  &-pined {
+    &::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 0;
+      border: 4px solid;
+      border-color: var(--primary) var(--primary) transparent transparent;
+    }
+  }
+}
+
+.content-wrap {
+  max-width: calc(100% - 110px);
+}

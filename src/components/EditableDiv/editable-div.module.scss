@@ -1,0 +1,19 @@
+.input {
+  padding: 12px 18px;
+  outline: none;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-x: hidden;
+  overflow-y: auto;
+  cursor: text;
+  // fix safari input
+  -webkit-user-select: text;
+  background-color: #fff;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  &:empty:before {
+    content: attr(placeholder);
+    color: rgb(169, 169, 169);
+  }
+}

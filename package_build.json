@@ -1,0 +1,63 @@
+{
+  "name": "openim-pc-demo",
+  "version": "1.0.0",
+  "main": "dist-electron/main/index.js",
+  "description": "OpenIM PC Demo.",
+  "author": "blooming",
+  "private": true,
+  "debug": {
+    "env": {
+      "VITE_DEV_SERVER_URL": "http://127.0.0.1:7777/"
+    }
+  },
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc && vite build && electron-builder",
+    "preview": "vite preview",
+    "el:build": "vite build  &&  electron-builder --macos --x64",
+    "el:build-win": "vite build  &&  electron-builder --win --x64",
+    "el:build-linux": "vite build  &&  electron-builder --linux",
+    "pree2e": "vite build --mode=test",
+    "e2e": "playwright test",
+    "format": "prettier --write .",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
+    "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx --fix --quiet src",
+    "prepare": "husky install"
+  },
+  "engines": {
+    "node": "^14.18.0 || >=16.0.0"
+  },
+  "build": {
+    "extends": null,
+    "files": ["dist/**/*", "dist-electron/**/*"],
+    "directories": {
+      "output": "package"
+    },
+    "productName": "openim-pc-demo",
+    "win": {
+      "icon": "./dist/icons/logo.ico"
+    },
+    "mac": {
+      "icon": "./dist/icons/logo.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "deleteAppDataOnUninstall": true,
+      "shortcutName": "openim-pc-demo"
+    },
+    "asar": false
+  },
+  "lint-staged": {
+    "src/**/*.{tsx,ts}": ["prettier --write", "eslint --fix"],
+    "*.{json,html,css,scss,xml,md}": ["prettier --write"]
+  },
+  "dependencies": {
+    "electron-log": "^4.4.8",
+    "electron-store": "^8.1.0"
+  }
+}
