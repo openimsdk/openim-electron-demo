@@ -9,3 +9,4 @@ export declare function updateFriendRequest(db: Database, localFriendRequest: Lo
 export declare function getRecvFriendApplication(db: Database, loginUserID: string): QueryExecResult[];
 export declare function getSendFriendApplication(db: Database, loginUserID: string): QueryExecResult[];
 export declare function getFriendApplicationByBothID(db: Database, fromUserID: string, toUserID: boolean): QueryExecResult[];
+export declare function getBothFriendReq(db: Database, fromUserID: string, toUserID: boolean): QueryExecResult[];

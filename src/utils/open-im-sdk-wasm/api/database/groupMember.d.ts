@@ -18,3 +18,4 @@ export declare function deleteGroupAllMembers(groupID: string): Promise<string>;
 export declare function updateGroupMember(localGroupMemberStr: string): Promise<string>;
 export declare function updateGroupMemberField(groupID: string, userID: string, localGroupMemberStr: string): Promise<string>;
 export declare function searchGroupMembers(keyword: string, groupID: string, isSearchMemberNickname: boolean, isSearchUserID: boolean, offset: number, count: number): Promise<string>;
+export declare function getUserJoinedGroupIDs(userID: string): Promise<string>;

@@ -9,3 +9,4 @@ export declare function addMemberCount(groupID: string): Promise<string>;
 export declare function getJoinedWorkingGroupIDList(): Promise<string>;
 export declare function getJoinedWorkingGroupList(): Promise<string>;
 export declare function getGroupMemberAllGroupIDs(): Promise<string>;
+export declare function getGroups(groupIDListStr: string): Promise<string>;

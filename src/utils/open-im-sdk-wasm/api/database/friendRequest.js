@@ -1,5 +1,5 @@
 import { DatabaseErrorCode } from '../../constant';
-import { insertFriendRequest as databaseInsertFriendRequest, deleteFriendRequestBothUserID as databasedeleteFriendRequestBothUserID, updateFriendRequest as databaseupdateFriendRequest, getRecvFriendApplication as databaseGetRecvFriendApplication, getSendFriendApplication as databaseGetSendFriendApplication, getFriendApplicationByBothID as databaseGetFriendApplicationByBothID, } from '../../sqls';
+import { insertFriendRequest as databaseInsertFriendRequest, deleteFriendRequestBothUserID as databasedeleteFriendRequestBothUserID, updateFriendRequest as databaseupdateFriendRequest, getRecvFriendApplication as databaseGetRecvFriendApplication, getSendFriendApplication as databaseGetSendFriendApplication, getFriendApplicationByBothID as databaseGetFriendApplicationByBothID, getBothFriendReq as databaseGetBothFriendReq, } from '../../sqls';
 import { converSqlExecResult, convertObjectField, convertToSnakeCaseObject, formatResponse, } from '../../utils';
 import { getInstance } from './instance';
 export async function insertFriendRequest(localFriendRequestStr) {
@@ -63,6 +63,17 @@ export async function getFriendApplicationByBothID(fromUserID, toUserID) {
     try {
         const db = await getInstance();
         const execResult = databaseGetFriendApplicationByBothID(db, fromUserID, toUserID);
+        return formatResponse(converSqlExecResult(execResult[0], 'CamelCase'));
+    }
+    catch (e) {
+        console.error(e);
+        return formatResponse(undefined, DatabaseErrorCode.ErrorInit, JSON.stringify(e));
+    }
+}
+export async function getBothFriendReq(fromUserID, toUserID) {
+    try {
+        const db = await getInstance();
+        const execResult = databaseGetBothFriendReq(db, fromUserID, toUserID);
         return formatResponse(converSqlExecResult(execResult[0], 'CamelCase'));
     }
     catch (e) {

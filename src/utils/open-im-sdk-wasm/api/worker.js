@@ -13,15 +13,15 @@ deleteConversationUnreadMessageList, batchInsertConversationUnreadMessageList,
 // black
 getBlackList, getBlackListUserID, getBlackInfoByBlockUserID, getBlackInfoList, insertBlack, deleteBlack, updateBlack, 
 // friendRequest
-insertFriendRequest, deleteFriendRequestBothUserID, updateFriendRequest, getRecvFriendApplication, getSendFriendApplication, getFriendApplicationByBothID, 
+insertFriendRequest, deleteFriendRequestBothUserID, updateFriendRequest, getRecvFriendApplication, getSendFriendApplication, getFriendApplicationByBothID, getBothFriendReq, 
 // groups
-insertGroup, deleteGroup, updateGroup, getJoinedGroupList, getGroupInfoByGroupID, getAllGroupInfoByGroupIDOrGroupName, subtractMemberCount, addMemberCount, getJoinedWorkingGroupIDList, getJoinedWorkingGroupList, 
+insertGroup, deleteGroup, updateGroup, getJoinedGroupList, getGroupInfoByGroupID, getAllGroupInfoByGroupIDOrGroupName, subtractMemberCount, addMemberCount, getJoinedWorkingGroupIDList, getJoinedWorkingGroupList, getGroups, 
 // groupRequest
 insertGroupRequest, deleteGroupRequest, updateGroupRequest, getSendGroupApplication, insertAdminGroupRequest, deleteAdminGroupRequest, updateAdminGroupRequest, getAdminGroupApplication, 
 // friend
 insertFriend, deleteFriend, updateFriend, getAllFriendList, searchFriendList, getFriendInfoList, getFriendInfoByFriendUserID, 
 // groupMember
-batchInsertGroupMember, deleteGroupAllMembers, deleteGroupMember, getAllGroupMemberList, getAllGroupMemberUserIDList, getGroupAdminID, getGroupMemberCount, getGroupMemberInfoByGroupIDUserID, getGroupMemberListByGroupID, getGroupMemberListSplit, getGroupMemberListSplitByJoinTimeFilter, getGroupMemberOwner, getGroupMemberOwnerAndAdmin, getGroupMemberUIDListByGroupID, getGroupOwnerAndAdminByGroupID, getGroupSomeMemberInfo, insertGroupMember, searchGroupMembers, updateGroupMember, updateGroupMemberField, 
+batchInsertGroupMember, deleteGroupAllMembers, deleteGroupMember, getAllGroupMemberList, getAllGroupMemberUserIDList, getGroupAdminID, getGroupMemberCount, getGroupMemberInfoByGroupIDUserID, getGroupMemberListByGroupID, getGroupMemberListSplit, getGroupMemberListSplitByJoinTimeFilter, getGroupMemberOwner, getGroupMemberOwnerAndAdmin, getGroupMemberUIDListByGroupID, getGroupOwnerAndAdminByGroupID, getGroupSomeMemberInfo, insertGroupMember, searchGroupMembers, updateGroupMember, updateGroupMemberField, getUserJoinedGroupIDs, 
 // temp cache chatlogs
 batchInsertTempCacheMessageList, InsertTempCacheMessage, getAllSingleConversationIDList, getAllConversationIDList, getPageFriendList, getGroupMemberAllGroupIDs, getAlreadyExistSeqList, markConversationAllMessageAsRead, searchAllMessageByContentType, deleteConversationMsgs, markConversationMessageAsRead, markConversationMessageAsReadBySeqs, markDeleteConversationAllMessages, getUnreadMessage, getConversationPeerNormalMsgSeq, getConversationNormalMsgSeq, deleteConversationAllMessages, getMessagesByClientMsgIDs, getMessagesBySeqs, getMessageBySeq, getAllConversations, 
 // upload
@@ -134,6 +134,7 @@ rpc.registerMethod('updateFriendRequest', updateFriendRequest);
 rpc.registerMethod('getRecvFriendApplication', getRecvFriendApplication);
 rpc.registerMethod('getSendFriendApplication', getSendFriendApplication);
 rpc.registerMethod('getFriendApplicationByBothID', getFriendApplicationByBothID);
+rpc.registerMethod('getBothFriendReq', getBothFriendReq);
 // groups
 rpc.registerMethod('insertGroup', insertGroup);
 rpc.registerMethod('deleteGroup', deleteGroup);
@@ -146,6 +147,7 @@ rpc.registerMethod('addMemberCount', addMemberCount);
 rpc.registerMethod('getJoinedWorkingGroupIDList', getJoinedWorkingGroupIDList);
 rpc.registerMethod('getJoinedWorkingGroupList', getJoinedWorkingGroupList);
 rpc.registerMethod('getGroupMemberAllGroupIDs', getGroupMemberAllGroupIDs);
+rpc.registerMethod('getGroups', getGroups);
 // groupMembers
 rpc.registerMethod('getGroupMemberInfoByGroupIDUserID', getGroupMemberInfoByGroupIDUserID);
 rpc.registerMethod('getAllGroupMemberList', getAllGroupMemberList);
@@ -167,6 +169,7 @@ rpc.registerMethod('deleteGroupAllMembers', deleteGroupAllMembers);
 rpc.registerMethod('updateGroupMember', updateGroupMember);
 rpc.registerMethod('updateGroupMemberField', updateGroupMemberField);
 rpc.registerMethod('searchGroupMembers', searchGroupMembers);
+rpc.registerMethod('getUserJoinedGroupIDs', getUserJoinedGroupIDs);
 // groupRequest
 rpc.registerMethod('insertGroupRequest', insertGroupRequest);
 rpc.registerMethod('deleteGroupRequest', deleteGroupRequest);

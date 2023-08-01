@@ -23,3 +23,4 @@ export declare function deleteGroupAllMembers(db: Database, groupID: string): Qu
 export declare function updateGroupMember(db: Database, localGroupMember: LocalGroupMember): QueryExecResult[];
 export declare function updateGroupMemberField(db: Database, groupID: string, userID: string, localGroupMember: LocalGroupMember): QueryExecResult[];
 export declare function searchGroupMembers(db: Database, keyword: string, groupID: string, isSearchMemberNickname: boolean, isSearchUserID: boolean, offset: number, count: number): QueryExecResult[];
+export declare function getUserJoinedGroupIDs(db: Database, userID: string): QueryExecResult[];

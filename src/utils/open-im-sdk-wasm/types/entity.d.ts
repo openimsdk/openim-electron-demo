@@ -406,3 +406,10 @@ export declare type SearchMessageResultItem = {
     faceURL: string;
     messageList: MessageItem[];
 };
+export declare type AdvancedGetMessageResult = {
+    isEnd: boolean;
+    lastMinSeq: number;
+    errCode: number;
+    errMsg: string;
+    messageList: MessageItem[];
+};

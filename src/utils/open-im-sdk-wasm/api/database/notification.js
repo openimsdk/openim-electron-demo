@@ -1,6 +1,6 @@
 import { DatabaseErrorCode } from '../../constant';
 import { insertNotificationSeq as databaseInsertNotificationSeq, setNotificationSeq as databaseSetNotificationSeq, getNotificationAllSeqs as databaseGetNotificationAllSeqs, } from '../../sqls';
-import { formatResponse,converSqlExecResult } from '../../utils';
+import { converSqlExecResult, formatResponse } from '../../utils';
 import { getInstance } from './instance';
 export async function setNotificationSeq(conversationID, seq) {
     try {

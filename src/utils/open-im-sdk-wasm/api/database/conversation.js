@@ -176,7 +176,7 @@ export async function getConversationByUserID(userID) {
             'isPrivateChat',
             'isNotInGroup',
             'isMsgDestruct',
-        ]));
+        ])[0]);
     }
     catch (e) {
         console.error(e);

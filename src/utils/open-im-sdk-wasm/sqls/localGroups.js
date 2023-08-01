@@ -94,3 +94,8 @@ export function getGroupMemberAllGroupIDs(db) {
     select distinct group_id from local_group_members
     `);
 }
+export function getGroups(db, groupIDs) {
+    return db.exec(`
+    select * from local_groups where group_id in (${groupIDs.join(',')});
+    `);
+}

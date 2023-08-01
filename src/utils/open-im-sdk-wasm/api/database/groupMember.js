@@ -1,5 +1,5 @@
 import { DatabaseErrorCode } from '../../constant';
-import { getGroupMemberInfoByGroupIDUserID as databaseGetGroupMemberInfoByGroupIDUserID, getAllGroupMemberList as databaseGetAllGroupMemberList, getAllGroupMemberUserIDList as databaseGetAllGroupMemberUserIDList, getGroupMemberCount as databaseGetGroupMemberCount, getGroupSomeMemberInfo as databaseGetGroupSomeMemberInfo, getGroupAdminID as databaseGetGroupAdminID, getGroupMemberListByGroupID as databaseGetGroupMemberListByGroupID, getGroupMemberListSplit as databaseGetGroupMemberListSplit, getGroupMemberOwnerAndAdmin as databaseGetGroupMemberOwnerAndAdmin, getGroupMemberOwner as databaseGetGroupMemberOwner, getGroupMemberListSplitByJoinTimeFilter as databaseGetGroupMemberListSplitByJoinTimeFilter, getGroupOwnerAndAdminByGroupID as databaseGetGroupOwnerAndAdminByGroupID, getGroupMemberUIDListByGroupID as databaseGetGroupMemberUIDListByGroupID, insertGroupMember as databaseInsertGroupMember, batchInsertGroupMember as databaseBatchInsertGroupMember, deleteGroupMember as databaseDeleteGroupMember, deleteGroupAllMembers as databaseDeleteGroupAllMembers, updateGroupMember as databaseUpdateGroupMember, updateGroupMemberField as databaseUpdateGroupMemberField, searchGroupMembers as databaseSearchGroupMembers, } from '../../sqls';
+import { getGroupMemberInfoByGroupIDUserID as databaseGetGroupMemberInfoByGroupIDUserID, getAllGroupMemberList as databaseGetAllGroupMemberList, getAllGroupMemberUserIDList as databaseGetAllGroupMemberUserIDList, getGroupMemberCount as databaseGetGroupMemberCount, getGroupSomeMemberInfo as databaseGetGroupSomeMemberInfo, getGroupAdminID as databaseGetGroupAdminID, getGroupMemberListByGroupID as databaseGetGroupMemberListByGroupID, getGroupMemberListSplit as databaseGetGroupMemberListSplit, getGroupMemberOwnerAndAdmin as databaseGetGroupMemberOwnerAndAdmin, getGroupMemberOwner as databaseGetGroupMemberOwner, getGroupMemberListSplitByJoinTimeFilter as databaseGetGroupMemberListSplitByJoinTimeFilter, getGroupOwnerAndAdminByGroupID as databaseGetGroupOwnerAndAdminByGroupID, getGroupMemberUIDListByGroupID as databaseGetGroupMemberUIDListByGroupID, insertGroupMember as databaseInsertGroupMember, batchInsertGroupMember as databaseBatchInsertGroupMember, deleteGroupMember as databaseDeleteGroupMember, deleteGroupAllMembers as databaseDeleteGroupAllMembers, updateGroupMember as databaseUpdateGroupMember, updateGroupMemberField as databaseUpdateGroupMemberField, searchGroupMembers as databaseSearchGroupMembers, getUserJoinedGroupIDs as databaseGetUserJoinedGroupIDs, } from '../../sqls';
 import { converSqlExecResult, convertObjectField, convertToSnakeCaseObject, formatResponse, } from '../../utils';
 import { getInstance } from './instance';
 export async function getGroupMemberInfoByGroupIDUserID(groupID, userID) {
@@ -249,6 +249,17 @@ export async function searchGroupMembers(keyword, groupID, isSearchMemberNicknam
         return formatResponse(converSqlExecResult(execResult[0], 'CamelCase', [], {
             user_group_face_url: 'faceURL',
         }));
+    }
+    catch (e) {
+        console.error(e);
+        return formatResponse(undefined, DatabaseErrorCode.ErrorInit, JSON.stringify(e));
+    }
+}
+export async function getUserJoinedGroupIDs(userID) {
+    try {
+        const db = await getInstance();
+        const execResult = databaseGetUserJoinedGroupIDs(db, userID);
+        return formatResponse(converSqlExecResult(execResult[0], 'CamelCase').map(item => item.groupID));
     }
     catch (e) {
         console.error(e);

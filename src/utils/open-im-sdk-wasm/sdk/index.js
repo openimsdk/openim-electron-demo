@@ -118,11 +118,7 @@ class SDK extends Emitter {
         return this._invoker('getAllConversationList', window.getAllConversationList, [operationID]);
     };
     getOneConversation = (params, operationID = uuidv4()) => {
-        return this._invoker('getOneConversation', window.getOneConversation, [
-            operationID,
-            params.sessionType,
-            params.sourceID,
-        ]);
+        return this._invoker('getOneConversation', window.getOneConversation, [operationID, params.sessionType, params.sourceID]);
     };
     getAdvancedHistoryMessageList = (params, operationID = uuidv4()) => {
         return this._invoker('getAdvancedHistoryMessageList', window.getAdvancedHistoryMessageList, [operationID, JSON.stringify(params)]);
@@ -147,13 +143,7 @@ class SDK extends Emitter {
         ]);
     };
     getGroupMemberList = (params, operationID = uuidv4()) => {
-        return this._invoker('getGroupMemberList', window.getGroupMemberList, [
-            operationID,
-            params.groupID,
-            params.filter,
-            params.offset,
-            params.count,
-        ]);
+        return this._invoker('getGroupMemberList', window.getGroupMemberList, [operationID, params.groupID, params.filter, params.offset, params.count]);
     };
     createTextMessage = (text, operationID = uuidv4()) => {
         return this._invoker('createTextMessage', window.createTextMessage, [operationID, text], data => {
@@ -303,12 +293,12 @@ class SDK extends Emitter {
         return this._invoker('networkStatusChanged ', window.networkStatusChanged, [operationID]);
     };
     getLoginUser = (operationID = uuidv4()) => {
-        return this._invoker('getLoginUser', window.getLoginUser, [operationID]);
-    };
-    getSelfUserInfo = (operationID = uuidv4()) => {
-        return this._invoker('getSelfUserInfo', window.getSelfUserInfo, [
+        return this._invoker('getLoginUser', window.getLoginUser, [
             operationID,
         ]);
+    };
+    getSelfUserInfo = (operationID = uuidv4()) => {
+        return this._invoker('getSelfUserInfo', window.getSelfUserInfo, [operationID]);
     };
     getUsersInfo = (data, operationID = uuidv4()) => {
         return this._invoker('getUsersInfo', window.getUsersInfo, [
@@ -524,10 +514,7 @@ class SDK extends Emitter {
         ]);
     };
     searchFriends = (data, operationID = uuidv4()) => {
-        return this._invoker('searchFriends ', window.searchFriends, [
-            operationID,
-            JSON.stringify(data),
-        ]);
+        return this._invoker('searchFriends ', window.searchFriends, [operationID, JSON.stringify(data)]);
     };
     getSpecifiedFriendsInfo = (data, operationID = uuidv4()) => {
         return this._invoker('getSpecifiedFriendsInfo ', window.getSpecifiedFriendsInfo, [operationID, JSON.stringify(data)]);
@@ -539,9 +526,7 @@ class SDK extends Emitter {
         return this._invoker('getFriendApplicationListAsApplicant ', window.getFriendApplicationListAsApplicant, [operationID]);
     };
     getFriendList = (operationID = uuidv4()) => {
-        return this._invoker('getFriendList ', window.getFriendList, [
-            operationID,
-        ]);
+        return this._invoker('getFriendList ', window.getFriendList, [operationID]);
     };
     setFriendRemark = (data, operationID = uuidv4()) => {
         return this._invoker('setFriendRemark ', window.setFriendRemark, [
@@ -577,9 +562,7 @@ class SDK extends Emitter {
         ]);
     };
     getBlackList = (operationID = uuidv4()) => {
-        return this._invoker('getBlackList ', window.getBlackList, [
-            operationID,
-        ]);
+        return this._invoker('getBlackList ', window.getBlackList, [operationID]);
     };
     inviteUserToGroup = (data, operationID = uuidv4()) => {
         return this._invoker('inviteUserToGroup ', window.inviteUserToGroup, [
@@ -618,10 +601,7 @@ class SDK extends Emitter {
         ]);
     };
     searchGroupMembers = (data, operationID = uuidv4()) => {
-        return this._invoker('searchGroupMembers ', window.searchGroupMembers, [
-            operationID,
-            JSON.stringify(data),
-        ]);
+        return this._invoker('searchGroupMembers ', window.searchGroupMembers, [operationID, JSON.stringify(data)]);
     };
     setGroupApplyMemberFriend = (data, operationID = uuidv4()) => {
         return this._invoker('setGroupApplyMemberFriend ', window.setGroupApplyMemberFriend, [operationID, data.groupID, data.rule]);
@@ -630,9 +610,7 @@ class SDK extends Emitter {
         return this._invoker('setGroupLookMemberInfo ', window.setGroupLookMemberInfo, [operationID, data.groupID, data.rule]);
     };
     getJoinedGroupList = (operationID = uuidv4()) => {
-        return this._invoker('getJoinedGroupList ', window.getJoinedGroupList, [
-            operationID,
-        ]);
+        return this._invoker('getJoinedGroupList ', window.getJoinedGroupList, [operationID]);
     };
     createGroup = (data, operationID = uuidv4()) => {
         return this._invoker('createGroup ', window.createGroup, [
@@ -726,10 +704,7 @@ class SDK extends Emitter {
         return this._invoker('setGlobalRecvMessageOpt ', window.setGlobalRecvMessageOpt, [operationID, opt]);
     };
     findMessageList = (data, operationID = uuidv4()) => {
-        return this._invoker('findMessageList ', window.findMessageList, [
-            operationID,
-            JSON.stringify(data),
-        ]);
+        return this._invoker('findMessageList ', window.findMessageList, [operationID, JSON.stringify(data)]);
     };
     uploadFile = (data, operationID = uuidv4()) => {
         fileMapSet(data.uuid, data.file);

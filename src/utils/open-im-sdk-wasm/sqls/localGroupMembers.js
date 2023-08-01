@@ -257,3 +257,8 @@ export function searchGroupMembers(db, keyword, groupID, isSearchMemberNickname,
     }
     return db.exec(condition);
 }
+export function getUserJoinedGroupIDs(db, userID) {
+    return db.exec(`
+    select group_id from local_group_members where user_id = ${userID};
+    `);
+}

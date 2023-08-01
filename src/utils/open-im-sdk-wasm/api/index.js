@@ -243,6 +243,7 @@ export function initDatabaseAPI() {
     window.getRecvFriendApplication = registeMethodOnWindow('getRecvFriendApplication');
     window.getSendFriendApplication = registeMethodOnWindow('getSendFriendApplication');
     window.getFriendApplicationByBothID = registeMethodOnWindow('getFriendApplicationByBothID');
+    window.getBothFriendReq = registeMethodOnWindow('getBothFriendReq');
     // friend
     window.insertFriend = registeMethodOnWindow('insertFriend');
     window.deleteFriendDB = registeMethodOnWindow('deleteFriend');
@@ -264,6 +265,8 @@ export function initDatabaseAPI() {
     window.getJoinedWorkingGroupIDList = registeMethodOnWindow('getJoinedWorkingGroupIDList');
     window.getJoinedWorkingGroupList = registeMethodOnWindow('getJoinedWorkingGroupList');
     window.getGroupMemberAllGroupIDs = registeMethodOnWindow('getGroupMemberAllGroupIDs');
+    window.getUserJoinedGroupIDs = registeMethodOnWindow('getUserJoinedGroupIDs');
+    window.getGroups = registeMethodOnWindow('getGroups');
     // groupRequest
     window.insertGroupRequest = registeMethodOnWindow('insertGroupRequest');
     window.deleteGroupRequest = registeMethodOnWindow('deleteGroupRequest');

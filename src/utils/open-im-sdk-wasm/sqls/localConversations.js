@@ -33,7 +33,7 @@ export function localConversations(db) {
 }
 export function getConversationByUserID(db, userID) {
     return db.exec(`
-        select * from local_conversations where user_id = "${userID}";
+        select * from local_conversations where user_id = "${userID}" limit 1;
     `);
 }
 export function getAllConversationList(db) {
