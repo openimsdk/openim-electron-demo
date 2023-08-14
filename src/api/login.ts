@@ -220,10 +220,10 @@ interface UpdateBusinessUserInfoParams {
 }
 
 export const updateBusinessUserInfo = async (
-  params: Partial<UpdateBusinessUserInfoParams>,
+  params: Partial<UpdateBusinessUserInfoParams> & { userID: string },
 ) => {
-  const userID = useUserStore.getState().selfInfo.userID;
-  const token = (await getChatToken(userID)) as string;
+  // const userID = useUserStore.getState().selfInfo.userID;
+  const token = (await getChatToken(params.userID)) as string;
   return request.post<unknown>(
     "/user/update",
     {

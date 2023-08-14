@@ -21,6 +21,7 @@ import OIMAvatar from "@/components/OIMAvatar";
 import { useContactStore, useConversationStore, useUserStore } from "@/store";
 import { feedbackToast, getFileType } from "@/utils/common";
 import emitter from "@/utils/events";
+import { getIMUserID } from "@/utils/storage";
 
 import { OverlayVisibleHandle } from "../../hooks/useOverlayVisible";
 import { IMSDK } from "../MainContentWrap";
@@ -178,7 +179,8 @@ const LeftNavBar = memo(() => {
       const newInfo = {
         faceURL: url,
       };
-      await updateBusinessUserInfo(newInfo);
+      const userID = useUserStore.getState().selfInfo.userID;
+      await updateBusinessUserInfo({ ...newInfo, userID });
       updateSelfInfo(newInfo);
     } catch (error) {
       feedbackToast({ error: "修改头像失败！" });

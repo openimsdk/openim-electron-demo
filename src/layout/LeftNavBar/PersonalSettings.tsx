@@ -14,6 +14,7 @@ import i18n from "@/i18n";
 import { useMessageStore, useUserStore } from "@/store";
 import { feedbackToast } from "@/utils/common";
 import { MessageReceiveOptType } from "@/utils/open-im-sdk-wasm/types/enum";
+import { getIMUserID } from "@/utils/storage";
 
 import { OverlayVisibleHandle, useOverlayVisible } from "../../hooks/useOverlayVisible";
 import { IMSDK } from "../MainContentWrap";
@@ -78,9 +79,12 @@ export const PersonalSettingsContent = ({
   const clearHistoryMessage = useMessageStore((state) => state.clearHistoryMessage);
 
   const { isLoading: businessSettingUpdating, mutate: updateBusinessSetting } =
-    useMutation(updateBusinessUserInfo, {
-      onError: errorHandle,
-    });
+    useMutation(
+      updateBusinessUserInfo, // Pass userId as a parameter
+      {
+        onError: errorHandle,
+      },
+    );
   const { isLoading: recvMessageOptUpdating, mutate: updateRecvMessageOpt } =
     useMutation((opt: MessageReceiveOptType) => IMSDK.setGlobalRecvMessageOpt(opt), {
       onError: errorHandle,
@@ -146,12 +150,15 @@ export const PersonalSettingsContent = ({
     if (key === "allowAddFriend") {
       updateInfo[key] = !vaule ? BusinessAllowType.Allow : BusinessAllowType.NotAllow;
     }
-
-    updateBusinessSetting(updateInfo, {
-      onSuccess: () => {
-        updateSelfInfo(updateInfo);
+    const userID = useUserStore.getState().selfInfo.userID;
+    updateBusinessSetting(
+      { ...updateInfo, userID },
+      {
+        onSuccess: () => {
+          updateSelfInfo(updateInfo);
+        },
       },
-    });
+    );
   };
 
   return (

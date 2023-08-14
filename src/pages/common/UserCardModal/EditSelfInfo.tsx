@@ -7,6 +7,7 @@ import { errorHandle } from "@/api/errorHandle";
 import { BusinessUserInfo, updateBusinessUserInfo } from "@/api/login";
 import { OverlayVisibleHandle, useOverlayVisible } from "@/hooks/useOverlayVisible";
 import { useUserStore } from "@/store";
+import { getIMUserID } from "@/utils/storage";
 
 const EditSelfInfo: ForwardRefRenderFunction<
   OverlayVisibleHandle,
@@ -17,10 +18,12 @@ const EditSelfInfo: ForwardRefRenderFunction<
   const updateSelfInfo = useUserStore((state) => state.updateSelfInfo);
 
   const { isOverlayOpen, closeOverlay } = useOverlayVisible(ref);
-
-  const { isLoading, mutate } = useMutation(updateBusinessUserInfo, {
-    onError: errorHandle,
-  });
+  const { isLoading, mutate } = useMutation(
+    updateBusinessUserInfo, // Pass userId as a parameter
+    {
+      onError: errorHandle,
+    },
+  );
 
   const onFinish = (value: BusinessUserInfo & { birth: Dayjs }) => {
     const options = {
@@ -29,13 +32,17 @@ const EditSelfInfo: ForwardRefRenderFunction<
       gender: value.gender,
       birth: value.birth.unix() * 1000,
     };
-    mutate(options, {
-      onSuccess: () => {
-        updateSelfInfo(options);
-        refreshSelfInfo();
-        closeOverlay();
+    const userID = useUserStore.getState().selfInfo.userID; // Assuming getIMUserID returns a Promise
+    mutate(
+      { ...options, userID },
+      {
+        onSuccess: () => {
+          updateSelfInfo(options);
+          refreshSelfInfo();
+          closeOverlay();
+        },
       },
-    });
+    );
   };
 
   return (
