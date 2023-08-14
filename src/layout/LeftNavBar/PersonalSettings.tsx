@@ -79,12 +79,9 @@ export const PersonalSettingsContent = ({
   const clearHistoryMessage = useMessageStore((state) => state.clearHistoryMessage);
 
   const { isLoading: businessSettingUpdating, mutate: updateBusinessSetting } =
-    useMutation(
-      updateBusinessUserInfo, // Pass userId as a parameter
-      {
-        onError: errorHandle,
-      },
-    );
+    useMutation(updateBusinessUserInfo, {
+      onError: errorHandle,
+    });
   const { isLoading: recvMessageOptUpdating, mutate: updateRecvMessageOpt } =
     useMutation((opt: MessageReceiveOptType) => IMSDK.setGlobalRecvMessageOpt(opt), {
       onError: errorHandle,

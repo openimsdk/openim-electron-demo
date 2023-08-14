@@ -18,12 +18,9 @@ const EditSelfInfo: ForwardRefRenderFunction<
   const updateSelfInfo = useUserStore((state) => state.updateSelfInfo);
 
   const { isOverlayOpen, closeOverlay } = useOverlayVisible(ref);
-  const { isLoading, mutate } = useMutation(
-    updateBusinessUserInfo, // Pass userId as a parameter
-    {
-      onError: errorHandle,
-    },
-  );
+  const { isLoading, mutate } = useMutation(updateBusinessUserInfo, {
+    onError: errorHandle,
+  });
 
   const onFinish = (value: BusinessUserInfo & { birth: Dayjs }) => {
     const options = {
