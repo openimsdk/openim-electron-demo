@@ -98,8 +98,9 @@ export function useGlobalEvent() {
 
   const tryLogin = async () => {
     setConnectState((state) => ({ ...state, isLogining: true }));
-    const IMToken = (await getIMToken()) as string;
+
     const IMUserID = (await getIMUserID()) as string;
+    const IMToken = (await getIMToken(IMUserID)) as string;
     if (IMToken && IMUserID) {
       try {
         await IMSDK.login({

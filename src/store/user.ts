@@ -11,7 +11,7 @@ import { useContactStore } from "./contact";
 import { useConversationStore } from "./conversation";
 import { AppConfig, AppSettings, UserStore } from "./type";
 
-export const useUserStore = create<UserStore>()((set) => ({
+export const useUserStore = create<UserStore>()((set, get) => ({
   selfInfo: {} as BusinessUserInfo,
   appConfig: {} as AppConfig,
   appSettings: {
@@ -23,7 +23,7 @@ export const useUserStore = create<UserStore>()((set) => ({
       const { data } = await IMSDK.getSelfUserInfo<BusinessUserInfo>();
       const {
         data: { users },
-      } = await getBusinessUserInfo([data.userID]);
+      } = await getBusinessUserInfo([data.userID], true);
       const bussinessData = users[0];
       set(() => ({ selfInfo: bussinessData }));
     } catch (error) {
@@ -53,7 +53,8 @@ export const useUserStore = create<UserStore>()((set) => ({
     console.log("call userLogout:::");
 
     await IMSDK.logout();
-    clearIMProfile();
+    const userID = get().selfInfo.userID;
+    clearIMProfile(userID);
     set({ selfInfo: {} as BusinessUserInfo });
     useContactStore.getState().clearContactStore();
     useConversationStore.getState().clearConversationStore();

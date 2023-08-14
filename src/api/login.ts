@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "react-query";
 import { v4 as uuidv4 } from "uuid";
 
 import { USER_URL } from "@/config";
+import { useUserStore } from "@/store";
 import { AppConfig } from "@/store/type";
 import { MessageReceiveOptType } from "@/utils/open-im-sdk-wasm/types/enum";
 import createAxiosInstance from "@/utils/request";
@@ -168,8 +169,9 @@ export enum BusinessAllowType {
   NotAllow = 2,
 }
 
-export const getBusinessUserInfo = async (userIDs: string[]) => {
-  const token = (await getChatToken()) as string;
+export const getBusinessUserInfo = async (userIDs: string[], isSelfInfo = false) => {
+  const userID = isSelfInfo ? userIDs[0] : useUserStore.getState().selfInfo.userID;
+  const token = (await getChatToken(userID)) as string;
   return request.post<{ users: BusinessUserInfo[] }>(
     "/user/find/full",
     {
@@ -185,7 +187,8 @@ export const getBusinessUserInfo = async (userIDs: string[]) => {
 };
 
 export const searchBusinessUserInfo = async (keyword: string) => {
-  const token = (await getChatToken()) as string;
+  const userID = useUserStore.getState().selfInfo.userID;
+  const token = (await getChatToken(userID)) as string;
   return request.post<{ total: number; users: BusinessUserInfo[] }>(
     "/user/search/full",
     {
@@ -219,7 +222,8 @@ interface UpdateBusinessUserInfoParams {
 export const updateBusinessUserInfo = async (
   params: Partial<UpdateBusinessUserInfoParams>,
 ) => {
-  const token = (await getChatToken()) as string;
+  const userID = useUserStore.getState().selfInfo.userID;
+  const token = (await getChatToken(userID)) as string;
   return request.post<unknown>(
     "/user/update",
     {

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getIMToken } from "./storage";
+import { useUserStore } from "@/store";
 
 const createAxiosInstance = (baseURL: string) => {
   const serves = axios.create({
@@ -9,7 +10,9 @@ const createAxiosInstance = (baseURL: string) => {
 
   serves.interceptors.request.use(
     async (config) => {
-      config.headers.token = config.headers.token ?? (await getIMToken());
+      config.headers.token =
+        config.headers.token ??
+        (await getIMToken(useUserStore.getState().selfInfo.userID));
       return config;
     },
     (err) => Promise.reject(err),

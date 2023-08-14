@@ -5,7 +5,7 @@ import { useConversationStore, useUserStore } from "@/store";
 import emitter from "@/utils/events";
 import { getSDK } from "@/utils/open-im-sdk-wasm";
 import { AllowType } from "@/utils/open-im-sdk-wasm/types/enum";
-import { getIMToken, getIMUserID } from "@/utils/storage";
+import { getIMToken, getIMUserID, setTMUserID } from "@/utils/storage";
 
 export const IMSDK = getSDK("./openIM.wasm");
 
@@ -19,8 +19,8 @@ export const MainContentWrap = () => {
 
   useEffect(() => {
     const loginCheck = async () => {
-      const IMToken = await getIMToken();
       const IMUserID = await getIMUserID();
+      const IMToken = await getIMToken(IMUserID as string);
       if (!IMToken || !IMUserID) {
         navigate("/login");
         return;
@@ -49,6 +49,9 @@ export const MainContentWrap = () => {
           currentGroupInfo?.applyMemberFriend === AllowType.NotAllowed,
       });
     };
+    window.addEventListener("beforeunload", (event: BeforeUnloadEvent) => {
+      setTMUserID(useUserStore.getState().selfInfo.userID);
+    });
   }, [selfID]);
 
   useEffect(() => {
