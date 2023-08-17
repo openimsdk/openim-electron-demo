@@ -222,9 +222,38 @@ export function useGlobalEvent() {
   const notPushType = [MessageType.TypingMessage, MessageType.RevokeMessage];
 
   const handleNewMessage = (newServerMsg: ExMessageItem) => {
-    if (!notPushType.includes(newServerMsg.contentType)) {
+    if (
+      inCurrentConversation(newServerMsg) &&
+      !notPushType.includes(newServerMsg.contentType)
+    ) {
       pushNewMessage(newServerMsg);
       emitter.emit("CHAT_LIST_SCROLL_TO_BOTTOM", true);
+    }
+  };
+
+  const inCurrentConversation = (newServerMsg: ExMessageItem) => {
+    switch (newServerMsg.sessionType) {
+      case SessionType.Single:
+        return (
+          newServerMsg.sendID ===
+            useConversationStore.getState().currentConversation?.userID ||
+          (newServerMsg.sendID === useUserStore.getState().selfInfo.userID &&
+            newServerMsg.recvID ===
+              useConversationStore.getState().currentConversation?.userID)
+        );
+      case SessionType.Group:
+      case SessionType.WorkingGroup:
+        return (
+          newServerMsg.groupID ===
+          useConversationStore.getState().currentConversation?.groupID
+        );
+      case SessionType.Notification:
+        return (
+          newServerMsg.sendID ===
+          useConversationStore.getState().currentConversation?.userID
+        );
+      default:
+        return false;
     }
   };
 
