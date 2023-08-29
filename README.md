@@ -2,6 +2,10 @@
 
 ## Getting Started
 
+### Environment
+
+> It is recommended to use node14.x-16.x version, npm7.x+ version
+
 ### Update Config
 
 - For web
@@ -9,9 +13,9 @@
   > modify it to your own ip, but do not need to modify the port
 
 ```bash
-export const WS_URL = "ws://125.124.195.201:10001";
-export const API_URL = "http://125.124.195.201:10002";
-export const USER_URL = "http://125.124.195.201:10008";
+export const WS_URL = "ws://14.29.213.197:10001";
+export const API_URL = "http://14.29.213.197:10002";
+export const USER_URL = "http://14.29.213.197:10008";
 ```
 
 ### Develop

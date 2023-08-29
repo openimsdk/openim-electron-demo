@@ -1,47 +1,51 @@
-![avatar](https://openim-1253691595.cos.ap-nanjing.myqcloud.com/WechatIMG20.jpeg)
+<img src="https://github.com/OpenIMSDK/OpenIM-Docs/blob/main/docs/images/WechatIMG20.jpeg" alt="image" style="width: 350px; " />
 
-## Getting Started
+## 快速开始
 
-### Update Config
+### 开发环境
 
-- For web
+> 建议使用 node14.x-16.x 版本，npm7.x+版本。
+
+### 配置修改
+
+- 修改 IM 连接地址
   > src->config
-  > modify it to your own ip, but do not need to modify the port
+  > 修改为你自己的 ip 即可，端口不必修改。
 
 ```bash
-export const WS_URL = "ws://125.124.195.201:10001";
-export const API_URL = "http://125.124.195.201:10002";
-export const USER_URL = "http://125.124.195.201:10008";
+export const WS_URL = "ws://14.29.213.197:10001";
+export const API_URL = "http://14.29.213.197:10002";
+export const USER_URL = "http://14.29.213.197:10008";
 ```
 
-### Develop
+### 开发
 
-- Get dependencies from npm
+- 通过 npm 获取项目依赖
 
   ```bash
   npm install
   ```
 
-- Run and preview at local (web & electron)
+- 本地调试运行（同时启动 web 和 pc 端）
 
   ```
   npm run dev
 
   ```
 
-- Build (web)
+- 打包 (web)
 
-  > You can refer to the dependencies in the `package_build_web.json` file to reduce the size of the installation package
+  > 你可以将`package_build_web.json`中的内容替换到`package.json`文件中,移除了部分 pc 相关的依赖。
 
   ```
   npm run build
   ```
 
-- Build (electron)
+- 打包 (electron)
 
-  > You can refer to the dependencies in the `package_build.json` file to reduce the size of the installation package
+  > 你可以将`package_build.json`中的内容替换到`package.json`文件中,仅保留 pc 运行需要用到的依赖，减少包体积。
 
-  > you need update `utils/open_im_sdk_wasm/api/database/instance.js` wasm import path first.
+  > 你需要修改`utils/open_im_sdk_wasm/api/database/instance.js`中 wasm 文件的引入路径。
   >
   > ```javascript
   > - SQL = await initSqlJs({ locateFile: () => '/sql-wasm.wasm' });
@@ -56,6 +60,6 @@ export const USER_URL = "http://125.124.195.201:10008";
   npm run el:build-linux
   ```
 
-## Getting Help
+## 获取帮助
 
-The best way to interact with our team is through GitHub.You can open an issue with this.You can also find some Doc in [Our Developer Guide](https://doc.rentsoft.cn/).
+与我们团队交流的最佳方式是通过 GitHub。您可以通过此问题提出问题。您还可以在[开发者中心](https://doc.rentsoft.cn/) 中找到一些文档。
