@@ -2,19 +2,21 @@ import { v4 as uuidv4 } from "uuid";
 
 import { API_URL } from "@/config";
 import createAxiosInstance from "@/utils/request";
+import { getIMUserID } from "@/utils/storage";
 
 const request = createAxiosInstance(API_URL);
 
 interface UserOnlineState {
-  detailPlatformStatus: null;
-  status: "offline" | "online";
+  platformID: number;
+  status: 0 | 1;
   userID: string;
 }
 
-export const getUserOnlineStatus = (userIDs: string[]) =>
-  request.post<UserOnlineState[]>(
-    "/user/get_users_online_status",
+export const getUserOnlineStatus = async (userIDs: string[]) =>
+  request.post<{ statusList: UserOnlineState[] }>(
+    "/user/get_users_status",
     {
+      userID: await getIMUserID(),
       userIDs,
     },
     {

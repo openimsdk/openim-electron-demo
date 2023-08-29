@@ -576,12 +576,6 @@ export const formatAtText = (atel: AtTextElem) => {
 };
 
 export const getIsOnline = async (userIDs: string[]) => {
-  let isOnline = false;
-  try {
-    const { data } = await getUserOnlineStatus(userIDs);
-    isOnline = data[0].status !== "offline";
-  } catch (error) {
-    console.log("get online state failed", error);
-  }
-  return isOnline;
+  const { data } = await getUserOnlineStatus(userIDs);
+  return data.statusList[0].status === 1;
 };
