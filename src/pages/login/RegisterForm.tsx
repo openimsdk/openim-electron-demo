@@ -182,7 +182,7 @@ const RegisterForm = ({ setFormType }: RegisterFormProps) => {
         <span className=" text-blue-600">
           {form.getFieldValue("areaCode")} {form.getFieldValue("phoneNumber")}
         </span>
-        <span>的 6 位验证码，有效期 10 分钟</span>
+        <span>的 6 位验证码，有效期 10 分钟（默认验证码：666666）</span>
       </div>
       <Form
         form={form}
