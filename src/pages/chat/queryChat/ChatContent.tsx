@@ -12,7 +12,7 @@ import MessageItem from "./MessageItem";
 import SystemNotification from "./SystemNotification";
 
 const START_INDEX = 10000;
-const INITIAL_ITEM_COUNT = 40;
+const INITIAL_ITEM_COUNT = 20;
 
 const ChatContent = () => {
   const { conversationID } = useParams();
@@ -60,15 +60,12 @@ const ChatContent = () => {
         firstItemIndex={firstItemIndex}
         initialTopMostItemIndex={INITIAL_ITEM_COUNT - 1}
         ref={virtuoso}
-        overscan={{
-          main: 800,
-          reverse: 1200,
-        }}
         data={messageList}
         startReached={loadMoreMessage}
         components={{
           Header: () => (loading ? <div>loading...</div> : null),
         }}
+        computeItemKey={(_, item) => item.clientMsgID}
         itemContent={(_, message) => {
           if (SystemMessageTypes.includes(message.contentType)) {
             return <SystemNotification message={message} />;

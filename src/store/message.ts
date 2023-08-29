@@ -9,7 +9,7 @@ import { MessageType } from "@/utils/open-im-sdk-wasm/types/enum";
 import { useConversationStore } from "./conversation";
 import { MessageStore, PreViewImg } from "./type";
 
-const GET_HISTORY_MESSAGE_COUNT = 40;
+const GET_HISTORY_MESSAGE_COUNT = 20;
 
 export interface ExType {
   checked?: boolean;
