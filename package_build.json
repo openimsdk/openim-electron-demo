@@ -35,10 +35,10 @@
     },
     "productName": "openim-pc-demo",
     "win": {
-      "icon": "./dist/icons/logo.ico"
+      "icon": "./dist/icons/icon.ico"
     },
     "mac": {
-      "icon": "./dist/icons/logo.png"
+      "icon": "./dist/icons/icon.png"
     },
     "nsis": {
       "oneClick": false,
