@@ -53,11 +53,11 @@ export const USER_URL = "http://14.29.213.197:10008";
   > ```
 
   ```bash
-  npm run el:build
+  npm run build:mac
   // or
-  npm run el:build-win
+  npm run build:win
   // or
-  npm run el:build-linux
+  npm run build:linux
   ```
 
 ## Getting Help
