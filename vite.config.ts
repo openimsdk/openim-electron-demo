@@ -42,9 +42,9 @@ export default defineConfig(({ command }) => {
           loadViteEnv(),
         ],
       }),
-      legacy({
-        targets: ["defaults", "not IE 11"],
-      }),
+      // legacy({
+      //   targets: ["defaults", "not IE 11"],
+      // }),
       // visualizer({ open: true }),
     ],
     server: !!process.env.VSCODE_DEBUG

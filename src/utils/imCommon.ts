@@ -574,8 +574,3 @@ export const formatAtText = (atel: AtTextElem) => {
   });
   return mstr;
 };
-
-export const getIsOnline = async (userIDs: string[]) => {
-  const { data } = await getUserOnlineStatus(userIDs);
-  return data.statusList[0].status === 1;
-};

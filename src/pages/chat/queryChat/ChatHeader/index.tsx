@@ -7,10 +7,13 @@ import launch_group from "@/assets/images/chatHeader/launch_group.png";
 import settings from "@/assets/images/chatHeader/settings.png";
 import OIMAvatar from "@/components/OIMAvatar";
 import { OverlayVisibleHandle } from "@/hooks/useOverlayVisible";
+import { IMSDK } from "@/layout/MainContentWrap";
 import { useConversationStore } from "@/store";
 import emitter from "@/utils/events";
-import { getIsOnline, isGroupSession } from "@/utils/imCommon";
-import { SessionType } from "@/utils/open-im-sdk-wasm/types/enum";
+import { isGroupSession } from "@/utils/imCommon";
+import { CbEvents } from "@/utils/open-im-sdk-wasm/constant";
+import { UserOnlineState, WSEvent } from "@/utils/open-im-sdk-wasm/types/entity";
+import { OnlineState, SessionType } from "@/utils/open-im-sdk-wasm/types/enum";
 
 import GroupSetting from "../GroupSetting";
 import SingleSetting from "../SingleSetting";
@@ -133,7 +136,19 @@ const OnlineOrTypingStatus = ({ userID }: { userID: string }) => {
   const [online, setOnline] = useState(false);
 
   useEffect(() => {
-    getIsOnline([userID]).then((val) => setOnline(val));
+    const userStatusChangeHandler = ({ data }: WSEvent<UserOnlineState>) => {
+      if (data.userID === userID) {
+        setOnline(data.status === OnlineState.Online);
+      }
+    };
+    IMSDK.on(CbEvents.OnUserStatusChanged, userStatusChangeHandler);
+    IMSDK.subscribeUsersStatus([userID]).then(({ data }) =>
+      setOnline(data[0].status === OnlineState.Online),
+    );
+    return () => {
+      IMSDK.off(CbEvents.OnUserStatusChanged, userStatusChangeHandler);
+      IMSDK.unsubscribeUsersStatus([userID]);
+    };
   }, [userID]);
 
   return (

@@ -1,6 +1,6 @@
 import Emitter from '../utils/emitter';
 import { AccessFriendParams, AccessGroupParams, AccessMessageParams, AddFriendParams, AdvancedMsgParams, AdvancedQuoteMsgParams, AtMsgParams, ChangeGroupMemberMuteParams, ChangeGroupMuteParams, CreateGroupParams, CustomMsgParams, FaceMessageParams, FileMsgFullParams, FileMsgParams, FindMessageParams, GetAdvancedHistoryMsgParams, GetGroupMemberByTimeParams, GetGroupMemberParams, GetHistoryMsgParams, GetOneConversationParams, GetOneCveParams, GroupBaseInfo, ImageMsgParams, InitAndLoginConfig, InsertGroupMsgParams, InsertSingleMsgParams, InviteGroupParams, isRecvParams, JoinGroupParams, LocationMsgParams, MarkNotiParams, MemberExParams, MemberNameParams, MergerMsgParams, PartialUserItem, PinCveParams, QuoteMsgParams, RemarkFriendParams, SearchFriendParams, SearchGroupMemberParams, SearchGroupParams, SearchLocalParams, SendMsgParams, setBurnDurationParams, SetDraftParams, SetGroupRoleParams, SetGroupVerificationParams, SetMemberAuthParams, SetMessageLocalExParams, setPrvParams, SoundMsgParams, SouondMsgFullParams, SplitParams, TransferGroupParams, TypingUpdateParams, UploadFileParams, VideoMsgFullParams, VideoMsgParams } from '../types/params';
-import { CardElem, MessageItem, WsResponse } from '../types/entity';
+import { CardElem, MessageItem, WsResponse, UserOnlineState } from '../types/entity';
 import { MessageReceiveOptType } from '../types/enum';
 declare class SDK extends Emitter {
     private wasmInitializedPromise;
@@ -55,7 +55,7 @@ declare class SDK extends Emitter {
     createVideoMessage: <T>(data: VideoMsgParams, operationID?: string) => Promise<WsResponse<T>>;
     createVideoMessageByFile: <T>(data: VideoMsgParams & {
         videoFile: File;
-        snapFile: File;
+        snapshotFile: File;
     }, operationID?: string) => Promise<WsResponse<T>>;
     createFileMessage: <T>(data: FileMsgParams, operationID?: string) => Promise<WsResponse<T>>;
     createFileMessageByFile: <T>(data: FileMsgParams & {
@@ -137,6 +137,10 @@ declare class SDK extends Emitter {
     uploadFile: (data: UploadFileParams, operationID?: string) => Promise<WsResponse<{
         url: string;
     }>>;
+    subscribeUsersStatus: (data: string[], operationID?: string) => Promise<WsResponse<UserOnlineState[]>>;
+    unsubscribeUsersStatus: (data: string[], operationID?: string) => Promise<WsResponse<UserOnlineState[]>>;
+    getUserStatus: (operationID?: string) => Promise<WsResponse<UserOnlineState[]>>;
+    getSubscribeUsersStatus: (operationID?: string) => Promise<WsResponse<UserOnlineState[]>>;
 }
 export declare function getSDK(url?: string): SDK;
 export {};

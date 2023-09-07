@@ -145,3 +145,8 @@ export var LoginStatus;
     LoginStatus[LoginStatus["Logging"] = 2] = "Logging";
     LoginStatus[LoginStatus["Logged"] = 3] = "Logged";
 })(LoginStatus || (LoginStatus = {}));
+export var OnlineState;
+(function (OnlineState) {
+    OnlineState[OnlineState["Online"] = 1] = "Online";
+    OnlineState[OnlineState["Offline"] = 0] = "Offline";
+})(OnlineState || (OnlineState = {}));

@@ -43,5 +43,7 @@ export declare enum CbEvents {
     OnGroupMemberInfoChanged = "OnGroupMemberInfoChanged",
     OnGroupApplicationAccepted = "OnGroupApplicationAccepted",
     OnGroupApplicationRejected = "OnGroupApplicationRejected",
-    UploadComplete = "UploadComplete"
+    UploadComplete = "UploadComplete",
+    OnRecvCustomBusinessMessage = "OnRecvCustomBusinessMessage",
+    OnUserStatusChanged = "OnUserStatusChanged",
 }

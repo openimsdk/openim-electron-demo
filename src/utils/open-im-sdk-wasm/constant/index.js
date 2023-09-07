@@ -45,4 +45,6 @@ export var CbEvents;
     CbEvents["OnGroupApplicationAccepted"] = "OnGroupApplicationAccepted";
     CbEvents["OnGroupApplicationRejected"] = "OnGroupApplicationRejected";
     CbEvents["UploadComplete"] = "UploadComplete";
+    CbEvents["OnRecvCustomBusinessMessage"] = "OnRecvCustomBusinessMessage";
+    CbEvents["OnUserStatusChanged"] = "OnUserStatusChanged";
 })(CbEvents || (CbEvents = {}));

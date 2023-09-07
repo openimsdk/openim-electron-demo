@@ -127,3 +127,7 @@ export declare enum LoginStatus {
     Logging = 2,
     Logged = 3
 }
+export declare enum OnlineState {
+    Online = 1,
+    Offline = 0
+}

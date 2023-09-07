@@ -163,6 +163,7 @@ class SDK extends Emitter {
         });
     };
     createImageMessageByFile = (params, operationID = uuidv4()) => {
+        params.sourcePicture.uuid = `${params.sourcePicture.uuid}/${params.file.name}`;
         fileMapSet(params.sourcePicture.uuid, params.file);
         return this._invoker('createImageMessageByFile', window.createImageMessageByURL, [
             operationID,
@@ -331,6 +332,7 @@ class SDK extends Emitter {
         });
     };
     createSoundMessageByFile = (data, operationID = uuidv4()) => {
+        data.uuid = `${data.uuid}/${data.file.name}`
         fileMapSet(data.uuid, data.file);
         return this._invoker('createSoundMessageByFile', window.createSoundMessageByURL, [operationID, JSON.stringify(data)], data => {
             // compitable with old version sdk
@@ -344,8 +346,10 @@ class SDK extends Emitter {
         });
     };
     createVideoMessageByFile = (data, operationID = uuidv4()) => {
+        data.videoUUID = `${data.videoUUID}/${data.videoFile.name}`;
+        data.snapshotUUID = `${data.snapshotUUID}/${data.snapshotFile.name}`;
         fileMapSet(data.videoUUID, data.videoFile);
-        fileMapSet(data.snapshotUUID, data.snapFile);
+        fileMapSet(data.snapshotUUID, data.snapshotFile);
         return this._invoker('createVideoMessageByFile', window.createVideoMessageByURL, [operationID, JSON.stringify(data)], data => {
             // compitable with old version sdk
             return data[0];
@@ -358,6 +362,7 @@ class SDK extends Emitter {
         });
     };
     createFileMessageByFile = (data, operationID = uuidv4()) => {
+        data.uuid = `${data.uuid}/${data.file.name}`;
         fileMapSet(data.uuid, data.file);
         return this._invoker('createFileMessageByFile', window.createFileMessageByURL, [operationID, JSON.stringify(data)], data => {
             // compitable with old version sdk
@@ -707,6 +712,7 @@ class SDK extends Emitter {
         return this._invoker('findMessageList ', window.findMessageList, [operationID, JSON.stringify(data)]);
     };
     uploadFile = (data, operationID = uuidv4()) => {
+        data.uuid = `${data.uuid}/${data.file.name}`;
         fileMapSet(data.uuid, data.file);
         return this._invoker('uploadFile ', window.uploadFile, [
             operationID,
@@ -716,6 +722,20 @@ class SDK extends Emitter {
                 cause: '',
             }),
         ]);
+    };
+    subscribeUsersStatus = (data, operationID = uuidv4()) => {
+        return this._invoker('subscribeUsersStatus ', window.subscribeUsersStatus, [operationID, JSON.stringify(data)]);
+    };
+    unsubscribeUsersStatus = (data, operationID = uuidv4()) => {
+        return this._invoker('unsubscribeUsersStatus ', window.unsubscribeUsersStatus, [operationID, JSON.stringify(data)]);
+    };
+    getUserStatus = (operationID = uuidv4()) => {
+        return this._invoker('getUserStatus ', window.getUserStatus, [
+            operationID,
+        ]);
+    };
+    getSubscribeUsersStatus = (operationID = uuidv4()) => {
+        return this._invoker('getSubscribeUsersStatus ', window.getSubscribeUsersStatus, [operationID]);
     };
 }
 let instance;

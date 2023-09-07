@@ -1,5 +1,5 @@
 import { CbEvents } from '../constant';
-import { GroupType, SessionType, MessageType, Platform, MessageStatus, GroupStatus, GroupVerificationType, AllowType, GroupJoinSource, GroupMemberRole, MessageReceiveOptType, GroupAtType, LogLevel, ApplicationHandleResult, Relationship } from './enum';
+import { GroupType, SessionType, MessageType, Platform, MessageStatus, GroupStatus, GroupVerificationType, AllowType, GroupJoinSource, GroupMemberRole, MessageReceiveOptType, GroupAtType, LogLevel, ApplicationHandleResult, Relationship, OnlineState } from './enum';
 export declare type WSEvent<T = unknown> = {
     event: CbEvents;
     data: T;
@@ -193,6 +193,7 @@ export declare type ConversationItem = {
     latestMsgSendTime: number;
     draftText: string;
     draftTextTime: number;
+    burnDuration: number;
     isPinned: boolean;
     isNotInGroup: boolean;
     isPrivateChat: boolean;
@@ -412,4 +413,9 @@ export declare type AdvancedGetMessageResult = {
     errCode: number;
     errMsg: string;
     messageList: MessageItem[];
+};
+export declare type UserOnlineState = {
+    platformIDs: Platform[];
+    status: OnlineState;
+    userID: string;
 };
