@@ -9,7 +9,7 @@ export function useFileMessage() {
     const { width, height } = await getPicInfo(file);
     const baseInfo = {
       uuid: uuidV4(),
-      type: getFileType(file.name),
+      type: file.type,
       size: file.size,
       width,
       height,
@@ -28,10 +28,10 @@ export function useFileMessage() {
     const { width, height } = await getPicInfo(snapShotFile);
     const options = {
       videoFile: file,
-      snapFile: snapShotFile,
+      snapshotFile: snapShotFile,
       videoPath: "",
       duration: await getMediaDuration(URL.createObjectURL(file)),
-      videoType: getFileType(file.name),
+      videoType: file.type,
       snapshotPath: "",
       videoUUID: uuidV4(),
       videoUrl: "",
@@ -41,7 +41,7 @@ export function useFileMessage() {
       snapshotUrl: URL.createObjectURL(snapShotFile),
       snapshotWidth: width,
       snapshotHeight: height,
-      snapShotType: getFileType(file.name),
+      snapShotType: snapShotFile.type,
     };
     return (await IMSDK.createVideoMessageByFile<ExMessageItem>(options)).data;
   };
