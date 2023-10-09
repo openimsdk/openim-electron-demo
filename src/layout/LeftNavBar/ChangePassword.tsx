@@ -1,5 +1,6 @@
 import { CloseOutlined } from "@ant-design/icons";
 import { Button, Divider, Form, FormInstance, Input, Modal } from "antd";
+import md5 from "md5";
 import { forwardRef, ForwardRefRenderFunction, memo } from "react";
 
 import { useModifyPassword } from "@/api/login";
@@ -57,11 +58,10 @@ export const ChangePasswordContent = ({
   const { isLoading: passwordUpdating, mutate: updatePassword } = useModifyPassword();
 
   const onFinish = (value: PasswordFormData) => {
-    console.log(value);
     updatePassword(
       {
-        currentPassword: value.oldPassword,
-        newPassword: value.newPassword,
+        currentPassword: md5(value.oldPassword),
+        newPassword: md5(value.newPassword),
         userID: useUserStore.getState().selfInfo.userID,
       },
       {
@@ -113,8 +113,8 @@ export const ChangePasswordContent = ({
           rules={[
             {
               required: true,
-              pattern: /^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]{8,20})$/,
-              message: "请输入8-20位字母+数字组合！",
+              pattern: /^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]{6,20})$/,
+              message: "请输入6-20位字母+数字组合！",
             },
           ]}
         >
@@ -127,8 +127,8 @@ export const ChangePasswordContent = ({
           rules={[
             {
               required: true,
-              pattern: /^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]{8,20})$/,
-              message: "请输入8-20位字母+数字组合！",
+              pattern: /^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]{6,20})$/,
+              message: "请输入6-20位字母+数字组合！",
             },
           ]}
         >

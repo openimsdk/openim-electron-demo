@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "react-query";
 import { v4 as uuidv4 } from "uuid";
 
 import { USER_URL } from "@/config";
+import { useUserStore } from "@/store";
 import { AppConfig } from "@/store/type";
 import { MessageReceiveOptType } from "@/utils/open-im-sdk-wasm/types/enum";
 import createAxiosInstance from "@/utils/request";
@@ -105,7 +106,7 @@ export const useReset = () => {
 
 export const useModifyPassword = () => {
   return useMutation(
-    (params: API.Login.ModifyParams) =>
+    async (params: API.Login.ModifyParams) =>
       request.post(
         "/account/password/change",
         {
@@ -113,6 +114,7 @@ export const useModifyPassword = () => {
         },
         {
           headers: {
+            token: (await getChatToken()) as string,
             operationID: uuidv4(),
           },
         },
@@ -224,6 +226,7 @@ export const updateBusinessUserInfo = async (
     "/user/update",
     {
       ...params,
+      userID: useUserStore.getState().selfInfo.userID,
     },
     {
       headers: {
