@@ -46,7 +46,7 @@ const ConversationMenuContent = memo(
     const removeConversation = async () => {
       setLoading(true);
       try {
-        await IMSDK.deleteConversation(conversation.conversationID);
+        await IMSDK.deleteConversationAndDeleteAllMsg(conversation.conversationID);
         delConversationByCID(conversation.conversationID);
       } catch (error) {
         feedbackToast({ error, msg: t("toast.deleteConversationFailed") });

@@ -282,16 +282,11 @@ export const systemNotificationFormat = (msg: MessageItem) => {
         }),
         name: groupNameDetails.group.groupName,
       });
-    case MessageType.BurnMessageChange:
-      const burnDetails = JSON.parse(msg.notificationElem.detail);
-      return t("messageDescription.burnReadStatus", {
-        status: burnDetails.isPrivate ? t("on") : t("off"),
-      });
     case MessageType.OANotification:
       const customNoti = JSON.parse(msg.notificationElem.detail);
       return customNoti.text;
     default:
-      return "";
+      return "[暂未支持的消息类型]";
   }
 };
 
@@ -487,13 +482,8 @@ export const formatMessageByType = (message: MessageItem): string => {
     case MessageType.OANotification:
       const customNoti = JSON.parse(message.notificationElem.detail);
       return customNoti.text;
-    case MessageType.BurnMessageChange:
-      const burnDetails = JSON.parse(message.notificationElem.detail);
-      return t("messageDescription.burnReadStatus", {
-        status: burnDetails.isPrivate ? t("on") : t("off"),
-      });
     default:
-      return "";
+      return "[暂未支持的消息类型]";
   }
 };
 
