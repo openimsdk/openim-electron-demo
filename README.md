@@ -1,65 +1,79 @@
-<img src="https://github.com/OpenIMSDK/OpenIM-Docs/blob/main/docs/images/WechatIMG20.jpeg" alt="image" style="width: 350px; " />
+# OpenIM Electron Demo 💬💻
 
-## Getting Started
+<p>
+  <a href="https://doc.rentsoft.cn/">OpenIM Docs</a>
+  •
+  <a href="https://github.com/openimsdk/open-im-server">OpenIM Server</a>
+  •
+  <a href="https://github.com/openimsdk/open-im-sdk-web-wasm">openim-sdk-wasm</a>
+  •
+  <a href="https://github.com/openimsdk/openim-sdk-core">openim-sdk-core</a>
+</p>
 
-### Environment
+<br>
 
-> It is recommended to use node14.x-16.x version, npm7.x+ version
+OpenIM Electron Demo is an open-source instant messaging application built on OpenIM SDK Wasm, OpenIM Server, and Electron. It demonstrates how to quickly integrate instant messaging capabilities into any web app using OpenIM.
 
-### Update Config
+## Tech Stack 🛠️
 
-- For web
-  > src->config
-  > modify it to your own ip, but do not need to modify the port
+- This is a [`Electron`](https://www.electronjs.org/) project bootstrapped with [`Vite`](https://vitejs.dev/).
+- App is built with [openim-sdk-wasm](https://github.com/openimsdk/open-im-sdk-web-wasm) library.
 
-```bash
-export const WS_URL = "ws://14.29.213.197:10001";
-export const API_URL = "http://14.29.213.197:10002";
-export const USER_URL = "http://14.29.213.197:10008";
-```
+## Live Demo 🌐
 
-### Develop
+Give it a try at [https://web-enterprise.rentsoft.cn](https://web-enterprise.rentsoft.cn).
 
-- Get dependencies from npm
+## Dev Setup 🛠️
 
-  ```bash
-  npm install
-  ```
+> It is recommended to use version 16.x-18.x.
 
-- Run and preview at local (web & electron)
+Follow these steps to set up a local development environment:
 
-  ```
-  npm run dev
+1. Run `npm install` to install all dependencies.
+2. Modify the request address to your own OpenIM Server IP in the following files:
+   - `src/utils/open_im_sdk_wasm/api/config.js`
+     ```js
+     export const WS_URL = "ws://your-server-ip:10001";
+     export const API_URL = "http://your-server-ip:10002";
+     export const USER_URL = "http://your-server-ip:10008";
+     ```
+3. Run `npm run dev` to start the development server. Visit [http://localhost:5174](http://localhost:5174) to see the result. An Electron application will be launched by default.
+4. Start development! 🎉
 
-  ```
+## Build 🚀
 
-- Build (web)
+> This project allows building web applications and Electron applications separately, but there will be some differences during the build process.
 
-  > You can refer to the dependencies in the `package_build_web.json` file to reduce the size of the installation package
+### Web Application
 
-  ```
-  npm run build
-  ```
+1. Replace the contents of the `package_build_web.json` file with `package.json`, removing dependencies required for Electron to run. Also, modify the build script.
+2. Run the following command to build the web application:
+   ````bash
+   npm run build
+   ```
+   ````
+3. The build result will be located in the `dist` folder.
 
-- Build (electron)
+### Electron Application
 
-  > You can refer to the dependencies in the `package_build.json` file to reduce the size of the installation package
-
-  > you need update `utils/open_im_sdk_wasm/api/database/instance.js` wasm import path first.
-  >
-  > ```javascript
-  > - SQL = await initSqlJs({ locateFile: () => '/sql-wasm.wasm' });
-  > + SQL = await initSqlJs({ locateFile: () => '../sql-wasm.wasm' });
-  > ```
-
-  ```bash
-  npm run build:mac
-  // or
-  npm run build:win
-  // or
-  npm run build:linux
-  ```
-
-## Getting Help
-
-The best way to interact with our team is through GitHub.You can open an issue with this.You can also find some Doc in [Our Developer Guide](https://doc.rentsoft.cn/).
+1. Replace the contents of the `package_build.json` file with `package.json`, keeping only the dependencies required for Electron to function. This significantly reduces the package size. Also, modify the packaging script.
+2. Update the path for wasm import in the `utils/open_im_sdk_wasm/api/database/instance.js` file:
+   ````javascript
+   - SQL = await initSqlJs({ locateFile: () => '/sql-wasm.wasm' });
+   + SQL = await initSqlJs({ locateFile: () => '../sql-wasm.wasm' });
+   ```
+   ````
+3. Run one of the following commands to build the Electron application:
+   - macOS:
+     ```bash
+     npm run build:mac
+     ```
+   - Windows:
+     ```bash
+     npm run build:win
+     ```
+   - Linux:
+     ```bash
+     npm run build:linux
+     ```
+4. The build result will be located in the `package` folder.
