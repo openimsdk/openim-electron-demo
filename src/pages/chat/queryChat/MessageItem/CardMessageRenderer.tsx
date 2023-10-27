@@ -1,3 +1,4 @@
+import { t } from "i18next";
 import { FC } from "react";
 
 import OIMAvatar from "@/components/OIMAvatar";
@@ -23,7 +24,9 @@ const CardMessageRenderer: FC<IMessageItemProps> = ({ message }) => {
           {cardData.nickname}
         </div>
       </div>
-      <div className="py-1.5 pl-4 text-xs text-[var(--sub-text)]">个人名片</div>
+      <div className="py-1.5 pl-4 text-xs text-[var(--sub-text)]">
+        {t("placeholder.personalCard")}
+      </div>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { CloseOutlined } from "@ant-design/icons";
 import { Button, Input, Modal, Upload } from "antd";
+import i18n, { t } from "i18next";
 import {
   forwardRef,
   ForwardRefRenderFunction,
@@ -39,11 +40,18 @@ interface IChooseModalProps {
 }
 
 const titleMap = {
-  CRATE_GROUP: "创建群聊",
-  INVITE_TO_GROUP: "邀请好友",
-  KICK_FORM_GROUP: "移出成员",
-  FORWARD_MESSAGE: "转发消息",
+  CRATE_GROUP: t("placeholder.createGroup"),
+  INVITE_TO_GROUP: t("placeholder.invitation"),
+  KICK_FORM_GROUP: t("placeholder.kickMember"),
+  FORWARD_MESSAGE: t("placeholder.mergeForward"),
 };
+
+i18n.on("languageChanged", () => {
+  titleMap.CRATE_GROUP = t("placeholder.createGroup");
+  titleMap.INVITE_TO_GROUP = t("placeholder.invitation");
+  titleMap.KICK_FORM_GROUP = t("placeholder.kickMember");
+  titleMap.FORWARD_MESSAGE = t("placeholder.mergeForward");
+});
 
 const showConversationTypes = ["FORWARD_MESSAGE"];
 const onlyMemberTypes = ["KICK_FORM_GROUP"];
@@ -114,7 +122,7 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
               groupID: item.groupID ?? "",
             });
           });
-          message.success("发送成功！");
+          message.success(t("toast.sendSuccess"));
           break;
         default:
           break;
@@ -146,7 +154,7 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
       });
       setGroupBaseInfo((prev) => ({ ...prev, groupAvatar: url }));
     } catch (error) {
-      feedbackToast({ error: "修改群头像失败！" });
+      feedbackToast({ error: t("toast.updateAvatarFailed") });
     }
   };
 
@@ -183,9 +191,11 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
         {type === "CRATE_GROUP" ? (
           <div className="px-6 pt-4">
             <div className="mb-6 flex items-center">
-              <div className="min-w-[60px] font-medium">群名称</div>
+              <div className="min-w-[60px] font-medium">
+                {t("placeholder.groupName")}
+              </div>
               <Input
-                placeholder="请输入"
+                placeholder={t("placeholder.pleaseEnter")}
                 value={groupBaseInfo.groupName}
                 onChange={(e) =>
                   setGroupBaseInfo((state) => ({ ...state, groupName: e.target.value }))
@@ -193,7 +203,9 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
               />
             </div>
             <div className="mb-6 flex items-center">
-              <div className="min-w-[60px] font-medium">群头像</div>
+              <div className="min-w-[60px] font-medium">
+                {t("placeholder.groupAvatar")}
+              </div>
               <div className="flex items-center">
                 <OIMAvatar src={groupBaseInfo.groupAvatar} isgroup />
                 <Upload
@@ -202,13 +214,15 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
                   customRequest={customUpload as any}
                 >
                   <span className="ml-3 cursor-pointer text-xs text-[var(--primary)]">
-                    点击修改
+                    {t("placeholder.clickToModify")}
                   </span>
                 </Upload>
               </div>
             </div>
             <div className="flex">
-              <div className="min-w-[60px] font-medium">群成员</div>
+              <div className="min-w-[60px] font-medium">
+                {t("placeholder.groupMember")}
+              </div>
               <ChooseBox
                 className="!m-0 !h-[40vh] flex-1"
                 ref={chooseBoxRef}
@@ -231,7 +245,7 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
             className="mr-6 border-0 bg-[var(--chat-bubble)] px-6"
             onClick={closeOverlay}
           >
-            取消
+            {t("cancel")}
           </Button>
           <Button
             className="px-6"
@@ -239,7 +253,7 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
             loading={loading}
             onClick={confirmChoose}
           >
-            确定
+            {t("confirm")}
           </Button>
         </div>
       </div>

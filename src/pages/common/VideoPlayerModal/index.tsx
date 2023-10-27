@@ -7,11 +7,11 @@ import { SimplePlayer } from "xgplayer";
 import { I18N } from "xgplayer";
 import ZH from "xgplayer/es/lang/zh-cn";
 import Error from "xgplayer/es/plugins/error";
+import Fullscreen from "xgplayer/es/plugins/fullscreen";
 import Mobile from "xgplayer/es/plugins/mobile";
 import PC from "xgplayer/es/plugins/pc";
 import Play from "xgplayer/es/plugins/play";
 import Progress from "xgplayer/es/plugins/progress";
-// 引入es目录下的插件
 import Start from "xgplayer/es/plugins/start";
 import Time from "xgplayer/es/plugins/time";
 
@@ -25,7 +25,7 @@ const VideoPlayerModal: FC<{ url: string; closeOverlay: () => void }> = ({
     new SimplePlayer({
       id: "video_player",
       url,
-      plugins: [Start, PC, Mobile, Progress, Play, Time, Error], // 传入需要组装的插件
+      plugins: [Start, PC, Mobile, Progress, Play, Time, Error, Fullscreen],
     });
   }, []);
 

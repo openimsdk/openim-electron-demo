@@ -1,4 +1,5 @@
 import { useDeepCompareEffect } from "ahooks";
+import { t } from "i18next";
 import { useCallback, useEffect } from "react";
 import { Virtuoso } from "react-virtuoso";
 
@@ -47,7 +48,7 @@ export const NewFriends = () => {
 
   return (
     <div className="flex h-full w-full flex-col bg-white">
-      <p className="m-5.5 text-base font-extrabold">新的好友</p>
+      <p className="m-5.5 text-base font-extrabold">{t("placeholder.newFriends")}</p>
       <div className="flex-1 pb-3">
         <Virtuoso
           className="h-full overflow-x-hidden"

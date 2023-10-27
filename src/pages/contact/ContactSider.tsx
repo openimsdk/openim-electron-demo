@@ -1,5 +1,6 @@
 import { Badge } from "antd";
 import clsx from "clsx";
+import { t } from "i18next";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -12,22 +13,22 @@ import { useContactStore } from "@/store";
 
 const Links = [
   {
-    label: "新的好友",
+    label: t("placeholder.newFriends"),
     icon: new_friends,
     path: "/contact/newFriends",
   },
   {
-    label: "群通知",
+    label: t("placeholder.groupNotification"),
     icon: group_notifications,
     path: "/contact/groupNotifications",
   },
   {
-    label: "我的好友",
+    label: t("placeholder.myFriend"),
     icon: my_friends,
     path: "/contact",
   },
   {
-    label: "我的群组",
+    label: t("placeholder.myGroup"),
     icon: my_groups,
     path: "/contact/myGroups",
   },
@@ -56,7 +57,9 @@ const ContactSider = () => {
   return (
     <FlexibleSider needHidden={true}>
       <div className="h-full bg-white">
-        <div className="pb-3 pl-5.5 pt-5.5 text-base font-extrabold">通讯录</div>
+        <div className="pb-3 pl-5.5 pt-5.5 text-base font-extrabold">
+          {t("placeholder.contact")}
+        </div>
         <ul>
           {Links.map((item, index) => {
             return (

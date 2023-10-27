@@ -1,5 +1,6 @@
 import { CloseOutlined, RightOutlined } from "@ant-design/icons";
 import { Checkbox, Divider, Modal, Spin } from "antd";
+import { t } from "i18next";
 import { forwardRef, ForwardRefRenderFunction, memo, useRef } from "react";
 import { useMutation } from "react-query";
 
@@ -12,6 +13,7 @@ import {
 } from "@/api/login";
 import i18n from "@/i18n";
 import { useMessageStore, useUserStore } from "@/store";
+import { LocaleString } from "@/store/type";
 import { feedbackToast } from "@/utils/common";
 import { MessageReceiveOptType } from "@/utils/open-im-sdk-wasm/types/enum";
 
@@ -19,8 +21,6 @@ import { OverlayVisibleHandle, useOverlayVisible } from "../../hooks/useOverlayV
 import { IMSDK } from "../MainContentWrap";
 import BlackList from "./BlackList";
 import ChangePassword from "./ChangePassword";
-
-export type LocaleString = "zh-CN" | "en";
 
 const PersonalSettings: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
   _,
@@ -88,7 +88,7 @@ export const PersonalSettingsContent = ({
 
   const localeChange = (checked: boolean, locale: LocaleString) => {
     if (!checked) return;
-    console.log(checked, locale);
+    window.electronAPI?.ipcInvoke("changeLanguage", locale);
     i18n.changeLanguage(locale);
     updateAppSettings({
       locale,
@@ -109,8 +109,8 @@ export const PersonalSettingsContent = ({
 
   const tryClearChatLogs = () => {
     modal.confirm({
-      title: "清空聊天记录",
-      content: "确认清空所有聊天记录吗？",
+      title: t("toast.clearChatHistory"),
+      content: t("toast.confirmClearChatHistory"),
       onOk: async () => {
         try {
           await IMSDK.deleteAllMsgFromLocalAndSvr();
@@ -157,7 +157,7 @@ export const PersonalSettingsContent = ({
   return (
     <div className="flex max-h-[80vh] flex-col bg-[var(--chat-bubble)]">
       <div className="app-drag flex items-center justify-between bg-[var(--gap-text)] p-5">
-        <span className="text-base font-medium">账号设置</span>
+        <span className="text-base font-medium">{t("placeholder.accountSetting")}</span>
         <CloseOutlined
           className="app-no-drag cursor-pointer text-[#8e9aaf]"
           rev={undefined}
@@ -167,9 +167,11 @@ export const PersonalSettingsContent = ({
       <div className="flex-1 overflow-y-auto">
         <div className="px-6">
           <div>
-            <div className="pb-5 pt-4 text-base font-medium">个人设置</div>
+            <div className="pb-5 pt-4 text-base font-medium">
+              {t("placeholder.personalSetting")}
+            </div>
             <div className="pb-8 pl-1">
-              <div className="pb-3 font-medium">选择语言</div>
+              <div className="pb-3 font-medium">{t("placeholder.chooseLanguage")}</div>
               <div>
                 <Checkbox
                   checked={localeStr === "zh-CN"}
@@ -179,8 +181,8 @@ export const PersonalSettingsContent = ({
                   简体中文
                 </Checkbox>
                 <Checkbox
-                  checked={localeStr === "en"}
-                  onChange={(e) => localeChange(e.target.checked, "en")}
+                  checked={localeStr === "en-US"}
+                  onChange={(e) => localeChange(e.target.checked, "en-US")}
                 >
                   English
                 </Checkbox>
@@ -188,26 +190,28 @@ export const PersonalSettingsContent = ({
             </div>
             {Boolean(window.electronAPI) && (
               <div className="pb-8 pl-1">
-                <div className="pb-3 font-medium">点击关闭按钮时的事件</div>
+                <div className="pb-3 font-medium">
+                  {t("placeholder.closeButtonEvent")}
+                </div>
                 <div>
                   <Checkbox
                     checked={closeAction === "quit"}
                     className="w-36"
                     onChange={(e) => closeActionChange(e.target.checked, "quit")}
                   >
-                    退出应用
+                    {t("placeholder.exitApplication")}
                   </Checkbox>
                   <Checkbox
                     checked={closeAction === "miniSize"}
                     onChange={(e) => closeActionChange(e.target.checked, "miniSize")}
                   >
-                    最小化托盘
+                    {t("placeholder.minimize")}
                   </Checkbox>
                 </div>
               </div>
             )}
             <div className="pb-8 pl-1">
-              <div className="pb-3 font-medium">消息提示</div>
+              <div className="pb-3 font-medium">{t("placeholder.messageToast")}</div>
               <Spin spinning={businessSettingUpdating || recvMessageOptUpdating}>
                 <div>
                   <Checkbox
@@ -218,13 +222,15 @@ export const PersonalSettingsContent = ({
                       businessSettingsUpdate(e.target.checked, "globalRecvMsgOpt")
                     }
                   >
-                    勿扰模式
+                    {t("placeholder.messageNotNotify")}
                   </Checkbox>
                 </div>
               </Spin>
             </div>
             <div className="pb-8 pl-1">
-              <div className="pb-3 font-medium">添加好友设置</div>
+              <div className="pb-3 font-medium">
+                {t("placeholder.addFriendsSetting")}
+              </div>
               <div>
                 <Spin spinning={businessSettingUpdating}>
                   <Checkbox
@@ -233,7 +239,7 @@ export const PersonalSettingsContent = ({
                       businessSettingsUpdate(e.target.checked, "allowAddFriend")
                     }
                   >
-                    禁止添加我为好友
+                    {t("placeholder.refuseAddFriend")}
                   </Checkbox>
                 </Spin>
               </div>
@@ -245,7 +251,7 @@ export const PersonalSettingsContent = ({
           className="flex cursor-pointer items-center justify-between px-6 py-4"
           onClick={toBlackList}
         >
-          <div className="text-base font-medium">通信录黑名单</div>
+          <div className="text-base font-medium">{t("placeholder.blackList")}</div>
           <RightOutlined rev={undefined} />
         </div>
         <Divider className="m-0 border-4 border-[var(--gap-text)]" />
@@ -253,7 +259,7 @@ export const PersonalSettingsContent = ({
           className="flex cursor-pointer items-center justify-between px-6 py-4"
           onClick={toChangePassword}
         >
-          <div className="text-base font-medium">修改密码</div>
+          <div className="text-base font-medium">{t("placeholder.changePassword")}</div>
           <RightOutlined rev={undefined} />
         </div>
         <Divider className="m-0 border-4 border-[var(--gap-text)]" />
@@ -262,7 +268,7 @@ export const PersonalSettingsContent = ({
             className="text-base font-medium text-[var(--warn-text)]"
             onClick={tryClearChatLogs}
           >
-            清空聊天记录
+            {t("toast.clearChatHistory")}
           </div>
         </div>
       </div>

@@ -8,6 +8,7 @@ import {
 } from "ahooks";
 import { Button, Popover, Spin } from "antd";
 import clsx from "clsx";
+import { t } from "i18next";
 import {
   forwardRef,
   ForwardRefRenderFunction,
@@ -153,9 +154,9 @@ const ChatFooter = () => {
               <div
                 className="ml-1.5 line-clamp-1 text-xs text-[var(--sub-text)]"
                 title=""
-              >{`回复${quoteMessage.senderNickname}：${formatMessageByType(
-                quoteMessage,
-              )}`}</div>
+              >{`${t("placeholder.reply")}${
+                quoteMessage.senderNickname
+              }：${formatMessageByType(quoteMessage)}`}</div>
             </div>
           )}
           <EditableDiv
@@ -168,10 +169,10 @@ const ChatFooter = () => {
           />
           <div className="flex items-center justify-end pb-6 pr-6">
             <span className="mr-2.5 text-xs text-[var(--sub-text)]">
-              Enter发送/Shift+Enter换行
+              {t("placeholder.sendShortcutkey")}
             </span>
             <Button className="px-6 py-1" type="primary" onClick={enterToSend}>
-              发送
+              {t("placeholder.send")}
             </Button>
           </div>
         </div>

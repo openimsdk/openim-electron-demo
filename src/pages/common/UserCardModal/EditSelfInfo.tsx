@@ -1,5 +1,6 @@
 import { Button, DatePicker, Form, Input, Modal, Select } from "antd";
 import dayjs, { Dayjs } from "dayjs";
+import { t } from "i18next";
 import { forwardRef, ForwardRefRenderFunction, memo, useState } from "react";
 import { useMutation } from "react-query";
 
@@ -56,7 +57,7 @@ const EditSelfInfo: ForwardRefRenderFunction<
     >
       <div>
         <div className="flex bg-[var(--chat-bubble)] p-5">
-          <span className="text-base font-medium">编辑资料</span>
+          <span className="text-base font-medium">{t("placeholder.editInfo")}</span>
         </div>
         {isOverlayOpen && (
           <Form
@@ -70,36 +71,36 @@ const EditSelfInfo: ForwardRefRenderFunction<
             initialValues={{ ...selfInfo, birth: dayjs(selfInfo.birth) }}
           >
             <Form.Item
-              label="昵称"
+              label={t("placeholder.nickName")}
               name="nickname"
-              rules={[{ required: true, max: 20, message: "请输入昵称！" }]}
+              rules={[{ required: true, max: 20, message: t("toast.inputNickName") }]}
             >
               <Input />
             </Form.Item>
-            <Form.Item label="性别" name="gender">
+            <Form.Item label={t("placeholder.gender")} name="gender">
               <Select>
-                <Select.Option value={1}>男</Select.Option>
-                <Select.Option value={2}>女</Select.Option>
-                <Select.Option value={0}>未知</Select.Option>
+                <Select.Option value={1}>{t("placeholder.man")}</Select.Option>
+                <Select.Option value={2}>{t("placeholder.female")}</Select.Option>
+                <Select.Option value={0}>{t("placeholder.unknown")}</Select.Option>
               </Select>
             </Form.Item>
-            <Form.Item label="生日" name="birth">
+            <Form.Item label={t("placeholder.birth")} name="birth">
               <DatePicker
                 disabledDate={(current) => current && current > dayjs().endOf("day")}
               />
             </Form.Item>
             <Form.Item
-              label="手机号"
+              label={t("placeholder.phoneNumber")}
               name="phoneNumber"
-              // rules={[{ pattern: /^1[3-9]\d{9}$/, message: "请输入正确手机号！" }]}
+              // rules={[{ pattern: /^1[3-9]\d{9}$/, message: t("placeholder.inputCorrectPhoneNumber") }]}
             >
               <Input disabled />
             </Form.Item>
 
             <Form.Item
-              label="邮箱"
+              label={t("placeholder.email")}
               name="email"
-              rules={[{ type: "email", message: "请输入正确邮箱！" }]}
+              rules={[{ type: "email", message: t("placeholder.inputCorrectEmail") }]}
             >
               <Input />
             </Form.Item>
@@ -110,7 +111,7 @@ const EditSelfInfo: ForwardRefRenderFunction<
                   className="mr-3.5 border-0 bg-[var(--chat-bubble)] px-6"
                   onClick={closeOverlay}
                 >
-                  取消
+                  {t("cancel")}
                 </Button>
                 <Button
                   className="px-6"
@@ -118,7 +119,7 @@ const EditSelfInfo: ForwardRefRenderFunction<
                   htmlType="submit"
                   loading={isLoading}
                 >
-                  完成
+                  {t("confirm")}
                 </Button>
               </div>
             </Form.Item>

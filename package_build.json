@@ -61,6 +61,8 @@
   },
   "dependencies": {
     "electron-log": "^4.4.8",
-    "electron-store": "^8.1.0"
+    "electron-store": "^8.1.0",
+    "i18next": "^22.5.0",
+    "i18next-fs-backend": "^2.2.0"
   }
 }

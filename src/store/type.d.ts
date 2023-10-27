@@ -36,7 +36,7 @@ export interface AppSettings {
   closeAction: "miniSize" | "quit";
 }
 
-export type LocaleString = "zh-CN" | "en";
+export type LocaleString = "zh-CN" | "en-US";
 
 export type ConversationListUpdateType = "push" | "filter";
 

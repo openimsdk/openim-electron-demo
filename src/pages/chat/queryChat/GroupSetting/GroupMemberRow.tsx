@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { t } from "i18next";
 import { memo } from "react";
 
 import invite from "@/assets/images/chatSetting/invite.png";
@@ -43,8 +44,8 @@ const GroupMemberRow = ({
   return (
     <div className="p-4">
       <div className="mb-3 font-medium">
-        <span>{`群成员`}</span>
-        <span className="ml-2">{`${currentGroupInfo?.memberCount}人`}</span>
+        <span>{t("placeholder.groupMember")}</span>
+        <span className="ml-2">{currentGroupInfo?.memberCount}</span>
       </div>
       <div className="flex flex-wrap items-center">
         {fetchState.groupMemberList.slice(0, sliceCount).map((member) => (
@@ -63,7 +64,7 @@ const GroupMemberRow = ({
         >
           <img width={36} src={invite} alt="invite" />
           <div className="mt-2 max-w-full truncate text-xs text-[var(--sub-text)]">
-            添加
+            {t("placeholder.add")}
           </div>
         </div>
         {!isNomal && (
@@ -73,7 +74,7 @@ const GroupMemberRow = ({
           >
             <img width={36} src={kick} alt="kick" />
             <div className="mt-2 max-w-full truncate text-xs text-[var(--sub-text)]">
-              移除
+              {t("placeholder.remove")}
             </div>
           </div>
         )}
@@ -82,7 +83,7 @@ const GroupMemberRow = ({
         className="flex cursor-pointer items-center justify-center pt-2 text-xs text-[var(--primary)]"
         onClick={updateTravel}
       >
-        查看更多
+        {t("placeholder.viewMore")}
       </div>
     </div>
   );

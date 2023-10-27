@@ -1,5 +1,6 @@
 import { Button, Divider } from "antd";
 import dayjs from "dayjs";
+import { t } from "i18next";
 import {
   FC,
   forwardRef,
@@ -43,7 +44,7 @@ export type CardInfo = Partial<BusinessUserInfo & FriendUserItem>;
 
 const getGender = (gender: number) => {
   if (!gender) return "-";
-  return gender === 1 ? "男" : "女";
+  return gender === 1 ? t("placeholder.man") : t("placeholder.female");
 };
 
 const UserCardModal: ForwardRefRenderFunction<
@@ -127,14 +128,14 @@ const UserCardModal: ForwardRefRenderFunction<
   const setUserInfoRow = (info: CardInfo) => {
     let tmpFields = [] as FieldRow[];
     tmpFields.push({
-      title: "昵称",
+      title: t("placeholder.nickName"),
       value: info.nickname || "",
     });
     const isFriend = info?.remark !== undefined;
 
     if (isFriend) {
       tmpFields.push({
-        title: "备注",
+        title: t("placeholder.remark"),
         value: info.remark || "-",
         editable: true,
       });
@@ -144,15 +145,15 @@ const UserCardModal: ForwardRefRenderFunction<
         ...tmpFields,
         ...[
           {
-            title: "性别",
+            title: t("placeholder.gender"),
             value: getGender(info.gender!),
           },
           {
-            title: "生日",
-            value: info.birth ? dayjs(info.birth).format("YYYY年M月D日") : "-",
+            title: t("placeholder.birth"),
+            value: info.birth ? dayjs(info.birth).format("YYYY/M/D") : "-",
           },
           {
-            title: "手机号",
+            title: t("placeholder.phoneNumber"),
             value: info.phoneNumber || "-",
           },
         ],
@@ -169,22 +170,24 @@ const UserCardModal: ForwardRefRenderFunction<
         userIDList: [info.inviterUserID],
       });
       const inviterInfo = data[0];
-      joinSourceStr = `${inviterInfo?.nickname ?? ""}邀请入群`;
+      joinSourceStr = `${inviterInfo?.nickname ?? ""}${t("placeholder.inviteToGroup")}`;
     } else {
       joinSourceStr =
-        info.joinSource === GroupJoinSource.QrCode ? "扫码入群" : "搜索群组ID";
+        info.joinSource === GroupJoinSource.QrCode
+          ? t("placeholder.qrCodeToGroup")
+          : t("placeholder.selectIDToGroup");
     }
     setGorupMemberFields([
       {
-        title: "群昵称",
+        title: t("placeholder.groupNickName"),
         value: info.nickname,
       },
       {
-        title: "入群时间",
-        value: dayjs(info.joinTime).format("YYYY年M月D日"),
+        title: t("placeholder.joinGroupTime"),
+        value: dayjs(info.joinTime).format("YYYY/M/D"),
       },
       {
-        title: "入群方式",
+        title: t("placeholder.joinGroupMode"),
         value: joinSourceStr,
       },
     ]);
@@ -238,7 +241,7 @@ const UserCardModal: ForwardRefRenderFunction<
                     className="mr-3 cursor-pointer text-xs text-[var(--sub-text)]"
                     onClick={() => {
                       copyToClipboard(cardInfo?.userID ?? "");
-                      feedbackToast({ msg: "复制成功！" });
+                      feedbackToast({ msg: t("toast.copySuccess") });
                     }}
                   >
                     {cardInfo?.userID}
@@ -248,7 +251,7 @@ const UserCardModal: ForwardRefRenderFunction<
             </div>
             <div className="flex-1 overflow-y-auto">
               <UserCardDataGroup
-                title="个人信息"
+                title={t("placeholder.personalInfo")}
                 userID={cardInfo?.userID}
                 fieldRows={userFields}
                 updateCardRemark={updateCardRemark}
@@ -262,7 +265,7 @@ const UserCardModal: ForwardRefRenderFunction<
                 className="flex-1"
                 onClick={() => setIsSendRequest(true)}
               >
-                添加好友
+                {t("placeholder.addFriends")}
               </Button>
             )}
             {isSelf && (
@@ -271,7 +274,7 @@ const UserCardModal: ForwardRefRenderFunction<
                 className="flex-1"
                 onClick={() => editInfoRef.current?.openOverlay()}
               >
-                编辑资料
+                {t("placeholder.editInfo")}
               </Button>
             )}
             {showSendMessage && (
@@ -285,7 +288,7 @@ const UserCardModal: ForwardRefRenderFunction<
                   }).then(closeOverlay)
                 }
               >
-                发消息
+                {t("placeholder.sendMessage")}
               </Button>
             )}
           </div>

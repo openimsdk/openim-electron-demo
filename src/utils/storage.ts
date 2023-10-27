@@ -38,4 +38,6 @@ export const getChatToken = async () => await localForage.getItem("IM_CHAT_TOKEN
 export const getIMUserID = async () => await localForage.getItem("IM_USERID");
 
 export const getLocale = (): LocaleString =>
-  (localStorage.getItem("IM_LOCALE") as LocaleString) || "zh-CN";
+  window.electronAPI?.ipcSendSync("getKeyStoreSync", { key: "language" }) ||
+  (localStorage.getItem("IM_LOCALE") as LocaleString) ||
+  "zh-CN";

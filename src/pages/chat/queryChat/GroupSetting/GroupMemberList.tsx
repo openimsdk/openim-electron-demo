@@ -60,12 +60,12 @@ const MemberItem: FC<IMemberItemProps> = ({ member }) => {
           <div className="max-w-[120px] truncate">{member.nickname}</div>
           {isOwner && (
             <span className="ml-2 rounded border border-[#FF9831] px-1 text-xs text-[#FF9831]">
-              群主
+              {t("placeholder.groupOwner")}
             </span>
           )}
           {isAdmin && (
             <span className="ml-2 rounded border border-[#0289FA] px-1 text-xs text-[#0289FA]">
-              管理员
+              {t("placeholder.administrator")}
             </span>
           )}
         </div>

@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { t } from "i18next";
 import { FC } from "react";
 
 import file_icon from "@/assets/images/messageItem/file_icon.png";

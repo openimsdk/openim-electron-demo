@@ -1,4 +1,5 @@
 import { Button, Spin } from "antd";
+import { t } from "i18next";
 import { memo, useState } from "react";
 
 import arrow from "@/assets/images/contact/arrowTopRight.png";
@@ -31,9 +32,9 @@ const ApplicationItem = ({
 
   const getApplicationDesc = () => {
     if (isGroup) {
-      return `${isRecv ? "" : "我："}申请加入 `;
+      return `${isRecv ? "" : `${t("me")}：`}${t("application.applyToJoin")} `;
     }
-    return `${isRecv ? "" : "我："}申请添加您为好友 `;
+    return `${isRecv ? "" : `${t("me")}：`}${t("application.applyToFriend")} `;
   };
 
   const getTitle = () => {
@@ -45,12 +46,12 @@ const ApplicationItem = ({
 
   const getStatusStr = () => {
     if (source.handleResult === ApplicationHandleResult.Agree) {
-      return "已同意";
+      return t("application.agreed");
     }
     if (source.handleResult === ApplicationHandleResult.Reject) {
-      return "已拒绝";
+      return t("application.refused");
     }
-    return "等待验证";
+    return t("application.pending");
   };
 
   const getAvatarUrl = () => {
@@ -79,7 +80,7 @@ const ApplicationItem = ({
                 <span className="text-xs text-[#0289FAFF]">{source.groupName}</span>
               )}
             </p>
-            <p className="text-xs text-[#8E9AB0]">验证信息:</p>
+            <p className="text-xs text-[#8E9AB0]">{t("application.information")}:</p>
             <p className="text-xs text-[#8E9AB0]">{source.reqMsg}</p>
           </div>
         </div>
@@ -93,7 +94,7 @@ const ApplicationItem = ({
                 onClick={() => loadingWrap(false)}
                 className="!h-full !rounded-md border-2 border-[#0089FF] text-[#0089FF]"
               >
-                拒绝
+                {t("application.agree")}
               </Button>
             </div>
             <div className="h-8 w-[60px]">
@@ -104,7 +105,7 @@ const ApplicationItem = ({
                 className="!h-full !rounded-md bg-[#0289fa]"
                 onClick={() => loadingWrap(true)}
               >
-                同意
+                {t("application.refuse")}
               </Button>
             </div>
           </div>

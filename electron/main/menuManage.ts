@@ -1,4 +1,5 @@
 import { app, Menu } from "electron";
+import { t } from "i18next";
 import { isMac } from "../utils";
 
 const createAppMenu = () => {
@@ -7,12 +8,12 @@ const createAppMenu = () => {
       {
         label: app.getName(),
         submenu: [
-          { label: "关于", role: "about" },
+          { label: t("system.about"), role: "about" },
           { type: "separator" },
-          { label: "隐藏", role: "hide" },
+          { label: t("system.hide"), role: "hide" },
           { type: "separator" },
           {
-            label: "退出",
+            label: t("system.quit"),
             accelerator: "Command+Q",
             click: () => {
               global.forceQuit = true;
@@ -22,11 +23,11 @@ const createAppMenu = () => {
         ],
       },
       {
-        label: "窗口",
+        label: t("system.window"),
         role: "window",
         submenu: [
-          { label: "最小化", role: "minimize", accelerator: "Command+W" },
-          { label: "关闭", role: "close" },
+          { label: t("system.minimize"), role: "minimize" },
+          { label: t("system.close"), role: "close" },
         ],
       },
     ];

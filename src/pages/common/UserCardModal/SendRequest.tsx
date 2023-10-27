@@ -28,7 +28,7 @@ const SendRequest = ({
         toUserID: cardInfo.userID!,
         reqMsg,
       });
-      feedbackToast({ msg: "发送好友请求成功！" });
+      feedbackToast({ msg: t("toast.sendFreiendRequestSuccess") });
     } catch (error) {
       feedbackToast({ error, msg: t("toast.sendApplicationFailed") });
     }
@@ -44,7 +44,7 @@ const SendRequest = ({
             rev={undefined}
             onClick={backToCard}
           />
-          <div className="ml-2 font-medium">好友验证</div>
+          <div className="ml-2 font-medium">{t("placeholder.friendVerification")}</div>
         </div>
       </div>
       <div className="ignore-drag flex flex-1 flex-col">
@@ -63,14 +63,16 @@ const SendRequest = ({
           </div>
         </div>
         <div className="mt-7">
-          <div className="text-xs text-[var(--sub-text)]">验证信息</div>
+          <div className="text-xs text-[var(--sub-text)]">
+            {t("application.information")}
+          </div>
           <div className="mx-2 my-4">
             <Input.TextArea
               showCount
               value={reqMsg}
               maxLength={50}
               bordered={false}
-              placeholder="请输入"
+              placeholder={t("placeholder.pleaseEnter")}
               style={{ padding: "8px 6px" }}
               autoSize={{ minRows: 6, maxRows: 6 }}
               onChange={(e) => setReqMsg(e.target.value)}
@@ -85,7 +87,7 @@ const SendRequest = ({
             onClick={sendApplication}
             loading={loading}
           >
-            发送
+            {t("placeholder.send")}
           </Button>
         </div>
       </div>

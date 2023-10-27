@@ -11,7 +11,7 @@ import translation_en from "./resources/en.json";
 import translation_zh from "./resources/zh.json";
 
 const resources = {
-  en: {
+  "en-US": {
     translation: translation_en,
   },
   "zh-CN": {
@@ -25,6 +25,7 @@ i18n
   .init({
     resources,
     lng: getLocale(),
+    fallbackLng: "en-US",
     interpolation: {
       escapeValue: false,
     },

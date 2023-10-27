@@ -1,6 +1,7 @@
 import { RightOutlined } from "@ant-design/icons";
 import { Button, Divider, Upload } from "antd";
 import clsx from "clsx";
+import { t } from "i18next";
 import { memo, useCallback } from "react";
 import { useCopyToClipboard } from "react-use";
 import { v4 as uuidV4 } from "uuid";
@@ -52,7 +53,7 @@ const GroupSettings = ({
       });
       await updateGroupInfo({ faceURL: url });
     } catch (error) {
-      feedbackToast({ error: "修改群头像失败！" });
+      feedbackToast({ error: t("toast.updateAvatarFailed") });
     }
   };
 
@@ -113,7 +114,7 @@ const GroupSettings = ({
       <Divider className="m-0 border-4 border-[#F4F5F7]" />
 
       <Divider className="m-0 border-4 border-[#F4F5F7]" />
-      <SettingRow className="pb-2" title={"群聊ID"}>
+      <SettingRow className="pb-2" title={`${t("placeholder.group")}ID`}>
         <div className="flex items-center">
           <span className="mr-1 text-xs text-[var(--sub-text)]">
             {currentGroupInfo?.groupID}
@@ -125,26 +126,28 @@ const GroupSettings = ({
             alt=""
             onClick={() => {
               copyToClipboard(currentGroupInfo?.groupID ?? "");
-              feedbackToast({ msg: "复制成功！" });
+              feedbackToast({ msg: t("toast.copySuccess") });
             }}
           />
         </div>
       </SettingRow>
-      <SettingRow title={"群类型"}>
-        <span className="text-xs text-[var(--sub-text)]">{"工作群"}</span>
+      <SettingRow title={t("placeholder.groupTppe")}>
+        <span className="text-xs text-[var(--sub-text)]">
+          {t("placeholder.workGroup")}
+        </span>
       </SettingRow>
       <Divider className="m-0 border-4 border-[#F4F5F7]" />
       <SettingRow
         hidden={!isJoinGroup}
         className="pb-2"
-        title={"置顶会话"}
+        title={t("placeholder.sticky")}
         value={currentConversation?.isPinned}
         tryChange={updateConversationPin}
       />
       <SettingRow
         hidden={!isJoinGroup}
         className="pb-2"
-        title={"消息免打扰"}
+        title={t("placeholder.notNotify")}
         value={currentConversation?.recvMsgOpt === MessageReceiveOptType.NotNotify}
         tryChange={(checked) =>
           updateConversationMessageRemind(checked, MessageReceiveOptType.NotNotify)
@@ -152,7 +155,7 @@ const GroupSettings = ({
       />
       <SettingRow
         className="cursor-pointer"
-        title={"清空聊天记录"}
+        title={t("toast.clearChatHistory")}
         rowClick={clearConversationMessages}
       >
         <RightOutlined rev={undefined} />
@@ -163,11 +166,11 @@ const GroupSettings = ({
         <div className="flex w-full justify-center pb-3 pt-24">
           {isNomal ? (
             <Button type="primary" danger ghost onClick={tryQuitGroup}>
-              退出群组
+              {t("placeholder.exitGroup")}
             </Button>
           ) : (
             <Button type="primary" danger onClick={tryDismissGroup}>
-              解散群组
+              {t("placeholder.disbandGroup")}
             </Button>
           )}
         </div>

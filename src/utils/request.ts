@@ -24,10 +24,10 @@ const createAxiosInstance = (baseURL: string) => {
     },
     (err) => {
       if (err.message.includes("timeout")) {
-        console.log("错误回调", err);
+        console.log("error", err);
       }
       if (err.message.includes("Network Error")) {
-        console.log("错误回调", err);
+        console.log("error", err);
       }
       return Promise.reject(err);
     },

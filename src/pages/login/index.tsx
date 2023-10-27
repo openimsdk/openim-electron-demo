@@ -1,3 +1,4 @@
+import { t } from "i18next";
 import { useState } from "react";
 
 import login_bg from "@/assets/images/login/login_bg.png";
@@ -16,8 +17,8 @@ export const Login = () => {
   const LeftBar = () => (
     <div className="flex min-h-[420]">
       <div className="mr-14 text-center">
-        <div className="text-2xl">在线化办公</div>
-        <span className="text-sm  text-gray-400">多人协作，打造高效办公方式</span>
+        <div className="text-2xl">{t("placeholder.title")}</div>
+        <span className="text-sm  text-gray-400">{t("placeholder.subTitle")}</span>
         <img src={login_bg} alt="login_bg" />
       </div>
     </div>

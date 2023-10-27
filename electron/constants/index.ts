@@ -4,4 +4,5 @@ export const IpcRenderToMain = {
   closeWindow: "closeWindow",
   setKeyStore: "setKeyStore",
   getKeyStore: "getKeyStore",
+  getKeyStoreSync: "getKeyStoreSync",
 };

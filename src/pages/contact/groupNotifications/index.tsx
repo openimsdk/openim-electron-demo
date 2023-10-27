@@ -1,4 +1,5 @@
 import { useDeepCompareEffect } from "ahooks";
+import { t } from "i18next";
 import { useCallback } from "react";
 import { Virtuoso } from "react-virtuoso";
 
@@ -49,7 +50,9 @@ export const GroupNotifications = () => {
 
   return (
     <div className="flex h-full w-full flex-col bg-white">
-      <p className="m-5.5 text-base font-extrabold">群通知</p>
+      <p className="m-5.5 text-base font-extrabold">
+        {t("placeholder.groupNotification")}
+      </p>
       <div className="flex-1 pb-3">
         <Virtuoso
           className="h-full overflow-x-hidden"

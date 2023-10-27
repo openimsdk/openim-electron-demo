@@ -2,6 +2,7 @@ import { DownOutlined } from "@ant-design/icons";
 import { Popover, PopoverProps, Upload } from "antd";
 import { TooltipPlacement } from "antd/es/tooltip";
 import clsx from "clsx";
+import { t } from "i18next";
 import { UploadRequestOption } from "rc-upload/lib/interface";
 import { memo, ReactNode, useCallback, useRef, useState } from "react";
 import React from "react";
@@ -19,7 +20,7 @@ import EmojiPopContent from "./EmojiPopContent";
 
 const sendActionList = [
   {
-    title: "表情",
+    title: t("placeholder.emoji"),
     icon: emoji,
     key: "emoji",
     accept: undefined,
@@ -27,7 +28,7 @@ const sendActionList = [
     placement: "topLeft",
   },
   {
-    title: "图片",
+    title: t("placeholder.image"),
     icon: image,
     key: "image",
     accept: "image/*",
@@ -35,7 +36,7 @@ const sendActionList = [
     placement: undefined,
   },
   {
-    title: "视频",
+    title: t("placeholder.video"),
     icon: video,
     key: "video",
     accept: !window.electronAPI ? ".mp4" : "video/*",

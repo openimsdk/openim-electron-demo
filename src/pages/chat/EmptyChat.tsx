@@ -1,4 +1,5 @@
 import { Button, Layout } from "antd";
+import { t } from "i18next";
 
 import empty_chat_bg from "@/assets/images/empty_chat_bg.png";
 import emitter from "@/utils/events";
@@ -14,14 +15,16 @@ export const EmptyChat = () => {
     <Layout className="no-mobile flex items-center justify-center bg-white">
       <div>
         <div className="mb-12 flex flex-col items-center">
-          <div className="mb-3 text-xl font-medium">创建群组</div>
-          <div className="text-[var(--sub-text)]">创建群组，立即开启在线化办公</div>
+          <div className="mb-3 text-xl font-medium">{t("placeholder.createGroup")}</div>
+          <div className="text-[var(--sub-text)]">
+            {t("placeholder.createGroupToast")}
+          </div>
         </div>
         <img src={empty_chat_bg} alt="" width={320} />
 
         <div className="mt-28 flex justify-center">
           <Button className="px-8" type="primary" onClick={createNow}>
-            立即创建
+            {t("placeholder.createNow")}
           </Button>
         </div>
       </div>

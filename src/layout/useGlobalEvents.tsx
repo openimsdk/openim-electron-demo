@@ -1,4 +1,5 @@
 import { useLatest, useThrottleFn } from "ahooks";
+import { t } from "i18next";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -175,8 +176,8 @@ export function useGlobalEvent() {
   const connectSuccessHandler = () => {
     console.log("connect success...");
   };
-  const kickHandler = () => tryOut("您的账号已在其他设备登录,请重新登录");
-  const expiredHandler = () => tryOut("当前登录已过期,请重新登录");
+  const kickHandler = () => tryOut(t("toast.accountKicked"));
+  const expiredHandler = () => tryOut(t("toast.loginExpiration"));
 
   const tryOut = (msg: string) =>
     feedbackToast({
@@ -195,7 +196,7 @@ export function useGlobalEvent() {
     setConnectState((state) => ({ ...state, isSyncing: false }));
   };
   const syncFailedHandler = () => {
-    feedbackToast({ msg: "同步失败！", error: "同步失败！" });
+    feedbackToast({ msg: t("toast.syncFailed"), error: t("toast.syncFailed") });
     setConnectState((state) => ({ ...state, isSyncing: false }));
   };
 

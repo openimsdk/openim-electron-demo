@@ -16,7 +16,7 @@ const GroupListItem = ({
       <OIMAvatar src={source?.faceURL} isgroup />
       <div className="ml-3">
         <p className="text-base">{source.groupName}</p>
-        <p className="text-xs text-[#8E9AB0FF]">{source.memberCount}人</p>
+        <p className="text-xs text-[#8E9AB0FF]">{source.memberCount}</p>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { Drawer } from "antd";
+import { t } from "i18next";
 import { forwardRef, ForwardRefRenderFunction, memo, useRef, useState } from "react";
 
 import { OverlayVisibleHandle, useOverlayVisible } from "@/hooks/useOverlayVisible";
@@ -21,7 +22,7 @@ const GroupSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
     <Drawer
       title={
         !isPreviewMembers ? (
-          "设置"
+          t("placeholder.setting")
         ) : (
           <GroupMemberListHeader back2Settings={() => setIsPreviewMembers(false)} />
         )

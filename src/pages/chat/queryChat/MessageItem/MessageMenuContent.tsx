@@ -1,3 +1,4 @@
+import { t } from "i18next";
 import { memo } from "react";
 import { useCopyToClipboard } from "react-use";
 
@@ -21,37 +22,37 @@ import { MessageType } from "@/utils/open-im-sdk-wasm/types/enum";
 const messageMenuList = [
   {
     idx: 1,
-    title: "转发",
+    title: t("placeholder.forward"),
     icon: forward,
     hidden: false,
   },
   {
     idx: 2,
-    title: "复制",
+    title: t("placeholder.copy"),
     icon: copy,
     hidden: false,
   },
   {
     idx: 3,
-    title: "多选",
+    title: t("placeholder.check"),
     icon: check,
     hidden: false,
   },
   {
     idx: 4,
-    title: "回复",
+    title: t("placeholder.reply"),
     icon: reply,
     hidden: false,
   },
   {
     idx: 5,
-    title: "撤回",
+    title: t("placeholder.revoke"),
     icon: revoke,
     hidden: false,
   },
   {
     idx: 6,
-    title: "删除",
+    title: t("placeholder.delete"),
     icon: remove,
     hidden: false,
   },
@@ -93,7 +94,7 @@ const MessageMenuContent = ({
         break;
       case 2:
         copyToClipboard(getCopyText());
-        feedbackToast({ msg: "复制成功！" });
+        feedbackToast({ msg: t("toast.copySuccess") });
         break;
       case 3:
         updateCheckMode(true);
@@ -124,7 +125,7 @@ const MessageMenuContent = ({
             clientMsgID: message.clientMsgID,
             revokeTime: Date.now(),
             revokerID: selfUserID,
-            revokerNickname: "你",
+            revokerNickname: t("you"),
             revokerRole: 0,
             seq: message.seq,
             sessionType: message.sessionType,

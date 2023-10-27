@@ -1,4 +1,5 @@
 import { Spin } from "antd";
+import { t } from "i18next";
 import { useState } from "react";
 
 import cancel from "@/assets/images/chatFooter/cancel.png";
@@ -12,15 +13,15 @@ import { formatMessageByType, isGroupSession } from "@/utils/imCommon";
 
 const multipleActionList = [
   {
-    title: "合并转发",
+    title: t("placeholder.mergeForward"),
     icon: forward,
   },
   {
-    title: "删除",
+    title: t("placeholder.delete"),
     icon: remove,
   },
   {
-    title: "关闭",
+    title: t("placeholder.close"),
     icon: cancel,
   },
 ];
@@ -74,7 +75,7 @@ const MultipleActionBar = () => {
       );
       messageList.forEach((message) => deleteOneMessage(message.clientMsgID));
     } catch (error) {
-      feedbackToast({ error: "部分消息删除失败" });
+      feedbackToast({ error: t("toast.messagesDeleteFailed") });
     }
     setLoading(false);
   };
@@ -89,8 +90,10 @@ const MultipleActionBar = () => {
         messageList,
         summaryList,
         title: `${
-          isGroupSession(currentConversation?.conversationType) ? "群聊" : "和"
-        }${currentConversation?.showName}的聊天记录`,
+          isGroupSession(currentConversation?.conversationType)
+            ? t("placeholder.group")
+            : t("placeholder.and")
+        }${currentConversation?.showName}${t("placeholder.messageHistory")}`,
       })
     ).data;
   };

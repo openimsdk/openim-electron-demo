@@ -70,13 +70,18 @@ const ConversationMenuContent = memo(
       <Spin spinning={loading}>
         <div className="p-1">
           <MenuItem
-            title={`${conversation.isPinned ? "取消" : ""}置顶`}
+            title={`${conversation.isPinned ? t("cancel") : ""}${t(
+              "placeholder.sticky",
+            )}`}
             onClick={updateConversationPin}
           />
           {Boolean(conversation.unreadCount) && (
-            <MenuItem title={"标为已读"} onClick={markConversationAsRead} />
+            <MenuItem
+              title={t("placeholder.markAsRead")}
+              onClick={markConversationAsRead}
+            />
           )}
-          <MenuItem title={"移除"} onClick={removeConversation} />
+          <MenuItem title={t("placeholder.remove")} onClick={removeConversation} />
         </div>
       </Spin>
     );

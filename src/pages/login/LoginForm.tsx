@@ -1,4 +1,5 @@
 import { Button, Form, Input, QRCode, Select, Space } from "antd";
+import { t } from "i18next";
 import md5 from "md5";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -54,7 +55,7 @@ const LoginForm = ({ setFormType }: LoginFormProps) => {
   return (
     <>
       <div className="flex flex-row items-center justify-between">
-        <div className="text-xl font-medium">欢迎使用OpenIM</div>
+        <div className="text-xl font-medium">{t("placeholder.welcome")}</div>
       </div>
       <Form
         form={form}
@@ -68,36 +69,38 @@ const LoginForm = ({ setFormType }: LoginFormProps) => {
           password: "",
         }}
       >
-        <Form.Item label="手机号">
+        <Form.Item label={t("placeholder.phoneNumber")}>
           <Space.Compact className="w-full">
             <Form.Item name="areaCode" noStyle>
               <Select options={areaCode} className="!w-28" />
             </Form.Item>
             <Form.Item name="phoneNumber" noStyle>
-              <Input allowClear placeholder="请输入您的手机号" />
+              <Input allowClear placeholder={t("toast.inputCorrectPhoneNumber")} />
             </Form.Item>
           </Space.Compact>
         </Form.Item>
 
         {loginType === 0 && (
-          <Form.Item label="密码" name="password">
-            <Input.Password allowClear placeholder="请输入您的密码" />
+          <Form.Item label={t("placeholder.password")} name="password">
+            <Input.Password allowClear placeholder={t("toast.inputPassword")} />
           </Form.Item>
         )}
 
         <Form.Item className="mt-12">
           <Button type="primary" htmlType="submit" block loading={loginLoading}>
-            登录
+            {t("placeholder.login")}
           </Button>
         </Form.Item>
 
         <div className="flex flex-row items-center justify-center">
-          <span className="text-sm text-gray-400">还没有账号？</span>
+          <span className="text-sm text-gray-400">
+            {t("placeholder.registerToast")}
+          </span>
           <span
             className="cursor-pointer text-sm text-blue-500"
             onClick={() => setFormType(2)}
           >
-            立即注册
+            {t("placeholder.toRegister")}
           </span>
         </div>
       </Form>

@@ -82,6 +82,7 @@
     "electron-store": "^8.1.0",
     "i18next": "^22.5.0",
     "i18next-browser-languagedetector": "^7.0.2",
+    "i18next-fs-backend": "^2.2.0",
     "localforage": "^1.10.0",
     "md5": "^2.3.0",
     "mitt": "^3.0.0",

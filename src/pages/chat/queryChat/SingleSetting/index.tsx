@@ -48,12 +48,12 @@ const SingleSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
     };
     if (!isBlack) {
       modal.confirm({
-        title: "加入黑名单",
+        title: t("placeholder.moveBlacklist"),
         content: (
           <div className="flex items-baseline">
-            <div>确认将好友加入黑名单吗？</div>
+            <div>{t("toast.confirmMoveBlacklist")}</div>
             <span className="text-xs text-[var(--sub-text)]">
-              将无法接收该好友消息。
+              {t("placeholder.willFilterThisUserMessage")}
             </span>
           </div>
         ),
@@ -67,8 +67,8 @@ const SingleSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
   const tryUnfriend = () => {
     if (!currentConversation) return;
     modal.confirm({
-      title: "解除好友",
-      content: "确认解除好友吗？",
+      title: t("placeholder.unfriend"),
+      content: t("toast.confirmUnfriend"),
       onOk: async () => {
         try {
           await IMSDK.deleteFriend(currentConversation.userID);
@@ -85,7 +85,7 @@ const SingleSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
 
   return (
     <Drawer
-      title={"设置"}
+      title={t("placeholder.setting")}
       placement="right"
       rootClassName="chat-drawer"
       destroyOnClose
@@ -114,13 +114,13 @@ const SingleSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
       <Divider className="m-0 border-4 border-[#F4F5F7]" />
       <SettingRow
         className="pb-2"
-        title={"置顶会话"}
+        title={t("placeholder.sticky")}
         value={currentConversation?.isPinned}
         tryChange={updateConversationPin}
       />
       <SettingRow
         className="pb-2"
-        title={"消息免打扰"}
+        title={t("placeholder.notNotify")}
         value={currentConversation?.recvMsgOpt === MessageReceiveOptType.NotNotify}
         tryChange={(checked) =>
           updateConversationMessageRemind(checked, MessageReceiveOptType.NotNotify)
@@ -128,17 +128,21 @@ const SingleSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
       />
       <SettingRow
         className="pb-2"
-        title={"屏蔽该会话"}
+        title={t("placeholder.shieldConversation")}
         value={currentConversation?.recvMsgOpt === MessageReceiveOptType.NotReceive}
         tryChange={(checked) =>
           updateConversationMessageRemind(checked, MessageReceiveOptType.NotReceive)
         }
       />
-      <SettingRow title={"加入黑名单"} value={isBlack} tryChange={updateBlack} />
+      <SettingRow
+        title={t("placeholder.moveBlacklist")}
+        value={isBlack}
+        tryChange={updateBlack}
+      />
       <Divider className="m-0 border-4 border-[#F4F5F7]" />
       <SettingRow
         className="cursor-pointer"
-        title={"清空聊天记录"}
+        title={t("toast.clearChatHistory")}
         rowClick={clearConversationMessages}
       >
         <RightOutlined rev={undefined} />
@@ -148,7 +152,7 @@ const SingleSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
       {isFriend && (
         <div className="flex w-full justify-center pb-3 pt-24">
           <Button type="primary" danger onClick={tryUnfriend}>
-            解除好友
+            {t("placeholder.unfriend")}
           </Button>
         </div>
       )}

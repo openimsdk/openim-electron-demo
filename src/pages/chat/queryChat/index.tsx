@@ -1,5 +1,6 @@
 import { useRequest, useUnmount } from "ahooks";
 import { Layout } from "antd";
+import { t } from "i18next";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 

@@ -1,5 +1,6 @@
 import { CloseOutlined } from "@ant-design/icons";
 import { Button, Input } from "antd";
+import { t } from "i18next";
 import { forwardRef, ForwardRefRenderFunction, memo, useState } from "react";
 
 import { message } from "@/AntdGlobalComp";
@@ -35,13 +36,13 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
         const { data } = await IMSDK.getSpecifiedGroupsInfo<GroupItem[]>([keyword]);
         const groupInfo = data[0];
         if (!groupInfo) {
-          message.warning("搜索结果为空！");
+          message.warning(t("empty.noSearchResults"));
           return;
         }
         openGroupCardWithData(groupInfo);
       } catch (error) {
         if ((error as WSEvent).errCode === 1004) {
-          message.warning("搜索结果为空！");
+          message.warning(t("empty.noSearchResults"));
           return;
         }
         feedbackToast({ error });
@@ -52,7 +53,7 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
           data: { total, users },
         } = await searchBusinessUserInfo(keyword);
         if (!total) {
-          message.warning("搜索结果为空！");
+          message.warning(t("empty.noSearchResults"));
           return;
         }
         const { data } = await IMSDK.getUsersInfo<FullUserItem[]>([users[0].userID]);
@@ -64,7 +65,7 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
         });
       } catch (error) {
         if ((error as WSEvent).errCode === 1004) {
-          message.warning("搜索结果为空！");
+          message.warning(t("empty.noSearchResults"));
           return;
         }
         feedbackToast({ error });
@@ -92,7 +93,9 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
       maskTransitionName=""
     >
       <div className="flex h-12 items-center justify-between bg-[var(--gap-text)] px-5.5">
-        <div>{isSearchGroup ? "添加群组" : "添加好友"}</div>
+        <div>
+          {isSearchGroup ? t("placeholder.addGroup") : t("placeholder.addFriends")}
+        </div>
         <CloseOutlined
           className="cursor-pointer text-[#8e9ab0]"
           rev={undefined}
@@ -103,7 +106,7 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
         <div className="border-b border-[var(--gap-text)] px-5.5 py-6">
           <Input.Search
             className="no-addon-search"
-            placeholder="请输入"
+            placeholder={t("placeholder.pleaseEnter")}
             value={keyword}
             addonAfter={null}
             onChange={(e) => setKeyword(e.target.value)}
@@ -112,13 +115,13 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
         </div>
         <div className="flex justify-end px-5.5 py-2.5">
           <Button className="px-6" type="primary" onClick={searchData}>
-            确定
+            {t("confirm")}
           </Button>
           <Button
             className="ml-3 border-0 bg-[var(--chat-bubble)] px-6"
             onClick={closeOverlay}
           >
-            取消
+            {t("cancel")}
           </Button>
         </div>
       </div>

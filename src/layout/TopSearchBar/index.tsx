@@ -1,4 +1,5 @@
 import { Popover } from "antd";
+import i18n, { t } from "i18next";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import add_friend from "@/assets/images/topSearchBar/add_friend.png";
@@ -96,7 +97,7 @@ const TopSearchBar = () => {
       <div className="flex w-full items-center justify-center">
         <div className="app-no-drag flex h-[26px] w-1/3 cursor-pointer items-center justify-center rounded-md bg-[rgba(255,255,255,0.2)]">
           <img width={16} src={search} alt="" />
-          <span className="ml-2 text-[#D2E3F8]">搜索</span>
+          <span className="ml-2 text-[#D2E3F8]">{t("placeholder.search")}</span>
         </div>
         <Popover
           content={<ActionPopContent actionClick={actionClick} />}
@@ -137,20 +138,26 @@ export default TopSearchBar;
 const actionMenuList = [
   {
     idx: 0,
-    title: "添加好友",
+    title: t("placeholder.addFriends"),
     icon: add_friend,
   },
   {
     idx: 1,
-    title: "添加群组",
+    title: t("placeholder.addGroup"),
     icon: add_group,
   },
   {
     idx: 2,
-    title: "创建群组",
+    title: t("placeholder.createGroup"),
     icon: create_group,
   },
 ];
+
+i18n.on("languageChanged", () => {
+  actionMenuList[0].title = t("placeholder.addFriends");
+  actionMenuList[1].title = t("placeholder.addGroup");
+  actionMenuList[2].title = t("placeholder.createGroup");
+});
 
 const ActionPopContent = ({ actionClick }: { actionClick: (idx: number) => void }) => {
   return (

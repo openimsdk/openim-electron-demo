@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { t } from "i18next";
 import { useCallback } from "react";
 
 import { useContactStore } from "@/store";
@@ -21,7 +22,7 @@ export const MyFriends = () => {
 
   return (
     <div className="flex h-full w-full flex-col bg-white">
-      <div className="m-5.5 text-base font-extrabold">我的好友</div>
+      <div className="m-5.5 text-base font-extrabold">{t("placeholder.myFriend")}</div>
       <div className="ml-4 mt-4 flex-1 overflow-auto pr-4">
         <AlphabetIndex indexList={indexList} />
         <div

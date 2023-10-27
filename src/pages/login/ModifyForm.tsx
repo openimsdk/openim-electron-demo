@@ -1,5 +1,6 @@
 import { LeftOutlined } from "@ant-design/icons";
 import { App, Button, Form, Input, Select, Space } from "antd";
+import { t } from "i18next";
 import md5 from "md5";
 import { useEffect, useState } from "react";
 
@@ -73,7 +74,7 @@ const ModifyForm = ({ setFormType }: ModifyFormProps) => {
         { ...fields, password: md5(fields.password) },
         {
           onSuccess() {
-            message.success("修改密码成功，请重新登录");
+            message.success(t("toast.updatePasswordSuccess"));
             setFormType(0);
           },
         },
@@ -105,9 +106,9 @@ const ModifyForm = ({ setFormType }: ModifyFormProps) => {
     <div className="flex flex-col justify-between">
       <div className="cursor-pointer text-sm text-gray-400" onClick={back}>
         <LeftOutlined rev={undefined} />
-        <span className="ml-1">返回</span>
+        <span className="ml-1">{t("placeholder.nextStep")}</span>
       </div>
-      <div className="mt-6 text-2xl font-medium">忘记密码</div>
+      <div className="mt-6 text-2xl font-medium">{t("placeholder.forgetPassword")}</div>
       <Form
         form={form}
         layout="vertical"
@@ -116,52 +117,82 @@ const ModifyForm = ({ setFormType }: ModifyFormProps) => {
         className="mt-6"
         initialValues={{ areaCode: "+86" }}
       >
-        <Form.Item label="手机号" hidden={isConfirm}>
+        <Form.Item label={t("placeholder.phoneNumber")} hidden={isConfirm}>
           <Space.Compact className="w-full">
             <Form.Item name="areaCode" noStyle>
               <Select options={areaCode} className="!w-28" />
             </Form.Item>
             <Form.Item name="phoneNumber" noStyle>
-              <Input allowClear placeholder="请输入您的手机号" />
+              <Input allowClear placeholder={t("toast.inputCorrectPhoneNumber")} />
             </Form.Item>
           </Space.Compact>
         </Form.Item>
 
-        <Form.Item label="验证码" name="verifyCode" hidden={isConfirm}>
+        <Form.Item
+          label={t("placeholder.verifyCode")}
+          name="verifyCode"
+          hidden={isConfirm}
+        >
           <Space.Compact className="w-full">
-            <Input allowClear placeholder="请输入您的验证码" className="w-full" />
+            <Input
+              allowClear
+              placeholder={t("toast.inputVerifyCode")}
+              className="w-full"
+            />
             <Button type="primary" onClick={sendSmsHandle} loading={countdown > 0}>
-              {countdown > 0 ? `${countdown}秒` : "发送验证码"}
+              {countdown > 0
+                ? t("date.second", { num: countdown })
+                : t("placeholder.sendVerifyCode")}
             </Button>
           </Space.Compact>
         </Form.Item>
 
-        <Form.Item
-          label="密码"
-          name="password"
-          help={
-            <span className=" text-xs text-gray-400">
-              包含6～20位数字、大小写字母、特殊字符组合
-            </span>
-          }
-          hidden={!isConfirm}
-        >
-          <Input.Password allowClear placeholder="请输入您的密码" />
-        </Form.Item>
+        {isConfirm && (
+          <Form.Item
+            label={t("placeholder.password")}
+            name="password"
+            help={
+              <span className=" text-xs text-gray-400">{t("toast.passwordRules")}</span>
+            }
+            rules={[
+              {
+                required: true,
+                message: t("toast.inputPassword"),
+              },
+            ]}
+            hidden={!isConfirm}
+          >
+            <Input.Password allowClear placeholder={t("toast.inputPassword")} />
+          </Form.Item>
+        )}
 
-        <Form.Item
-          label="确认密码"
-          name="password2"
-          validateStatus={mathPassword ? "" : "error"}
-          help={mathPassword ? "" : "两次输入的密码不一致!"}
-          hidden={!isConfirm}
-        >
-          <Input.Password allowClear placeholder="请再次确认您的密码" />
-        </Form.Item>
+        {isConfirm && (
+          <Form.Item
+            label={t("placeholder.confirmPassword")}
+            name="password2"
+            rules={[
+              {
+                required: true,
+                message: "Please confirm your password",
+              },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("password") === value) {
+                    return Promise.resolve();
+                  }
+
+                  return Promise.reject(new Error(t("toast.passwordsDifferent")));
+                },
+              }),
+            ]}
+          >
+            <Input.Password allowClear placeholder={t("toast.reconfirmPassword")} />
+          </Form.Item>
+        )}
 
         <Form.Item className="mt-20">
           <Button type="primary" htmlType="submit" block>
-            {isConfirm ? "确认修改" : "下一步"}
+            {isConfirm ? t("confirm") : t("placeholder.nextStep")}
           </Button>
         </Form.Item>
       </Form>

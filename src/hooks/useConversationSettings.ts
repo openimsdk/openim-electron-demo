@@ -50,8 +50,8 @@ export function useConversationSettings() {
   const clearConversationMessages = useCallback(() => {
     if (!currentConversation) return;
     modal.confirm({
-      title: "清空聊天记录",
-      content: "确认清空聊天记录吗？",
+      title: t("toast.clearChatHistory"),
+      content: t("toast.confirmClearChatHistory"),
       onOk: async () => {
         try {
           await IMSDK.clearConversationAndDeleteAllMsg(

@@ -38,7 +38,7 @@ const GroupCardModal: ForwardRefRenderFunction<
     manual: true,
   });
 
-  const createTimeStr = dayjs(groupData?.createTime ?? 0).format("YYYY年M月D日");
+  const createTimeStr = dayjs(groupData?.createTime ?? 0).format("YYYY/M/D");
   const inThisGroup = fetchState.groupMemberList.length > 0;
 
   const renderList = inThisGroup
@@ -68,7 +68,7 @@ const GroupCardModal: ForwardRefRenderFunction<
         reqMsg,
         joinSource: GroupJoinSource.Search,
       });
-      feedbackToast({ msg: "发送入群请求成功！" });
+      feedbackToast({ msg: t("toast.sendJoinGroupRequestSuccess") });
       setIsSendRequest(false);
     } catch (error) {
       feedbackToast({ error, msg: t("toast.sendApplicationFailed") });
@@ -99,7 +99,7 @@ const GroupCardModal: ForwardRefRenderFunction<
             onClick={() => setIsSendRequest(false)}
           >
             <LeftOutlined rev={undefined} />
-            <div className="ml-1 font-medium">群聊验证</div>
+            <div className="ml-1 font-medium">{t("placeholder.groupVerification")}</div>
           </div>
         )}
         <div className="flex p-5.5">
@@ -119,14 +119,16 @@ const GroupCardModal: ForwardRefRenderFunction<
         </div>
         {isSendRequest ? (
           <div className="mx-5.5">
-            <div className="text-xs text-[var(--sub-text)]">验证信息</div>
+            <div className="text-xs text-[var(--sub-text)]">
+              {t("application.information")}
+            </div>
             <div className="mt-3">
               <Input.TextArea
                 showCount
                 value={reqMsg}
                 maxLength={50}
                 bordered={false}
-                placeholder="请输入"
+                placeholder={t("placeholder.pleaseEnter")}
                 style={{ padding: "8px 6px" }}
                 autoSize={{ minRows: 4, maxRows: 4 }}
                 onChange={(e) => setReqMsg(e.target.value)}
@@ -140,13 +142,15 @@ const GroupCardModal: ForwardRefRenderFunction<
                 loading={loading}
                 onClick={sendApplication}
               >
-                {"发送"}
+                {t("placeholder.send")}
               </Button>
             </div>
           </div>
         ) : (
           <div className="bg-[#F2F8FF] p-5.5">
-            <div className="mb-3">{`群成员：${groupData?.memberCount}人`}</div>
+            <div className="mb-3">{`${t("placeholder.groupMember")}：${
+              groupData?.memberCount
+            }`}</div>
             <div className="flex items-center">
               {renderList.map((item) => (
                 <OIMAvatar
@@ -165,7 +169,7 @@ const GroupCardModal: ForwardRefRenderFunction<
                 loading={loading}
                 onClick={joinOrSendMessage}
               >
-                {inThisGroup ? "发送消息" : "添加群聊"}
+                {inThisGroup ? t("placeholder.sendMessage") : t("placeholder.addGroup")}
               </Button>
             </div>
           </div>

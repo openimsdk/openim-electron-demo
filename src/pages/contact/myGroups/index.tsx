@@ -1,4 +1,5 @@
 import { Select } from "antd";
+import { t } from "i18next";
 import { useCallback, useState } from "react";
 import { Virtuoso } from "react-virtuoso";
 
@@ -39,15 +40,21 @@ export const MyGroups = () => {
   return (
     <div className="flex h-full w-full flex-col bg-white">
       <div className="m-5.5 flex flex-row justify-between">
-        <p className="text-base font-extrabold">我的群组</p>
+        <p className="text-base font-extrabold">{t("placeholder.myGroup")}</p>
         <Select
           defaultValue={String(selectGroup)}
           popupClassName="p-0"
           style={{ width: 200 }}
           onChange={handleChange}
           options={[
-            { value: String(GroupTypeEnum.CreatedGroup), label: "我创建的" },
-            { value: String(GroupTypeEnum.JoinedGroup), label: "我加入的" },
+            {
+              value: String(GroupTypeEnum.CreatedGroup),
+              label: t("placeholder.myCreated"),
+            },
+            {
+              value: String(GroupTypeEnum.JoinedGroup),
+              label: t("placeholder.myJoined"),
+            },
           ]}
         />
       </div>

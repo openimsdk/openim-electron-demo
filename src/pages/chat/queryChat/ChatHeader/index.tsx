@@ -1,5 +1,6 @@
 import { Layout, Tooltip } from "antd";
 import clsx from "clsx";
+import { t } from "i18next";
 import { useEffect, useRef, useState } from "react";
 
 import group_member from "@/assets/images/chatHeader/group_member.png";
@@ -21,17 +22,17 @@ import styles from "./chat-header.module.scss";
 
 const menuList = [
   {
-    title: "创建群聊",
+    title: t("placeholder.createGroup"),
     icon: launch_group,
     idx: 3,
   },
   {
-    title: "邀请",
+    title: t("placeholder.invitation"),
     icon: launch_group,
     idx: 4,
   },
   {
-    title: "设置",
+    title: t("placeholder.setting"),
     icon: settings,
     idx: 5,
   },
@@ -161,7 +162,9 @@ const OnlineOrTypingStatus = ({ userID }: { userID: string }) => {
           },
         )}
       />
-      <span className="text-xs text-[var(--sub-text)]">{online ? "在线" : "离线"}</span>
+      <span className="text-xs text-[var(--sub-text)]">
+        {online ? t("placeholder.online") : t("placeholder.offLine")}
+      </span>
     </div>
   );
 };

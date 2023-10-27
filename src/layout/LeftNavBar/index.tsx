@@ -1,6 +1,7 @@
 import { RightOutlined } from "@ant-design/icons";
 import { Badge, Divider, Layout, Popover, Upload } from "antd";
 import clsx from "clsx";
+import i18n, { t } from "i18next";
 import { UploadRequestOption } from "rc-upload/lib/interface";
 import React, { memo, useRef, useState } from "react";
 import {
@@ -34,16 +35,21 @@ const NavList = [
   {
     icon: message_icon,
     icon_active: message_icon_active,
-    title: "消息",
+    title: t("placeholder.chat"),
     path: "/chat",
   },
   {
     icon: contact_icon,
     icon_active: contact_icon_active,
-    title: "通讯录",
+    title: t("placeholder.contact"),
     path: "/contact",
   },
 ];
+
+i18n.on("languageChanged", () => {
+  NavList[0].title = t("placeholder.chat");
+  NavList[1].title = t("placeholder.contact");
+});
 
 type NavItemType = (typeof NavList)[0];
 
@@ -70,7 +76,7 @@ const NavItem = ({ nav: { icon, icon_active, title, path } }: { nav: NavItemType
 
   const tryNavigate = () => {
     if (isActive) return;
-    // TODO 从其他页面跳转回到chat页面时，保持回话（如果存在）
+    // TODO Keep answering when jumping back to chat from another page (if there is one)
     navigator.push(path);
   };
 
@@ -102,22 +108,22 @@ const NavItem = ({ nav: { icon, icon_active, title, path } }: { nav: NavItemType
 
 const profileMenuList = [
   {
-    title: "我的信息",
+    title: t("placeholder.myInfo"),
     gap: true,
     idx: 0,
   },
   {
-    title: "账号设置",
+    title: t("placeholder.accountSetting"),
     gap: true,
     idx: 1,
   },
   {
-    title: "关于我们",
+    title: t("placeholder.about"),
     gap: false,
     idx: 2,
   },
   {
-    title: "退出登录",
+    title: t("placeholder.logOut"),
     gap: false,
     idx: 3,
   },
@@ -153,8 +159,8 @@ const LeftNavBar = memo(() => {
 
   const tryLogout = () => {
     modal.confirm({
-      title: "退出登录",
-      content: "确认退出登录当前账号吗？",
+      title: t("placeholder.logOut"),
+      content: t("toast.confirmlogOut"),
       onOk: async () => {
         try {
           await userLogout();
@@ -181,7 +187,7 @@ const LeftNavBar = memo(() => {
       await updateBusinessUserInfo(newInfo);
       updateSelfInfo(newInfo);
     } catch (error) {
-      feedbackToast({ error: "修改头像失败！" });
+      feedbackToast({ error: t("toast.updateAvatarFailed") });
     }
   };
 

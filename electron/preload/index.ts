@@ -32,6 +32,10 @@ const ipcInvoke = (channel: string, ...arg: any) => {
   return ipcRenderer.invoke(channel, ...arg);
 };
 
+const ipcSendSync = (channel: string, ...arg: any) => {
+  return ipcRenderer.sendSync(channel, ...arg);
+};
+
 const Api: IElectronAPI = {
   getVersion: () => process.version,
   getPlatform,
@@ -40,6 +44,7 @@ const Api: IElectronAPI = {
   unsubscribe,
   unsubscribeAll,
   ipcInvoke,
+  ipcSendSync,
 };
 
 contextBridge.exposeInMainWorld("electronAPI", Api);

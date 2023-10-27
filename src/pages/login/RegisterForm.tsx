@@ -1,5 +1,6 @@
 import { LeftOutlined } from "@ant-design/icons";
 import { App, Button, Form, Input, InputRef, Select, Space } from "antd";
+import { t } from "i18next";
 import md5 from "md5";
 import React, { useEffect, useState } from "react";
 
@@ -29,7 +30,7 @@ const RegisterForm = ({ setFormType }: RegisterFormProps) => {
   const { mutate: verifyCode } = useVerifyCode();
   const { mutate: register } = useRegister();
 
-  // 0手机号 1验证码 2填信息
+  // 0login 1resetPassword 2register
   const [registerForm, setRegisterForm] = useState(0);
 
   const [code, setCode] = useState(["", "", "", "", "", ""]);
@@ -137,7 +138,7 @@ const RegisterForm = ({ setFormType }: RegisterFormProps) => {
         },
         {
           onSuccess() {
-            message.success("注册成功");
+            message.success(t("toast.registerSuccess"));
             setFormType(0);
           },
         },
@@ -170,19 +171,19 @@ const RegisterForm = ({ setFormType }: RegisterFormProps) => {
     <div className="flex flex-col justify-between">
       <div className="cursor-pointer text-sm text-gray-400" onClick={back}>
         <LeftOutlined rev={undefined} />
-        <span className="ml-1">返回</span>
+        <span className="ml-1">{t("placeholder.getBack")}</span>
       </div>
       <div className="mt-4 text-2xl font-medium">
-        {registerForm === 0 && <span>新用户注册</span>}
-        {registerForm === 1 && <span>验证手机号</span>}
-        {registerForm === 2 && <span>设置信息</span>}
+        {registerForm === 0 && <span>{t("placeholder.register")}</span>}
+        {registerForm === 1 && <span>{t("placeholder.verifyPhoneNumber")}</span>}
+        {registerForm === 2 && <span>{t("placeholder.setInfo")}</span>}
       </div>
       <div className="mt-4 tracking-wider text-gray-400" hidden={registerForm !== 1}>
-        <span>请输入发送至</span>
+        <span>{t("placeholder.pleaseEnterSendTo")}</span>
         <span className=" text-blue-600">
           {form.getFieldValue("areaCode")} {form.getFieldValue("phoneNumber")}
         </span>
-        <span>的 6 位验证码，有效期 10 分钟（默认验证码：666666）</span>
+        <span>{t("placeholder.verifyValidity")}</span>
       </div>
       <Form
         form={form}
@@ -192,24 +193,30 @@ const RegisterForm = ({ setFormType }: RegisterFormProps) => {
         className="mt-4"
         initialValues={{ areaCode: "+86" }}
       >
-        <Form.Item label="手机号" hidden={registerForm !== 0}>
+        <Form.Item label={t("placeholder.phoneNumber")} hidden={registerForm !== 0}>
           <Space.Compact className="w-full">
             <Form.Item name="areaCode" noStyle>
               <Select options={areaCode} className="!w-28" />
             </Form.Item>
             <Form.Item name="phoneNumber" noStyle>
-              <Input allowClear placeholder="请输入您的手机号" />
+              <Input allowClear placeholder={t("toast.inputCorrectPhoneNumber")} />
             </Form.Item>
           </Space.Compact>
         </Form.Item>
 
         <Form.Item
           className=" mb-24"
-          label="邀请码"
+          label={t("placeholder.invitationCode")}
           name="invitationCode"
           hidden={registerForm !== 0}
         >
-          <Input allowClear placeholder="请输入邀请码（选填）" className="w-full" />
+          <Input
+            allowClear
+            placeholder={`${t("toast.inputInvitationCode")}${t(
+              "placeholder.optional",
+            )}`}
+            className="w-full"
+          />
         </Form.Item>
 
         <Form.Item label="" hidden={registerForm !== 1} className="mb-14 mt-8">
@@ -231,50 +238,52 @@ const RegisterForm = ({ setFormType }: RegisterFormProps) => {
             {countdown > 0 ? (
               <>
                 <span className=" text-blue-500">{countdown}s </span>
-                <span>后重新获取验证码</span>
+                <span>{t("placeholder.regain") + t("placeholder.invitationCode")}</span>
               </>
             ) : (
               <>
                 <span onClick={sendSmsHandle} className="cursor-pointer text-blue-500">
-                  重新获取
+                  {t("placeholder.regain")}
                 </span>
-                <span>验证码</span>
+                <span>{t("placeholder.invitationCode")}</span>
               </>
             )}
           </div>
         </Form.Item>
 
-        <Form.Item label="昵称" name="nickname" hidden={registerForm !== 2}>
-          <Input allowClear placeholder="请输入您的昵称" />
+        <Form.Item
+          label={t("placeholder.nickName")}
+          name="nickname"
+          hidden={registerForm !== 2}
+        >
+          <Input allowClear placeholder={t("toast.inputNickName")} />
         </Form.Item>
 
         <Form.Item
-          label="密码"
+          label={t("placeholder.password")}
           name="password"
           help={
-            <span className=" text-xs text-gray-400">
-              包含6～20位数字、大小写字母、特殊字符组合
-            </span>
+            <span className=" text-xs text-gray-400">{t("toast.passwordRules")}</span>
           }
           hidden={registerForm !== 2}
         >
-          <Input.Password allowClear placeholder="请输入您的密码" />
+          <Input.Password allowClear placeholder={t("toast.inputPassword")} />
         </Form.Item>
 
         <Form.Item
-          label="确认密码"
+          label={t("placeholder.confirmPassword")}
           name="password2"
           validateStatus={mathPassword ? "" : "error"}
-          help={mathPassword ? "" : "两次输入的密码不一致!"}
+          help={mathPassword ? "" : t("toast.passwordsDifferent")}
           hidden={registerForm !== 2}
           className="mb-8"
         >
-          <Input.Password allowClear placeholder="请再次确认您的密码" />
+          <Input.Password allowClear placeholder={t("toast.passwordsDifferent")} />
         </Form.Item>
 
         <Form.Item>
           <Button type="primary" htmlType="submit" block>
-            {registerForm === 2 ? "完成" : "下一步"}
+            {registerForm === 2 ? t("confirm") : t("placeholder.nextStep")}
           </Button>
         </Form.Item>
       </Form>

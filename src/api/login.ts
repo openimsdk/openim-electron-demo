@@ -57,7 +57,7 @@ export const useVerifyCode = () => {
   );
 };
 
-// 注册
+// register
 export const useRegister = () => {
   return useMutation(
     (params: API.Login.DemoRegisterType) =>

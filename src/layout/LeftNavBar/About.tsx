@@ -1,5 +1,6 @@
 import { CloseOutlined, RightOutlined } from "@ant-design/icons";
 import { Divider, Form, Modal } from "antd";
+import { t } from "i18next";
 import { forwardRef, ForwardRefRenderFunction, memo } from "react";
 
 import logo from "@/assets/images/profile/logo.png";
@@ -39,7 +40,7 @@ export const AboutContent = ({ closeOverlay }: { closeOverlay?: () => void }) =>
   return (
     <div className="bg-[var(--chat-bubble)]">
       <div className="app-drag flex items-center justify-between bg-[var(--gap-text)] p-5">
-        <span className="text-base font-medium">关于我们</span>
+        <span className="text-base font-medium">{t("placeholder.about")}</span>
         <CloseOutlined
           className="app-no-drag cursor-pointer text-[#8e9aaf]"
           rev={undefined}
@@ -54,7 +55,7 @@ export const AboutContent = ({ closeOverlay }: { closeOverlay?: () => void }) =>
       <Divider className="border-1 m-0 border-[var(--gap-text)]" />
 
       {/* <div className="flex cursor-pointer items-center justify-between px-6 py-4">
-        <div className="text-base">检查新版本</div>
+        <div className="text-base">{t("placeholder.checkNewVersion")}</div>
         <RightOutlined rev={undefined} />
       </div> */}
     </div>

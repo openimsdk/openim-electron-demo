@@ -1,5 +1,6 @@
 import { CloseOutlined } from "@ant-design/icons";
 import { Button, Empty, Modal } from "antd";
+import { t } from "i18next";
 import { forwardRef, ForwardRefRenderFunction, memo, useState } from "react";
 
 import OIMAvatar from "@/components/OIMAvatar";
@@ -59,7 +60,7 @@ const BlackItem = ({
         <div className="ml-3">{black.nickname}</div>
       </div>
       <Button type="primary" ghost loading={loading} onClick={tryRemove}>
-        移除
+        {t("placeholder.remove")}
       </Button>
     </div>
   );
@@ -79,7 +80,7 @@ export const BlackListContent = ({ closeOverlay }: { closeOverlay?: () => void }
   return (
     <div className="flex h-[468px] flex-col bg-[var(--chat-bubble)]">
       <div className="app-drag flex items-center justify-between p-5">
-        <span className="text-base font-medium">通讯录黑名单</span>
+        <span className="text-base font-medium">{t("placeholder.blackList")}</span>
         <CloseOutlined
           className="app-no-drag cursor-pointer text-[#8e9aaf]"
           rev={undefined}

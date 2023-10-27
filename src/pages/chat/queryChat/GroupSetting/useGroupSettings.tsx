@@ -31,12 +31,12 @@ export function useGroupSettings({ closeOverlay }: { closeOverlay: () => void })
     if (!currentGroupInfo) return;
 
     modal.confirm({
-      title: "解散群组",
+      title: t("placeholder.disbandGroup"),
       content: (
         <div className="flex items-baseline">
-          <div>确认解散该群组吗？</div>
+          <div>{t("toast.confirmDisbandGroup")}</div>
           <span className="text-xs text-[var(--sub-text)]">
-            解除后将移除所有群成员。
+            {t("placeholder.disbandGroupToast")}
           </span>
         </div>
       ),
@@ -55,12 +55,12 @@ export function useGroupSettings({ closeOverlay }: { closeOverlay: () => void })
     if (!currentGroupInfo) return;
 
     modal.confirm({
-      title: "退出群组",
+      title: t("placeholder.exitGroup"),
       content: (
         <div className="flex items-baseline">
-          <div>确认退出该群组吗？</div>
+          <div>{t("toast.confirmExitGroup")}</div>
           <span className="text-xs text-[var(--sub-text)]">
-            退出后你将不再接收该群组消息。
+            {t("placeholder.exitGroupToast")}
           </span>
         </div>
       ),

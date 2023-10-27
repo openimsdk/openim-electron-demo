@@ -1,5 +1,6 @@
 import { CloseOutlined } from "@ant-design/icons";
 import { Button, Divider, Form, FormInstance, Input, Modal } from "antd";
+import { t } from "i18next";
 import md5 from "md5";
 import { forwardRef, ForwardRefRenderFunction, memo } from "react";
 
@@ -68,7 +69,7 @@ export const ChangePasswordContent = ({
         onSuccess: () => {
           closeOverlay?.();
           feedbackToast({
-            msg: "修改成功，请重新登录！",
+            msg: t("toast.updatePasswordSuccess"),
             onClose: () => {
               useUserStore.getState().userLogout();
             },
@@ -81,7 +82,7 @@ export const ChangePasswordContent = ({
   return (
     <div className="flex flex-col overflow-hidden">
       <div className="app-drag flex items-center justify-between p-5">
-        <span className="text-base font-medium">修改密码</span>
+        <span className="text-base font-medium">{t("placeholder.changePassword")}</span>
         <CloseOutlined
           className="app-no-drag cursor-pointer !text-[#8e9aaf]"
           rev={undefined}
@@ -99,36 +100,36 @@ export const ChangePasswordContent = ({
         autoComplete="off"
       >
         <Form.Item
-          label="原密码:"
+          label={t("placeholder.oldPassword")}
           name="oldPassword"
           className="mb-2 px-5"
-          rules={[{ required: true, message: "请输入原密码！" }]}
+          rules={[{ required: true, message: t("toast.inputOldPassword") }]}
         >
           <Input.Password />
         </Form.Item>
         <Form.Item
-          label="新密码:"
+          label={t("placeholder.newPassword")}
           name="newPassword"
           className="mb-2 px-5"
           rules={[
             {
               required: true,
               pattern: /^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]{6,20})$/,
-              message: "请输入6-20位字母+数字组合！",
+              message: t("toast.passwordRules"),
             },
           ]}
         >
           <Input.Password />
         </Form.Item>
         <Form.Item
-          label="确认密码:"
+          label={t("placeholder.confirmPassword")}
           name="confirmPassword"
           className="mb-2 px-5"
           rules={[
             {
               required: true,
               pattern: /^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]{6,20})$/,
-              message: "请输入6-20位字母+数字组合！",
+              message: t("toast.passwordRules"),
             },
           ]}
         >
@@ -143,7 +144,7 @@ export const ChangePasswordContent = ({
               className="mr-3.5 border-0 bg-[var(--chat-bubble)] px-6"
               onClick={closeOverlay}
             >
-              取消
+              {t("cancel")}
             </Button>
             <Button
               className="px-6"
@@ -151,7 +152,7 @@ export const ChangePasswordContent = ({
               htmlType="submit"
               loading={passwordUpdating}
             >
-              确定
+              {t("confirm")}
             </Button>
           </div>
         </Form.Item>

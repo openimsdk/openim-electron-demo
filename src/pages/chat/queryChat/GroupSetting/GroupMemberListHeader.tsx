@@ -21,7 +21,7 @@ const GroupMemberListHeader = ({ back2Settings }: { back2Settings: () => void })
           rev={undefined}
           onClick={back2Settings}
         />
-        <div>群成员列表</div>
+        <div>{t("placeholder.memberList")}</div>
       </div>
       <div className="mr-4 flex items-center">
         <img

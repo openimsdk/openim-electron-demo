@@ -286,7 +286,7 @@ export const systemNotificationFormat = (msg: MessageItem) => {
       const customNoti = JSON.parse(msg.notificationElem.detail);
       return customNoti.text;
     default:
-      return "[暂未支持的消息类型]";
+      return "";
   }
 };
 
@@ -316,7 +316,7 @@ export const formatMessageTime = (timestemp: number, keepSameYear = false): stri
   const keepYear = keepSameYear || !isThisYear(timestemp);
 
   if (!isRecent && !keepYear) {
-    return dayjs(timestemp).format("M月D日 HH:mm");
+    return dayjs(timestemp).format("M/D HH:mm");
   }
 
   return dayjs(timestemp).calendar();
@@ -483,7 +483,7 @@ export const formatMessageByType = (message: MessageItem): string => {
       const customNoti = JSON.parse(message.notificationElem.detail);
       return customNoti.text;
     default:
-      return "[暂未支持的消息类型]";
+      return "";
   }
 };
 

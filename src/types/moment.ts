@@ -18,7 +18,7 @@ export type WorkMoments = {
 };
 
 export type Content = {
-  // 0图文 1视频
+  // 0text 1video
   type: 0 | 1;
   text: string;
   metas: {

@@ -1,6 +1,7 @@
 import { Checkbox, Popover } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import clsx from "clsx";
+import { t } from "i18next";
 import { FC, useCallback, useRef, useState } from "react";
 
 import OIMAvatar from "@/components/OIMAvatar";

@@ -1,5 +1,6 @@
 import { useMount } from "ahooks";
 import { Layout, Spin } from "antd";
+import { t } from "i18next";
 import { Outlet, useMatches, useNavigate } from "react-router-dom";
 
 import LeftNavBar from "./LeftNavBar";
@@ -21,7 +22,7 @@ export const MainContentLayout = () => {
     }
   });
 
-  const loadingTip = connectState.isLogining ? "登录中..." : "同步中...";
+  const loadingTip = connectState.isLogining ? t("toast.loading") : t("toast.syncing");
 
   return (
     <Spin

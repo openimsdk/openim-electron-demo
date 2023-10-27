@@ -3,6 +3,7 @@ import { useLatest } from "ahooks";
 import { Breadcrumb, Input } from "antd";
 import { BreadcrumbItemType } from "antd/es/breadcrumb/Breadcrumb";
 import clsx from "clsx";
+import i18n, { t } from "i18next";
 import {
   forwardRef,
   ForwardRefRenderFunction,
@@ -31,20 +32,26 @@ import MenuItem from "./MenuItem";
 const menuList = [
   {
     idx: 0,
-    title: "最近聊天",
+    title: t("placeholder.latestChat"),
     icon: recently,
   },
   {
     idx: 1,
-    title: "我的好友",
+    title: t("placeholder.myFriend"),
     icon: friend,
   },
   {
     idx: 2,
-    title: "我的群组",
+    title: t("placeholder.myGroup"),
     icon: group,
   },
 ];
+
+i18n.on("languageChanged", () => {
+  menuList[0].title = t("placeholder.latestChat");
+  menuList[1].title = t("placeholder.myFriend");
+  menuList[2].title = t("placeholder.myGroup");
+});
 
 export type ChooseMenuItem = (typeof menuList)[0];
 
@@ -172,8 +179,8 @@ const ChooseBox: ForwardRefRenderFunction<ChooseBoxHandle, IChooseBoxProps> = (
       </div>
       <div className="flex flex-1 flex-col overflow-hidden">
         <div className="mx-5 py-5.5">
-          已选择
-          <span className="text-[var(--primary)]">{` ${checkedList.length} `}</span>项
+          {t("placeholder.selected")}
+          <span className="text-[var(--primary)]">{` ${checkedList.length} `}</span>
         </div>
         <div className="mb-3 flex-1 overflow-y-auto">
           {checkedList.map((item) => (
@@ -249,15 +256,15 @@ const CommonLeft = memo(
       switch (idx) {
         case 0:
           setCheckList(await checkInGroup(conversationList));
-          pushItem.title = "最近聊天";
+          pushItem.title = t("placeholder.latestChat");
           break;
         case 1:
           setCheckList(await checkInGroup(friendList));
-          pushItem.title = "我的好友";
+          pushItem.title = t("placeholder.myFriend");
           break;
         case 2:
           setCheckList(await checkInGroup(groupList));
-          pushItem.title = "我的群组";
+          pushItem.title = t("placeholder.myFriend");
           break;
         default:
           break;
@@ -285,7 +292,7 @@ const CommonLeft = memo(
           separator=">"
           items={[
             {
-              title: "联系人",
+              title: t("placeholder.contacts"),
               href: "",
               className: "text-xs text-[var(--sub-text)]",
               onClick: breadcrumbClick,
