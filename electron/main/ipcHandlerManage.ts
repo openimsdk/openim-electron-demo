@@ -1,4 +1,4 @@
-import { ipcMain } from "electron";
+import { app, ipcMain } from "electron";
 import { closeWindow, minimize, updateMaximize } from "./windowManage";
 import { IpcRenderToMain } from "../constants";
 import { getStore } from "./storeManage";
