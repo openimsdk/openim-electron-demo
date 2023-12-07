@@ -1,5 +1,6 @@
 import { LeftOutlined } from "@ant-design/icons";
 import { memo } from "react";
+import { t } from "i18next";
 
 import invite_header from "@/assets/images/chatSetting/invite_header.png";
 import { useConversationStore } from "@/store";
