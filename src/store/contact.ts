@@ -27,7 +27,7 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
   unHandleGroupApplicationCount: 0,
   getFriendListByReq: async () => {
     try {
-      const { data } = await IMSDK.getFriendList<FullUserItem[]>();
+      const { data } = await IMSDK.getFriendList();
       set(() => ({ friendList: data.map((item) => item.friendInfo!) }));
     } catch (error) {
       feedbackToast({ error, msg: t("toast.getFriendListFailed") });
@@ -54,7 +54,7 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
   },
   getBlackListByReq: async () => {
     try {
-      const { data } = await IMSDK.getBlackList<BlackUserItem[]>();
+      const { data } = await IMSDK.getBlackList();
       set(() => ({ blackList: data }));
     } catch (error) {
       feedbackToast({ error, msg: t("toast.getBlackListFailed") });
@@ -78,7 +78,7 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
   },
   getGroupListByReq: async () => {
     try {
-      const { data } = await IMSDK.getJoinedGroupList<GroupItem[]>();
+      const { data } = await IMSDK.getJoinedGroupList();
       set(() => ({ groupList: data }));
     } catch (error) {
       feedbackToast({ error, msg: t("toast.getGroupListFailed") });
@@ -105,9 +105,7 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
   },
   getRecvFriendApplicationListByReq: async () => {
     try {
-      const { data } = await IMSDK.getFriendApplicationListAsRecipient<
-        FriendApplicationItem[]
-      >();
+      const { data } = await IMSDK.getFriendApplicationListAsRecipient();
       set(() => ({ recvFriendApplicationList: data }));
     } catch (error) {
       console.error(error);
@@ -138,9 +136,7 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
   },
   getSendFriendApplicationListByReq: async () => {
     try {
-      const { data } = await IMSDK.getFriendApplicationListAsApplicant<
-        FriendApplicationItem[]
-      >();
+      const { data } = await IMSDK.getFriendApplicationListAsApplicant();
       set(() => ({ sendFriendApplicationList: data }));
     } catch (error) {
       console.error(error);
@@ -158,9 +154,7 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
   },
   getRecvGroupApplicationListByReq: async () => {
     try {
-      const { data } = await IMSDK.getGroupApplicationListAsRecipient<
-        GroupApplicationItem[]
-      >();
+      const { data } = await IMSDK.getGroupApplicationListAsRecipient();
       set(() => ({ recvGroupApplicationList: data }));
     } catch (error) {
       console.error(error);
@@ -187,9 +181,7 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
   },
   getSendGroupApplicationListByReq: async () => {
     try {
-      const { data } = await IMSDK.getGroupApplicationListAsApplicant<
-        GroupApplicationItem[]
-      >();
+      const { data } = await IMSDK.getGroupApplicationListAsApplicant();
       set(() => ({ sendGroupApplicationList: data }));
     } catch (error) {
       console.error(error);

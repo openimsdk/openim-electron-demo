@@ -20,7 +20,7 @@ export const useUserStore = create<UserStore>()((set) => ({
   },
   getSelfInfoByReq: async () => {
     try {
-      const { data } = await IMSDK.getSelfUserInfo<BusinessUserInfo>();
+      const { data } = await IMSDK.getSelfUserInfo();
       const {
         data: { users },
       } = await getBusinessUserInfo([data.userID]);

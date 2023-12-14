@@ -11,6 +11,7 @@ export var AllowType;
 })(AllowType || (AllowType = {}));
 export var GroupType;
 (function (GroupType) {
+    GroupType[GroupType["Group"] = 2] = "Group";
     GroupType[GroupType["WorkingGroup"] = 2] = "WorkingGroup";
 })(GroupType || (GroupType = {}));
 export var GroupJoinSource;
@@ -81,7 +82,6 @@ export var MessageType;
     MessageType[MessageType["FriendAdded"] = 1201] = "FriendAdded";
     MessageType[MessageType["OANotification"] = 1400] = "OANotification";
     MessageType[MessageType["GroupCreated"] = 1501] = "GroupCreated";
-    MessageType[MessageType["GroupInfoUpdated"] = 1502] = "GroupInfoUpdated";
     MessageType[MessageType["MemberQuit"] = 1504] = "MemberQuit";
     MessageType[MessageType["GroupOwnerTransferred"] = 1507] = "GroupOwnerTransferred";
     MessageType[MessageType["MemberKicked"] = 1508] = "MemberKicked";
@@ -92,21 +92,16 @@ export var MessageType;
     MessageType[MessageType["GroupMemberCancelMuted"] = 1513] = "GroupMemberCancelMuted";
     MessageType[MessageType["GroupMuted"] = 1514] = "GroupMuted";
     MessageType[MessageType["GroupCancelMuted"] = 1515] = "GroupCancelMuted";
-    MessageType[MessageType["GroupMemberInfoUpdated"] = 1516] = "GroupMemberInfoUpdated";
-    MessageType[MessageType["GroupMemberToAdmin"] = 1517] = "GroupMemberToAdmin";
-    MessageType[MessageType["GroupAdminToNomal"] = 1518] = "GroupAdminToNomal";
     MessageType[MessageType["GroupAnnouncementUpdated"] = 1519] = "GroupAnnouncementUpdated";
     MessageType[MessageType["GroupNameUpdated"] = 1520] = "GroupNameUpdated";
     MessageType[MessageType["BurnMessageChange"] = 1701] = "BurnMessageChange";
     // notification
     MessageType[MessageType["RevokeMessage"] = 2101] = "RevokeMessage";
-    MessageType[MessageType["HasReadReceiptMessage"] = 2150] = "HasReadReceiptMessage";
-    MessageType[MessageType["GroupHasReadReceipt"] = 2155] = "GroupHasReadReceipt";
 })(MessageType || (MessageType = {}));
 export var SessionType;
 (function (SessionType) {
     SessionType[SessionType["Single"] = 1] = "Single";
-    SessionType[SessionType["Group"] = 2] = "Group";
+    SessionType[SessionType["Group"] = 3] = "Group";
     SessionType[SessionType["WorkingGroup"] = 3] = "WorkingGroup";
     SessionType[SessionType["Notification"] = 4] = "Notification";
 })(SessionType || (SessionType = {}));
@@ -150,3 +145,8 @@ export var OnlineState;
     OnlineState[OnlineState["Online"] = 1] = "Online";
     OnlineState[OnlineState["Offline"] = 0] = "Offline";
 })(OnlineState || (OnlineState = {}));
+export var GroupMessageReaderFilter;
+(function (GroupMessageReaderFilter) {
+    GroupMessageReaderFilter[GroupMessageReaderFilter["Readed"] = 0] = "Readed";
+    GroupMessageReaderFilter[GroupMessageReaderFilter["UnRead"] = 1] = "UnRead";
+})(GroupMessageReaderFilter || (GroupMessageReaderFilter = {}));

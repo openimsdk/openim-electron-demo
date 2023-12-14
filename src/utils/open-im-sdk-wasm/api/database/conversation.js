@@ -171,6 +171,9 @@ export async function getConversationByUserID(userID) {
     try {
         const db = await getInstance();
         const execResult = databaseGetConversationByUserID(db, userID);
+        if (execResult.length === 0) {
+            return formatResponse('', DatabaseErrorCode.ErrorNoRecord, `no conversation with userID ${userID}`);
+        }
         return formatResponse(converSqlExecResult(execResult[0], 'CamelCase', [
             'isPinned',
             'isPrivateChat',

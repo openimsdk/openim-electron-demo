@@ -31,7 +31,7 @@ export function useConversationToggle() {
     if (!conversation) {
       try {
         conversation = (
-          await IMSDK.getOneConversation<ConversationItem>({
+          await IMSDK.getOneConversation({
             sourceID,
             sessionType,
           })

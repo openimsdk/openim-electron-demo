@@ -1,5 +1,5 @@
 import { DatabaseErrorCode } from '../../constant';
-import { getMessage as databaseGetMessage, getAlreadyExistSeqList as databaseGetAlreadyExistSeqList, getMessageBySeq as databaseGetMessageBySeq, getMessagesByClientMsgIDs as databaseGetMessagesByClientMsgIDs, getMessagesBySeqs as databaseGetMessagesBySeqs, getMessageListNoTime as databaseGetMessageListNoTime, getConversationNormalMsgSeq as databaseGetConversationNormalMsgSeq, getConversationPeerNormalMsgSeq as databaseGetConversationPeerNormalMsgSeq, getMultipleMessage as databaseGetMultipleMessage, getSendingMessageList as databaseGetSendingMessageList, updateMessageTimeAndStatus as databaseUpdateMessageTimeAndStatus, updateMessage as databaseUpdateMessage, updateMessageBySeq as databaseUpdateMessageBySeq, updateColumnsMessage as databaseUpdateColumnsMessage, deleteConversationMsgs as databaseDeleteConversationMsgs, markConversationAllMessageAsRead as databaseMarkConversationAllMessageAsRead, searchAllMessageByContentType as databaseSearchAllMessageByContentType, insertMessage as databaseInsertMessage, batchInsertMessageList as databaseBatchInsertMessageList, getMessageList as databaseGetMesageList, messageIfExists as databaseMessageIfExists, isExistsInErrChatLogBySeq as databaseIsExistsInErrChatLogBySeq, searchMessageByKeyword as databaseSearchMessageByKeyword, searchMessageByContentType as databaseSearchMessageByContentType, searchMessageByContentTypeAndKeyword as databaseSearchMessageByContentTypeAndKeyword, updateMsgSenderFaceURLAndSenderNickname as databaseUpdateMsgSenderFaceURLAndSenderNickname, deleteConversationAllMessages as databaseDeleteConversationAllMessages, markDeleteConversationAllMessages as databaseMarkDeleteConversationAllMessages, getUnreadMessage as databaseGetUnreadMessage, markConversationMessageAsReadBySeqs as databaseMarkConversationMessageAsReadBySeqs, markConversationMessageAsRead as databaseMarkConversationMessageAsRead, } from '../../sqls';
+import { getMessage as databaseGetMessage, getAlreadyExistSeqList as databaseGetAlreadyExistSeqList, getMessageBySeq as databaseGetMessageBySeq, getMessagesByClientMsgIDs as databaseGetMessagesByClientMsgIDs, getMessagesBySeqs as databaseGetMessagesBySeqs, getMessageListNoTime as databaseGetMessageListNoTime, getConversationNormalMsgSeq as databaseGetConversationNormalMsgSeq, getConversationPeerNormalMsgSeq as databaseGetConversationPeerNormalMsgSeq, getMultipleMessage as databaseGetMultipleMessage, getSendingMessageList as databaseGetSendingMessageList, updateMessageTimeAndStatus as databaseUpdateMessageTimeAndStatus, updateMessage as databaseUpdateMessage, updateMessageBySeq as databaseUpdateMessageBySeq, updateColumnsMessage as databaseUpdateColumnsMessage, deleteConversationMsgs as databaseDeleteConversationMsgs, markConversationAllMessageAsRead as databaseMarkConversationAllMessageAsRead, searchAllMessageByContentType as databaseSearchAllMessageByContentType, insertMessage as databaseInsertMessage, batchInsertMessageList as databaseBatchInsertMessageList, getMessageList as databaseGetMesageList, messageIfExists as databaseMessageIfExists, searchMessageByKeyword as databaseSearchMessageByKeyword, searchMessageByContentType as databaseSearchMessageByContentType, searchMessageByContentTypeAndKeyword as databaseSearchMessageByContentTypeAndKeyword, updateMsgSenderFaceURLAndSenderNickname as databaseUpdateMsgSenderFaceURLAndSenderNickname, deleteConversationAllMessages as databaseDeleteConversationAllMessages, markDeleteConversationAllMessages as databaseMarkDeleteConversationAllMessages, getUnreadMessage as databaseGetUnreadMessage, markConversationMessageAsReadBySeqs as databaseMarkConversationMessageAsReadBySeqs, markConversationMessageAsRead as databaseMarkConversationMessageAsRead, } from '../../sqls';
 import { converSqlExecResult, convertObjectField, convertToSnakeCaseObject, formatResponse, } from '../../utils';
 import { getInstance } from './instance';
 export async function getMessage(conversationID, clientMsgID) {
@@ -28,7 +28,7 @@ export async function getAlreadyExistSeqList(conversationID, lostSeqListStr) {
             'isRead',
             'isReact',
             'isExternalExtensions',
-        ])[0] ?? []);
+        ]).map(item => item.seq) ?? []);
     }
     catch (e) {
         console.error(e);
@@ -288,17 +288,6 @@ export async function messageIfExists(conversationID, clientMsgID) {
     try {
         const db = await getInstance();
         const execResult = databaseMessageIfExists(db, conversationID, clientMsgID);
-        return formatResponse(execResult.length !== 0);
-    }
-    catch (e) {
-        console.error(e);
-        return formatResponse(undefined, DatabaseErrorCode.ErrorInit, JSON.stringify(e));
-    }
-}
-export async function isExistsInErrChatLogBySeq(seq) {
-    try {
-        const db = await getInstance();
-        const execResult = databaseIsExistsInErrChatLogBySeq(db, seq);
         return formatResponse(execResult.length !== 0);
     }
     catch (e) {

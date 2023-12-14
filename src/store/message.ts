@@ -36,15 +36,14 @@ export const useMessageStore = create<MessageStore>()((set, get) => ({
     if (!conversationID) return;
     try {
       const prevList = [...get().historyMessageList];
-      const { data, operationID } =
-        await IMSDK.getAdvancedHistoryMessageList<IAdvancedMessageResponse>({
-          userID: "",
-          groupID: "",
-          count: GET_HISTORY_MESSAGE_COUNT,
-          lastMinSeq: loadMore ? get().lastMinSeq : 0,
-          startClientMsgID: loadMore ? prevList[0]?.clientMsgID : "",
-          conversationID,
-        });
+      const { data } = await IMSDK.getAdvancedHistoryMessageList({
+        userID: "",
+        groupID: "",
+        count: GET_HISTORY_MESSAGE_COUNT,
+        lastMinSeq: loadMore ? get().lastMinSeq : 0,
+        startClientMsgID: loadMore ? prevList[0]?.clientMsgID : "",
+        conversationID,
+      });
       const nextList = [...data.messageList, ...(loadMore ? prevList : [])];
 
       const imageUrls = filterPreviewImage(data.messageList);

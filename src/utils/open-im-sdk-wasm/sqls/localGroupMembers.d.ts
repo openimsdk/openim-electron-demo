@@ -10,7 +10,7 @@ export declare function getGroupMemberCount(db: Database, groupID: string): Quer
 export declare function getGroupSomeMemberInfo(db: Database, groupID: string, userIDList: string[]): QueryExecResult[];
 export declare function getGroupAdminID(db: Database, groupID: string): QueryExecResult[];
 export declare function getGroupMemberListByGroupID(db: Database, groupID: string): QueryExecResult[];
-export declare function getGroupMemberListSplit(db: Database, groupID: string, filter: number, offset: number, count: number): QueryExecResult[];
+export declare function getGroupMemberListSplit(db: Database, groupID: string, filter: number, offset: number, count: number, loginUserID: string): QueryExecResult[];
 export declare function getGroupMemberOwnerAndAdmin(db: Database, groupID: string): QueryExecResult[];
 export declare function getGroupMemberOwner(db: Database, groupID: string): QueryExecResult[];
 export declare function getGroupMemberListSplitByJoinTimeFilter(db: Database, groupID: string, offset: number, count: number, joinTimeBegin: number | undefined, joinTimeEnd: number | undefined, userIDList: string[]): QueryExecResult[];

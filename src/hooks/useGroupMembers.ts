@@ -109,7 +109,7 @@ export default function useGroupMembers(props?: UseGroupMembersProps) {
         loading: true,
       }));
       try {
-        const { data } = await IMSDK.searchGroupMembers<GroupMemberItem[]>({
+        const { data } = await IMSDK.searchGroupMembers({
           groupID: groupID ?? currentConversationGroupID ?? "",
           offset: isReach ? latestFetchState.current.searchOffset : 0,
           count: 20,
@@ -156,7 +156,7 @@ export default function useGroupMembers(props?: UseGroupMembersProps) {
         loading: true,
       }));
       try {
-        const { data } = await IMSDK.getGroupMemberList<GroupMemberItem[]>({
+        const { data } = await IMSDK.getGroupMemberList({
           groupID: sourceID,
           offset: refresh ? 0 : latestFetchState.current.offset,
           count: 20,

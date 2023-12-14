@@ -1,11 +1,11 @@
 import { RPC, RPCMessageEvent } from 'rpc-shooter';
 import { init, close, 
 // message
-getMessage, getMultipleMessage, getSendingMessageList, updateMessageTimeAndStatus, updateMessage, updateMessageBySeq, updateColumnsMessage, insertMessage, batchInsertMessageList, getMessageList, getMessageListNoTime, messageIfExists, isExistsInErrChatLogBySeq, searchMessageByKeyword, searchMessageByContentType, searchMessageByContentTypeAndKeyword, updateMsgSenderFaceURLAndSenderNickname, 
+getMessage, getMultipleMessage, getSendingMessageList, updateMessageTimeAndStatus, updateMessage, updateMessageBySeq, updateColumnsMessage, insertMessage, batchInsertMessageList, getMessageList, getMessageListNoTime, messageIfExists, searchMessageByKeyword, searchMessageByContentType, searchMessageByContentTypeAndKeyword, updateMsgSenderFaceURLAndSenderNickname, insertSendingMessage, deleteSendingMessage, getAllSendingMessages, 
 // conversation
 getAllConversationList, getAllConversationListToSync, getHiddenConversationList, getConversation, getMultipleConversation, updateColumnsConversation, decrConversationUnreadCount, batchInsertConversationList, insertConversation, getTotalUnreadMsgCount, batchUpdateConversationList, clearAllConversation, clearConversation, conversationIfExists, deleteConversation, getConversationByUserID, getConversationListSplit, incrConversationUnreadCount, removeConversationDraft, resetAllConversation, resetConversation, setConversationDraft, setMultipleConversationRecvMsgOpt, unPinConversation, 
 // users
-getLoginUser, insertLoginUser, updateLoginUser, 
+getLoginUser, insertLoginUser, updateLoginUser, getStrangerInfo, setStrangerInfo, 
 // super group
 getJoinedSuperGroupList, getJoinedSuperGroupIDList, getSuperGroupInfoByGroupID, deleteSuperGroup, insertSuperGroup, updateSuperGroup, 
 // unread messages
@@ -61,7 +61,6 @@ rpc.registerMethod('batchInsertMessageList', batchInsertMessageList);
 rpc.registerMethod('getMessageList', getMessageList);
 rpc.registerMethod('getMessageListNoTime', getMessageListNoTime);
 rpc.registerMethod('messageIfExists', messageIfExists);
-rpc.registerMethod('isExistsInErrChatLogBySeq', isExistsInErrChatLogBySeq);
 rpc.registerMethod('searchMessageByKeyword', searchMessageByKeyword);
 rpc.registerMethod('searchMessageByContentType', searchMessageByContentType);
 rpc.registerMethod('searchMessageByContentTypeAndKeyword', searchMessageByContentTypeAndKeyword);
@@ -80,6 +79,9 @@ rpc.registerMethod('markConversationMessageAsRead', markConversationMessageAsRea
 rpc.registerMethod('deleteConversationMsgs', deleteConversationMsgs);
 rpc.registerMethod('markConversationAllMessageAsRead', markConversationAllMessageAsRead);
 rpc.registerMethod('searchAllMessageByContentType', searchAllMessageByContentType);
+rpc.registerMethod('insertSendingMessage', insertSendingMessage);
+rpc.registerMethod('deleteSendingMessage', deleteSendingMessage);
+rpc.registerMethod('getAllSendingMessages', getAllSendingMessages);
 // conversation
 rpc.registerMethod('getAllConversationList', getAllConversationList);
 rpc.registerMethod('getAllConversationListToSync', getAllConversationListToSync);
@@ -111,6 +113,8 @@ rpc.registerMethod('getAllConversations', getAllConversations);
 rpc.registerMethod('getLoginUser', getLoginUser);
 rpc.registerMethod('insertLoginUser', insertLoginUser);
 rpc.registerMethod('updateLoginUser', updateLoginUser);
+rpc.registerMethod('getStrangerInfo', getStrangerInfo);
+rpc.registerMethod('setStrangerInfo', setStrangerInfo);
 rpc.registerMethod('getJoinedSuperGroupList', getJoinedSuperGroupList);
 rpc.registerMethod('getJoinedSuperGroupIDList', getJoinedSuperGroupIDList);
 rpc.registerMethod('getSuperGroupInfoByGroupID', getSuperGroupInfoByGroupID);

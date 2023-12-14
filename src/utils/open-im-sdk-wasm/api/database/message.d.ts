@@ -18,7 +18,6 @@ export declare function searchMessageByKeyword(conversationID: string, contentTy
 export declare function searchMessageByContentType(conversationID: string, contentTypeStr: string, startTime: number, endTime: number, offset: number, count: number): Promise<string>;
 export declare function searchMessageByContentTypeAndKeyword(conversationID: string, contentTypeStr: string, keywordListStr: string, keywordListMatchType: number, startTime: number, endTime: number): Promise<string>;
 export declare function messageIfExists(conversationID: string, clientMsgID: string): Promise<string>;
-export declare function isExistsInErrChatLogBySeq(seq: number): Promise<string>;
 export declare function updateMsgSenderFaceURLAndSenderNickname(conversationID: string, sendID: string, faceURL: string, nickname: string): Promise<string>;
 export declare function deleteConversationAllMessages(conversationID: string): Promise<string>;
 export declare function markDeleteConversationAllMessages(conversationID: string): Promise<string>;

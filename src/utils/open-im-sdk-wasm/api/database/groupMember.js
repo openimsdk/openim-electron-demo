@@ -87,10 +87,10 @@ export async function getGroupMemberListByGroupID(groupID) {
         return formatResponse(undefined, DatabaseErrorCode.ErrorInit, JSON.stringify(e));
     }
 }
-export async function getGroupMemberListSplit(groupID, filter, offset, count) {
+export async function getGroupMemberListSplit(groupID, filter, offset, count, loginUserID) {
     try {
         const db = await getInstance();
-        const execResult = databaseGetGroupMemberListSplit(db, groupID, filter, offset, count);
+        const execResult = databaseGetGroupMemberListSplit(db, groupID, filter, offset, count, loginUserID);
         return formatResponse(converSqlExecResult(execResult[0], 'CamelCase', [], {
             user_group_face_url: 'faceURL',
         }));

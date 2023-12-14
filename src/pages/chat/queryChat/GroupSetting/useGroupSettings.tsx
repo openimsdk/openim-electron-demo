@@ -5,7 +5,7 @@ import { modal } from "@/AntdGlobalComp";
 import { IMSDK } from "@/layout/MainContentWrap";
 import { useConversationStore } from "@/store";
 import { feedbackToast } from "@/utils/common";
-import { GroupBaseInfo } from "@/utils/open-im-sdk-wasm/types/params";
+import { GroupItem } from "@/utils/open-im-sdk-wasm/types/entity";
 
 export type PermissionMethods = "setGroupLookMemberInfo" | "setGroupApplyMemberFriend";
 
@@ -13,7 +13,7 @@ export function useGroupSettings({ closeOverlay }: { closeOverlay: () => void })
   const currentGroupInfo = useConversationStore((state) => state.currentGroupInfo);
 
   const updateGroupInfo = useCallback(
-    async (value: Omit<GroupBaseInfo, "groupID">) => {
+    async (value: Omit<GroupItem, "groupID">) => {
       if (!currentGroupInfo) return;
       try {
         await IMSDK.setGroupInfo({

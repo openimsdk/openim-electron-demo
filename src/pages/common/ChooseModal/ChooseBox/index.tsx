@@ -234,7 +234,7 @@ const CommonLeft = memo(
         .filter((item) => Boolean(item.userID))
         .map((item) => item.userID!);
       try {
-        const { data } = await IMSDK.getSpecifiedGroupMembersInfo<GroupMemberItem[]>({
+        const { data } = await IMSDK.getSpecifiedGroupMembersInfo({
           groupID: currentGroupID,
           userIDList,
         });

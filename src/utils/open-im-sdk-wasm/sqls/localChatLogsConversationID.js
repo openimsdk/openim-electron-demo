@@ -226,6 +226,7 @@ export function messageIfExists(db, conversationID, clientMsgID) {
 //     db: Database,
 // )
 export function updateMsgSenderFaceURLAndSenderNickname(db, conversationID, sendID, faceURL, nickname) {
+    _initLocalChatLogsTable(db, conversationID);
     return db.exec(`
       UPDATE chat_logs_${conversationID} SET sender_face_url = '${faceURL}', sender_nick_name = '${nickname}' WHERE send_id = '${sendID}';
       `);

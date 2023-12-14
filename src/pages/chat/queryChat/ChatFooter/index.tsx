@@ -113,14 +113,14 @@ const ChatFooter = () => {
     const cleanText = getCleanText(latestHtml.current);
     if (latestQuoteMessage.current) {
       return (
-        await IMSDK.createQuoteMessage<ExMessageItem>({
+        await IMSDK.createQuoteMessage({
           text: cleanText,
           message: JSON.stringify(latestQuoteMessage.current),
         })
       ).data;
     }
 
-    return (await IMSDK.createTextMessage<ExMessageItem>(cleanText)).data;
+    return (await IMSDK.createTextMessage(cleanText)).data;
   };
 
   const enterToSend = async () => {

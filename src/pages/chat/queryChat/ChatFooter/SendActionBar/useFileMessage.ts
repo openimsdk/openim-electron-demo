@@ -20,8 +20,9 @@ export function useFileMessage() {
       bigPicture: baseInfo,
       snapshotPicture: baseInfo,
       file,
+      sourcePath: `/${file.name}`,
     };
-    return (await IMSDK.createImageMessageByFile<ExMessageItem>(options)).data;
+    return (await IMSDK.createImageMessageByFile(options)).data;
   };
 
   const getVideoMessage = async (file: File, snapShotFile: File) => {
@@ -43,7 +44,7 @@ export function useFileMessage() {
       snapshotHeight: height,
       snapShotType: snapShotFile.type,
     };
-    return (await IMSDK.createVideoMessageByFile<ExMessageItem>(options)).data;
+    return (await IMSDK.createVideoMessageByFile(options)).data;
   };
 
   const createFileMessage = async (file: File): Promise<ExMessageItem> => {

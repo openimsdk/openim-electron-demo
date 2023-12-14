@@ -100,7 +100,7 @@ const UserCardModal: ForwardRefRenderFunction<
     const {
       data: { users },
     } = await getBusinessUserInfo([userID!]);
-    const { data } = await IMSDK.getUsersInfo<FullUserItem[]>([userID!]);
+    const { data } = await IMSDK.getUsersInfo([userID!]);
     return {
       ...data[0]?.friendInfo,
       ...users[0],
@@ -115,7 +115,7 @@ const UserCardModal: ForwardRefRenderFunction<
       return;
     }
 
-    const { data } = await IMSDK.getSpecifiedGroupMembersInfo<GroupMemberItem[]>({
+    const { data } = await IMSDK.getSpecifiedGroupMembersInfo({
       groupID,
       userIDList: [userID],
     });
@@ -165,7 +165,7 @@ const UserCardModal: ForwardRefRenderFunction<
   const setGroupMemberInfoRow = async (info: GroupMemberItem) => {
     let joinSourceStr = "-";
     if (info.joinSource === GroupJoinSource.Invitation) {
-      const { data } = await IMSDK.getSpecifiedGroupMembersInfo<GroupMemberItem[]>({
+      const { data } = await IMSDK.getSpecifiedGroupMembersInfo({
         groupID: groupID!,
         userIDList: [info.inviterUserID],
       });

@@ -54,7 +54,7 @@ class SDK extends Emitter {
                         data = JSON.parse(data);
                     }
                     catch (error) {
-                        console.log('SDK => parse error ', error);
+                        // parse error
                     }
                 }
                 response.data = data;
@@ -86,7 +86,7 @@ class SDK extends Emitter {
                         parsed.data = JSON.parse(parsed.data);
                     }
                     catch (error) {
-                        console.log('SDK => parse error ', error);
+                        // parse error
                     }
                 }
                 this.emit(parsed.event, parsed);
@@ -101,7 +101,7 @@ class SDK extends Emitter {
             wsAddr: params.wsAddr,
             dataDir: './',
             logLevel: params.logLevel || 5,
-            isLogStandardOutput: params.isLogStandardOutput || true,
+            isLogStandardOutput: params.isLogStandardOutput ?? true,
             logFilePath: './',
             isExternalExtensions: params.isExternalExtensions || false,
         };
@@ -154,6 +154,7 @@ class SDK extends Emitter {
     createImageMessage = (params, operationID = uuidv4()) => {
         return this._invoker('createImageMessage', window.createImageMessageByURL, [
             operationID,
+            params.sourcePath,
             JSON.stringify(params.sourcePicture),
             JSON.stringify(params.bigPicture),
             JSON.stringify(params.snapshotPicture),
@@ -167,6 +168,7 @@ class SDK extends Emitter {
         fileMapSet(params.sourcePicture.uuid, params.file);
         return this._invoker('createImageMessageByFile', window.createImageMessageByURL, [
             operationID,
+            params.sourcePath,
             JSON.stringify(params.sourcePicture),
             JSON.stringify(params.bigPicture),
             JSON.stringify(params.snapshotPicture),
@@ -293,8 +295,8 @@ class SDK extends Emitter {
     networkStatusChanged = (operationID = uuidv4()) => {
         return this._invoker('networkStatusChanged ', window.networkStatusChanged, [operationID]);
     };
-    getLoginUser = (operationID = uuidv4()) => {
-        return this._invoker('getLoginUser', window.getLoginUser, [
+    getLoginUserID = (operationID = uuidv4()) => {
+        return this._invoker('getLoginUserID', window.getLoginUserID, [
             operationID,
         ]);
     };
@@ -306,6 +308,9 @@ class SDK extends Emitter {
             operationID,
             JSON.stringify(data),
         ]);
+    };
+    getUsersInfoWithCache = (data, operationID = uuidv4()) => {
+        return this._invoker('getUsersInfoWithCache', window.getUsersInfoWithCache, [operationID, JSON.stringify(data.userIDList), data.groupID]);
     };
     setSelfInfo = (data, operationID = uuidv4()) => {
         return this._invoker('setSelfInfo', window.setSelfInfo, [
@@ -332,7 +337,7 @@ class SDK extends Emitter {
         });
     };
     createSoundMessageByFile = (data, operationID = uuidv4()) => {
-        data.uuid = `${data.uuid}/${data.file.name}`
+        data.uuid = `${data.uuid}/${data.file.name}`;
         fileMapSet(data.uuid, data.file);
         return this._invoker('createSoundMessageByFile', window.createSoundMessageByURL, [operationID, JSON.stringify(data)], data => {
             // compitable with old version sdk
@@ -730,13 +735,12 @@ class SDK extends Emitter {
         return this._invoker('unsubscribeUsersStatus ', window.unsubscribeUsersStatus, [operationID, JSON.stringify(data)]);
     };
     getUserStatus = (operationID = uuidv4()) => {
-        return this._invoker('getUserStatus ', window.getUserStatus, [
-            operationID,
-        ]);
+        return this._invoker('getUserStatus ', window.getUserStatus, [operationID]);
     };
     getSubscribeUsersStatus = (operationID = uuidv4()) => {
         return this._invoker('getSubscribeUsersStatus ', window.getSubscribeUsersStatus, [operationID]);
     };
+    fileMapSet = (uuid, file) => fileMapSet(uuid, file);
 }
 let instance;
 export function getSDK(url = '/openIM.wasm') {

@@ -86,7 +86,7 @@ const MultipleActionBar = () => {
       .slice(0, 4)
       .map((message) => `${message.senderNickname}：${formatMessageByType(message)}`);
     return (
-      await IMSDK.createMergerMessage<ExMessageItem>({
+      await IMSDK.createMergerMessage({
         messageList,
         summaryList,
         title: `${

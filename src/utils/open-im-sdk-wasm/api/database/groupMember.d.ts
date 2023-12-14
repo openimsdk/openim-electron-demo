@@ -5,7 +5,7 @@ export declare function getGroupMemberCount(groupID: string): Promise<string>;
 export declare function getGroupSomeMemberInfo(groupID: string, userIDListStr: string): Promise<string>;
 export declare function getGroupAdminID(groupID: string): Promise<string>;
 export declare function getGroupMemberListByGroupID(groupID: string): Promise<string>;
-export declare function getGroupMemberListSplit(groupID: string, filter: number, offset: number, count: number): Promise<string>;
+export declare function getGroupMemberListSplit(groupID: string, filter: number, offset: number, count: number, loginUserID: string): Promise<string>;
 export declare function getGroupMemberOwnerAndAdmin(groupID: string): Promise<string>;
 export declare function getGroupMemberOwner(groupID: string): Promise<string>;
 export declare function getGroupMemberListSplitByJoinTimeFilter(groupID: string, offset: number, count: number, joinTimeBegin: number | undefined, joinTimeEnd: number | undefined, userIDListStr: string): Promise<string>;

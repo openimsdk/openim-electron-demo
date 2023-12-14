@@ -1,5 +1,4 @@
 export * from './localChatLogsConversationID';
-export * from './localErrChatLogs';
 export * from './localConversations';
 export * from './localUsers';
 export * from './localSuperGroups';
@@ -14,3 +13,5 @@ export * from './localGroupMembers';
 export * from './tempCacheLocalChatLogs';
 export * from './localNotification';
 export * from './localUpload';
+export * from './localStranger';
+export * from './localSendingMessages';

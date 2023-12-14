@@ -106,7 +106,6 @@ export function initDatabaseAPI() {
     window.getMessageList = registeMethodOnWindow('getMessageList');
     window.getMessageListNoTime = registeMethodOnWindow('getMessageListNoTime');
     window.messageIfExists = registeMethodOnWindow('messageIfExists');
-    window.isExistsInErrChatLogBySeq = registeMethodOnWindow('isExistsInErrChatLogBySeq');
     window.messageIfExistsBySeq = registeMethodOnWindow('messageIfExistsBySeq');
     window.getAbnormalMsgSeq = registeMethodOnWindow('getAbnormalMsgSeq');
     window.getAbnormalMsgSeqList = registeMethodOnWindow('getAbnormalMsgSeqList');
@@ -140,6 +139,9 @@ export function initDatabaseAPI() {
     window.deleteConversationMsgs = registeMethodOnWindow('deleteConversationMsgs');
     window.markConversationAllMessageAsRead = registeMethodOnWindow('markConversationAllMessageAsRead');
     window.searchAllMessageByContentType = registeMethodOnWindow('searchAllMessageByContentType');
+    window.insertSendingMessage = registeMethodOnWindow('insertSendingMessage');
+    window.deleteSendingMessage = registeMethodOnWindow('deleteSendingMessage');
+    window.getAllSendingMessages = registeMethodOnWindow('getAllSendingMessages');
     // conversation
     window.getAllConversationListDB = registeMethodOnWindow('getAllConversationList');
     window.getAllConversationListToSync = registeMethodOnWindow('getAllConversationListToSync');
@@ -175,6 +177,8 @@ export function initDatabaseAPI() {
     window.getLoginUser = registeMethodOnWindow('getLoginUser');
     window.insertLoginUser = registeMethodOnWindow('insertLoginUser');
     window.updateLoginUser = registeMethodOnWindow('updateLoginUser');
+    window.getStrangerInfo = registeMethodOnWindow('getStrangerInfo');
+    window.setStrangerInfo = registeMethodOnWindow('setStrangerInfo');
     // super groups
     window.getJoinedSuperGroupList = registeMethodOnWindow('getJoinedSuperGroupList');
     window.getJoinedSuperGroupIDList = registeMethodOnWindow('getJoinedSuperGroupIDList');

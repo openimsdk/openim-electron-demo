@@ -33,7 +33,7 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
   const searchData = async () => {
     if (isSearchGroup) {
       try {
-        const { data } = await IMSDK.getSpecifiedGroupsInfo<GroupItem[]>([keyword]);
+        const { data } = await IMSDK.getSpecifiedGroupsInfo([keyword]);
         const groupInfo = data[0];
         if (!groupInfo) {
           message.warning(t("empty.noSearchResults"));
@@ -56,7 +56,7 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
           message.warning(t("empty.noSearchResults"));
           return;
         }
-        const { data } = await IMSDK.getUsersInfo<FullUserItem[]>([users[0].userID]);
+        const { data } = await IMSDK.getUsersInfo([users[0].userID]);
         const friendInfo = data[0].friendInfo;
 
         openUserCardWithData({

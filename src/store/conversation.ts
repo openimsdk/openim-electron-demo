@@ -24,7 +24,7 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
   getConversationListByReq: async (isOffset?: boolean) => {
     let tmpConversationList = [] as ConversationItem[];
     try {
-      const { data } = await IMSDK.getConversationListSplit<ConversationItem[]>({
+      const { data } = await IMSDK.getConversationListSplit({
         offset: isOffset ? get().conversationList.length : 0,
         count: 20,
       });
@@ -100,7 +100,7 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
   },
   getUnReadCountByReq: async () => {
     try {
-      const { data } = await IMSDK.getTotalUnreadMsgCount<number>();
+      const { data } = await IMSDK.getTotalUnreadMsgCount();
       set(() => ({ unReadCount: data }));
     } catch (error) {
       console.error(error);
@@ -112,7 +112,7 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
   getCurrentGroupInfoByReq: async (groupID: string) => {
     let groupInfo: GroupItem;
     try {
-      const { data } = await IMSDK.getSpecifiedGroupsInfo<GroupItem[]>([groupID]);
+      const { data } = await IMSDK.getSpecifiedGroupsInfo([groupID]);
       groupInfo = data[0];
       console.info(`getCurrentGroupInfoByReq: ${groupInfo.groupID}`);
     } catch (error) {
@@ -128,7 +128,7 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
     let memberInfo: GroupMemberItem;
     const selfID = useUserStore.getState().selfInfo.userID;
     try {
-      const { data } = await IMSDK.getSpecifiedGroupMembersInfo<GroupMemberItem[]>({
+      const { data } = await IMSDK.getSpecifiedGroupMembersInfo({
         groupID,
         userIDList: [selfID],
       });
