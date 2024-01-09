@@ -1,10 +1,10 @@
+import { SessionType } from "open-im-sdk-wasm";
+import { ConversationItem } from "open-im-sdk-wasm/lib/types/entity";
 import { useNavigate } from "react-router-dom";
 
 import { IMSDK } from "@/layout/MainContentWrap";
 import { useConversationStore } from "@/store";
 import { feedbackToast } from "@/utils/common";
-import { ConversationItem } from "@/utils/open-im-sdk-wasm/types/entity";
-import { SessionType } from "@/utils/open-im-sdk-wasm/types/enum";
 
 export function useConversationToggle() {
   const navigate = useNavigate();

@@ -1,6 +1,7 @@
 import { CloseOutlined } from "@ant-design/icons";
 import { Button, Input } from "antd";
 import { t } from "i18next";
+import { FullUserItem, GroupItem, WSEvent } from "open-im-sdk-wasm/lib/types/entity";
 import { forwardRef, ForwardRefRenderFunction, memo, useState } from "react";
 
 import { message } from "@/AntdGlobalComp";
@@ -9,11 +10,6 @@ import DraggableModalWrap from "@/components/DraggableModalWrap";
 import { OverlayVisibleHandle, useOverlayVisible } from "@/hooks/useOverlayVisible";
 import { CardInfo } from "@/pages/common/UserCardModal";
 import { feedbackToast } from "@/utils/common";
-import {
-  FullUserItem,
-  GroupItem,
-  WSEvent,
-} from "@/utils/open-im-sdk-wasm/types/entity";
 
 import { IMSDK } from "../MainContentWrap";
 

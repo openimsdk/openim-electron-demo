@@ -1,7 +1,7 @@
+import { GroupMemberRole } from "open-im-sdk-wasm";
 import { useMemo } from "react";
 
 import { useConversationStore } from "@/store";
-import { GroupMemberRole } from "@/utils/open-im-sdk-wasm/types/enum";
 
 export function useCurrentMemberRole() {
   const currentMemberInGroup = useConversationStore(

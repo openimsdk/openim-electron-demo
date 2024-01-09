@@ -1,9 +1,9 @@
 import { Image } from "antd";
+import { MessageType } from "open-im-sdk-wasm";
 import { FC } from "react";
 
 import play_icon from "@/assets/images/messageItem/play_video.png";
 import emitter from "@/utils/events";
-import { MessageType } from "@/utils/open-im-sdk-wasm/types/enum";
 
 import { IMessageItemProps } from ".";
 

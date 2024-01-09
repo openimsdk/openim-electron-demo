@@ -1,11 +1,11 @@
 import { App } from "antd";
 import { t } from "i18next";
+import { MessageReceiveOptType } from "open-im-sdk-wasm";
 import { useCallback } from "react";
 
 import { IMSDK } from "@/layout/MainContentWrap";
 import { useConversationStore, useMessageStore } from "@/store";
 import { feedbackToast } from "@/utils/common";
-import { MessageReceiveOptType } from "@/utils/open-im-sdk-wasm/types/enum";
 
 export function useConversationSettings() {
   const { modal } = App.useApp();

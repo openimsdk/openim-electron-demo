@@ -1,7 +1,7 @@
 import { ChooseModalState, ChooseModalType } from "@/pages/common/ChooseModal";
 import { CheckListItem } from "@/pages/common/ChooseModal/ChooseBox/CheckItem";
 import mitt from "mitt";
-import { GroupItem } from "./open-im-sdk-wasm/types/entity";
+import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
 
 type EmitterEvents = {
   OPEN_USER_CARD: OpenUserCardParams;

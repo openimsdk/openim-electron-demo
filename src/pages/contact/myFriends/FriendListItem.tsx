@@ -1,5 +1,6 @@
+import { FriendUserItem } from "open-im-sdk-wasm/lib/types/entity";
+
 import OIMAvatar from "@/components/OIMAvatar";
-import { FriendUserItem } from "@/utils/open-im-sdk-wasm/types/entity";
 
 const FriendListItem = ({
   friend,

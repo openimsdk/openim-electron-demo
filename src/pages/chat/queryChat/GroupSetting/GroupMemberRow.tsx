@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { t } from "i18next";
+import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
 import { memo } from "react";
 
 import invite from "@/assets/images/chatSetting/invite.png";
@@ -7,7 +8,6 @@ import kick from "@/assets/images/chatSetting/kick.png";
 import OIMAvatar from "@/components/OIMAvatar";
 import useGroupMembers from "@/hooks/useGroupMembers";
 import emitter from "@/utils/events";
-import { GroupItem } from "@/utils/open-im-sdk-wasm/types/entity";
 
 import styles from "./group-setting.module.scss";
 

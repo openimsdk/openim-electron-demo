@@ -1,6 +1,12 @@
 import { Button, Divider } from "antd";
 import dayjs from "dayjs";
 import { t } from "i18next";
+import { GroupJoinSource, SessionType } from "open-im-sdk-wasm";
+import {
+  FriendUserItem,
+  FullUserItem,
+  GroupMemberItem,
+} from "open-im-sdk-wasm/lib/types/entity";
 import {
   FC,
   forwardRef,
@@ -22,12 +28,6 @@ import { OverlayVisibleHandle, useOverlayVisible } from "@/hooks/useOverlayVisib
 import { IMSDK } from "@/layout/MainContentWrap";
 import { useUserStore } from "@/store";
 import { feedbackToast } from "@/utils/common";
-import {
-  FriendUserItem,
-  FullUserItem,
-  GroupMemberItem,
-} from "@/utils/open-im-sdk-wasm/types/entity";
-import { GroupJoinSource, SessionType } from "@/utils/open-im-sdk-wasm/types/enum";
 
 import EditSelfInfo from "./EditSelfInfo";
 import SendRequest from "./SendRequest";

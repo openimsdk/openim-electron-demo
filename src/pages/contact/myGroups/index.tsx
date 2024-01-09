@@ -1,11 +1,11 @@
 import { Select } from "antd";
 import { t } from "i18next";
+import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
 import { useCallback, useState } from "react";
 import { Virtuoso } from "react-virtuoso";
 
 import { useContactStore, useUserStore } from "@/store";
 import emitter from "@/utils/events";
-import { GroupItem } from "@/utils/open-im-sdk-wasm/types/entity";
 
 import GroupListItem from "./GroupListItem";
 

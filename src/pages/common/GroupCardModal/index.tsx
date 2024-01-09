@@ -3,6 +3,8 @@ import { useRequest } from "ahooks";
 import { Button, Input } from "antd";
 import dayjs from "dayjs";
 import { t } from "i18next";
+import { GroupJoinSource, SessionType } from "open-im-sdk-wasm";
+import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
 import { forwardRef, ForwardRefRenderFunction, memo, useState } from "react";
 
 import clock from "@/assets/images/common/clock.png";
@@ -15,8 +17,6 @@ import { OverlayVisibleHandle, useOverlayVisible } from "@/hooks/useOverlayVisib
 import { IMSDK } from "@/layout/MainContentWrap";
 import { getDefaultAvatar } from "@/utils/avatar";
 import { feedbackToast } from "@/utils/common";
-import { GroupItem } from "@/utils/open-im-sdk-wasm/types/entity";
-import { GroupJoinSource, SessionType } from "@/utils/open-im-sdk-wasm/types/enum";
 
 interface IGroupCardModalProps {
   groupData?: GroupItem;

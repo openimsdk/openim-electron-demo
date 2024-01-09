@@ -1,6 +1,7 @@
 import { RightOutlined } from "@ant-design/icons";
 import { Button, Divider, Drawer } from "antd";
 import { t } from "i18next";
+import { MessageReceiveOptType } from "open-im-sdk-wasm";
 import { forwardRef, ForwardRefRenderFunction, memo } from "react";
 
 import { modal } from "@/AntdGlobalComp";
@@ -12,7 +13,6 @@ import { IMSDK } from "@/layout/MainContentWrap";
 import { useContactStore } from "@/store/contact";
 import { feedbackToast } from "@/utils/common";
 import emitter from "@/utils/events";
-import { MessageReceiveOptType } from "@/utils/open-im-sdk-wasm/types/enum";
 
 // export interface SingleSettingProps {}
 

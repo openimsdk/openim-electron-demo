@@ -1,14 +1,14 @@
 import { Button, Spin } from "antd";
 import { t } from "i18next";
+import { ApplicationHandleResult } from "open-im-sdk-wasm";
+import {
+  FriendApplicationItem,
+  GroupApplicationItem,
+} from "open-im-sdk-wasm/lib/types/entity";
 import { memo, useState } from "react";
 
 import arrow from "@/assets/images/contact/arrowTopRight.png";
 import OIMAvatar from "@/components/OIMAvatar";
-import {
-  FriendApplicationItem,
-  GroupApplicationItem,
-} from "@/utils/open-im-sdk-wasm/types/entity";
-import { ApplicationHandleResult } from "@/utils/open-im-sdk-wasm/types/enum";
 
 type ApplicationItemSource = FriendApplicationItem & GroupApplicationItem;
 

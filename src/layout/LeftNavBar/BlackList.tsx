@@ -1,12 +1,12 @@
 import { CloseOutlined } from "@ant-design/icons";
 import { Button, Empty, Modal } from "antd";
 import { t } from "i18next";
+import { BlackUserItem } from "open-im-sdk-wasm/lib/types/entity";
 import { forwardRef, ForwardRefRenderFunction, memo, useState } from "react";
 
 import OIMAvatar from "@/components/OIMAvatar";
 import { useContactStore } from "@/store/contact";
 import { feedbackToast } from "@/utils/common";
-import { BlackUserItem } from "@/utils/open-im-sdk-wasm/types/entity";
 
 import { OverlayVisibleHandle, useOverlayVisible } from "../../hooks/useOverlayVisible";
 import { IMSDK } from "../MainContentWrap";

@@ -1,10 +1,10 @@
+import { MessageStatus } from "open-im-sdk-wasm";
+import { SendMsgParams } from "open-im-sdk-wasm/lib/types/params";
 import { useCallback } from "react";
 
 import { IMSDK } from "@/layout/MainContentWrap";
 import { ExMessageItem, useConversationStore, useMessageStore } from "@/store";
 import emitter from "@/utils/events";
-import { MessageStatus } from "@/utils/open-im-sdk-wasm/types/enum";
-import { SendMsgParams } from "@/utils/open-im-sdk-wasm/types/params";
 
 export type SendMessageParams = Partial<Omit<SendMsgParams, "message">> & {
   message: ExMessageItem;

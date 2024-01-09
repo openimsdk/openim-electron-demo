@@ -2,6 +2,7 @@ import { RightOutlined } from "@ant-design/icons";
 import { Button, Divider, Upload } from "antd";
 import clsx from "clsx";
 import { t } from "i18next";
+import { MessageReceiveOptType } from "open-im-sdk-wasm";
 import { memo, useCallback } from "react";
 import { useCopyToClipboard } from "react-use";
 import { v4 as uuidV4 } from "uuid";
@@ -15,7 +16,6 @@ import { useConversationSettings } from "@/hooks/useConversationSettings";
 import { useCurrentMemberRole } from "@/hooks/useCurrentMemberRole";
 import { IMSDK } from "@/layout/MainContentWrap";
 import { feedbackToast, getFileType } from "@/utils/common";
-import { MessageReceiveOptType } from "@/utils/open-im-sdk-wasm/types/enum";
 
 import GroupMemberRow from "./GroupMemberRow";
 import { useGroupSettings } from "./useGroupSettings";

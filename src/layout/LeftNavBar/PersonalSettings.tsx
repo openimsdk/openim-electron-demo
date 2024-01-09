@@ -1,6 +1,7 @@
 import { CloseOutlined, RightOutlined } from "@ant-design/icons";
 import { Checkbox, Divider, Modal, Spin } from "antd";
 import { t } from "i18next";
+import { MessageReceiveOptType } from "open-im-sdk-wasm";
 import { forwardRef, ForwardRefRenderFunction, memo, useRef } from "react";
 import { useMutation } from "react-query";
 
@@ -15,7 +16,6 @@ import i18n from "@/i18n";
 import { useMessageStore, useUserStore } from "@/store";
 import { LocaleString } from "@/store/type";
 import { feedbackToast } from "@/utils/common";
-import { MessageReceiveOptType } from "@/utils/open-im-sdk-wasm/types/enum";
 
 import { OverlayVisibleHandle, useOverlayVisible } from "../../hooks/useOverlayVisible";
 import { IMSDK } from "../MainContentWrap";

@@ -1,11 +1,11 @@
 import { t } from "i18next";
+import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
 import { useCallback } from "react";
 
 import { modal } from "@/AntdGlobalComp";
 import { IMSDK } from "@/layout/MainContentWrap";
 import { useConversationStore } from "@/store";
 import { feedbackToast } from "@/utils/common";
-import { GroupItem } from "@/utils/open-im-sdk-wasm/types/entity";
 
 export type PermissionMethods = "setGroupLookMemberInfo" | "setGroupApplyMemberFriend";
 
@@ -13,7 +13,7 @@ export function useGroupSettings({ closeOverlay }: { closeOverlay: () => void })
   const currentGroupInfo = useConversationStore((state) => state.currentGroupInfo);
 
   const updateGroupInfo = useCallback(
-    async (value: Omit<GroupItem, "groupID">) => {
+    async (value: Partial<GroupItem>) => {
       if (!currentGroupInfo) return;
       try {
         await IMSDK.setGroupInfo({

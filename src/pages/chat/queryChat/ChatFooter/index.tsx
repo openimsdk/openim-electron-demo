@@ -9,6 +9,7 @@ import {
 import { Button, Popover, Spin } from "antd";
 import clsx from "clsx";
 import { t } from "i18next";
+import { GroupMemberItem } from "open-im-sdk-wasm/lib/types/entity";
 import {
   forwardRef,
   ForwardRefRenderFunction,
@@ -32,7 +33,6 @@ import { IMSDK } from "@/layout/MainContentWrap";
 import { ExMessageItem, useConversationStore, useMessageStore } from "@/store";
 import { base64toFile, getExtraStr } from "@/utils/common";
 import { formatMessageByType } from "@/utils/imCommon";
-import { GroupMemberItem } from "@/utils/open-im-sdk-wasm/types/entity";
 
 import styles from "./chat-footer.module.scss";
 import SendActionBar from "./SendActionBar";

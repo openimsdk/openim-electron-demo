@@ -1,4 +1,4 @@
-import { Platform } from "@/utils/open-im-sdk-wasm/types/enum";
+import { Platform } from "open-im-sdk-wasm";
 
 export interface IElectronAPI {
   getVersion: () => string;

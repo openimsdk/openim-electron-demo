@@ -1,6 +1,9 @@
 import { Layout, Tooltip } from "antd";
 import clsx from "clsx";
 import { t } from "i18next";
+import { CbEvents } from "open-im-sdk-wasm";
+import { OnlineState, SessionType } from "open-im-sdk-wasm";
+import { UserOnlineState, WSEvent } from "open-im-sdk-wasm/lib/types/entity";
 import { useEffect, useRef, useState } from "react";
 
 import group_member from "@/assets/images/chatHeader/group_member.png";
@@ -12,9 +15,6 @@ import { IMSDK } from "@/layout/MainContentWrap";
 import { useConversationStore } from "@/store";
 import emitter from "@/utils/events";
 import { isGroupSession } from "@/utils/imCommon";
-import { CbEvents } from "@/utils/open-im-sdk-wasm/constant";
-import { UserOnlineState, WSEvent } from "@/utils/open-im-sdk-wasm/types/entity";
-import { OnlineState, SessionType } from "@/utils/open-im-sdk-wasm/types/enum";
 
 import GroupSetting from "../GroupSetting";
 import SingleSetting from "../SingleSetting";

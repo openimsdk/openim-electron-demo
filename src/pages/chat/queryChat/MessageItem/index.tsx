@@ -2,12 +2,12 @@ import { Checkbox, Popover } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import clsx from "clsx";
 import { t } from "i18next";
+import { MessageStatus, MessageType } from "open-im-sdk-wasm";
 import { FC, useCallback, useRef, useState } from "react";
 
 import OIMAvatar from "@/components/OIMAvatar";
 import { ExMessageItem, useMessageStore } from "@/store";
 import { formatMessageTime } from "@/utils/imCommon";
-import { MessageStatus, MessageType } from "@/utils/open-im-sdk-wasm/types/enum";
 
 import CardMessageRenderer from "./CardMessageRenderer";
 import CatchMessageRender from "./CatchMsgRenderer";

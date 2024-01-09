@@ -1,8 +1,5 @@
 import { t } from "i18next";
-import { create } from "zustand";
-
-import { IMSDK } from "@/layout/MainContentWrap";
-import { feedbackToast } from "@/utils/common";
+import { ApplicationHandleResult } from "open-im-sdk-wasm";
 import {
   BlackUserItem,
   FriendApplicationItem,
@@ -10,8 +7,11 @@ import {
   FullUserItem,
   GroupApplicationItem,
   GroupItem,
-} from "@/utils/open-im-sdk-wasm/types/entity";
-import { ApplicationHandleResult } from "@/utils/open-im-sdk-wasm/types/enum";
+} from "open-im-sdk-wasm/lib/types/entity";
+import { create } from "zustand";
+
+import { IMSDK } from "@/layout/MainContentWrap";
+import { feedbackToast } from "@/utils/common";
 
 import { ContactStore } from "./type";
 

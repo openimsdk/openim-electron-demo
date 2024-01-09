@@ -1,14 +1,14 @@
 import { CloseOutlined, RightOutlined } from "@ant-design/icons";
 import { Checkbox } from "antd";
 import clsx from "clsx";
-import { FC, memo } from "react";
-
-import OIMAvatar from "@/components/OIMAvatar";
 import {
   ConversationItem,
   FriendUserItem,
   GroupItem,
-} from "@/utils/open-im-sdk-wasm/types/entity";
+} from "open-im-sdk-wasm/lib/types/entity";
+import { FC, memo } from "react";
+
+import OIMAvatar from "@/components/OIMAvatar";
 
 interface ICheckItemProps {
   data: CheckListItem;

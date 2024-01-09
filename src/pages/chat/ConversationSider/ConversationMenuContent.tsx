@@ -1,11 +1,11 @@
 import { Spin } from "antd";
 import { t } from "i18next";
+import { ConversationItem } from "open-im-sdk-wasm/lib/types/entity";
 import { FC, memo, useState } from "react";
 
 import { IMSDK } from "@/layout/MainContentWrap";
 import { useConversationStore } from "@/store";
 import { feedbackToast } from "@/utils/common";
-import { ConversationItem } from "@/utils/open-im-sdk-wasm/types/entity";
 
 const MenuItem: FC<{ title: string; onClick: () => void }> = ({ title, onClick }) => (
   <div

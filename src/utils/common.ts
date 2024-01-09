@@ -2,7 +2,7 @@ import { t } from "i18next";
 
 import PinYin from "./pinyin";
 import { message } from "../AntdGlobalComp";
-import { FriendUserItem } from "./open-im-sdk-wasm/types/entity";
+import { FriendUserItem } from "open-im-sdk-wasm/lib/types/entity";
 
 type FeedbackToastParams = {
   msg?: string | null;

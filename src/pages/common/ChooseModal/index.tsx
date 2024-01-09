@@ -1,6 +1,7 @@
 import { CloseOutlined } from "@ant-design/icons";
 import { Button, Input, Modal, Upload } from "antd";
 import i18n, { t } from "i18next";
+import { GroupType } from "open-im-sdk-wasm";
 import {
   forwardRef,
   ForwardRefRenderFunction,
@@ -19,7 +20,6 @@ import { useSendMessage } from "@/pages/chat/queryChat/ChatFooter/useSendMessage
 import { ExMessageItem } from "@/store";
 import { feedbackToast, getFileType } from "@/utils/common";
 import emitter from "@/utils/events";
-import { GroupType } from "@/utils/open-im-sdk-wasm/types/enum";
 
 import ChooseBox, { ChooseBoxHandle } from "./ChooseBox";
 import { CheckListItem } from "./ChooseBox/CheckItem";

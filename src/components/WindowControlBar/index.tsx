@@ -1,7 +1,8 @@
+import { Platform } from "open-im-sdk-wasm";
+
 import win_close from "@/assets/images/topSearchBar/win_close.png";
 import win_max from "@/assets/images/topSearchBar/win_max.png";
 import win_min from "@/assets/images/topSearchBar/win_min.png";
-import { Platform } from "@/utils/open-im-sdk-wasm/types/enum";
 
 const WindowControlBar = () => {
   if (!window.electronAPI || window.electronAPI?.getPlatform() === Platform.MacOSX) {

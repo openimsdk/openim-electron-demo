@@ -1,15 +1,15 @@
 import { t } from "i18next";
-import { create } from "zustand";
-
-import { IMSDK } from "@/layout/MainContentWrap";
-import { feedbackToast } from "@/utils/common";
-import { conversationSort, isGroupSession } from "@/utils/imCommon";
 import {
   ConversationItem,
   GroupItem,
   GroupMemberItem,
   MessageItem,
-} from "@/utils/open-im-sdk-wasm/types/entity";
+} from "open-im-sdk-wasm/lib/types/entity";
+import { create } from "zustand";
+
+import { IMSDK } from "@/layout/MainContentWrap";
+import { feedbackToast } from "@/utils/common";
+import { conversationSort, isGroupSession } from "@/utils/imCommon";
 
 import { ConversationListUpdateType, ConversationStore } from "./type";
 import { useUserStore } from "./user";

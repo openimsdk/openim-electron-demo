@@ -1,9 +1,9 @@
+import { MessageType } from "open-im-sdk-wasm";
 import { FC } from "react";
 
 import { formatBr } from "@/utils/common";
 import { formatEmoji } from "@/utils/emojis";
 import { formatAtText } from "@/utils/imCommon";
-import { MessageType } from "@/utils/open-im-sdk-wasm/types/enum";
 
 import { IMessageItemProps } from ".";
 import styles from "./message-item.module.scss";

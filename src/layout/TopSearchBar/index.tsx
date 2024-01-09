@@ -1,5 +1,6 @@
 import { Popover } from "antd";
 import i18n, { t } from "i18next";
+import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import add_friend from "@/assets/images/topSearchBar/add_friend.png";
@@ -14,7 +15,6 @@ import GroupCardModal from "@/pages/common/GroupCardModal";
 import UserCardModal, { CardInfo } from "@/pages/common/UserCardModal";
 import VideoPlayerModal from "@/pages/common/VideoPlayerModal";
 import emitter, { OpenUserCardParams } from "@/utils/events";
-import { GroupItem } from "@/utils/open-im-sdk-wasm/types/entity";
 
 import SearchUserOrGroup from "./SearchUserOrGroup";
 

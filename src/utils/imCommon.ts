@@ -12,8 +12,8 @@ import {
   ConversationItem,
   MessageItem,
   PublicUserItem,
-} from "./open-im-sdk-wasm/types/entity";
-import { MessageType, SessionType } from "./open-im-sdk-wasm/types/enum";
+} from "open-im-sdk-wasm/lib/types/entity";
+import { MessageType, SessionType } from "open-im-sdk-wasm";
 import { isThisYear } from "date-fns";
 import { getUserOnlineStatus } from "@/api/imApi";
 

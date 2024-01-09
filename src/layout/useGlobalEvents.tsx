@@ -1,5 +1,20 @@
 import { useLatest, useThrottleFn } from "ahooks";
 import { t } from "i18next";
+import { CbEvents } from "open-im-sdk-wasm";
+import { MessageReceiveOptType, MessageType, SessionType } from "open-im-sdk-wasm";
+import {
+  BlackUserItem,
+  ConversationItem,
+  FriendApplicationItem,
+  FriendUserItem,
+  GroupApplicationItem,
+  GroupItem,
+  GroupMemberItem,
+  RevokedInfo,
+  SelfUserInfo,
+  WSEvent,
+  WsResponse,
+} from "open-im-sdk-wasm/lib/types/entity";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -16,25 +31,6 @@ import { useContactStore } from "@/store/contact";
 import { feedbackToast } from "@/utils/common";
 import emitter from "@/utils/events";
 import { initStore, isGroupSession } from "@/utils/imCommon";
-import { CbEvents } from "@/utils/open-im-sdk-wasm/constant";
-import {
-  BlackUserItem,
-  ConversationItem,
-  FriendApplicationItem,
-  FriendUserItem,
-  GroupApplicationItem,
-  GroupItem,
-  GroupMemberItem,
-  RevokedInfo,
-  SelfUserInfo,
-  WSEvent,
-  WsResponse,
-} from "@/utils/open-im-sdk-wasm/types/entity";
-import {
-  MessageReceiveOptType,
-  MessageType,
-  SessionType,
-} from "@/utils/open-im-sdk-wasm/types/enum";
 import { getIMToken, getIMUserID } from "@/utils/storage";
 
 import { IMSDK } from "./MainContentWrap";

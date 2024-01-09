@@ -1,5 +1,6 @@
 import { useDeepCompareEffect } from "ahooks";
 import { t } from "i18next";
+import { GroupApplicationItem } from "open-im-sdk-wasm/lib/types/entity";
 import { useCallback } from "react";
 import { Virtuoso } from "react-virtuoso";
 
@@ -8,7 +9,6 @@ import { IMSDK } from "@/layout/MainContentWrap";
 import { useUserStore } from "@/store";
 import { useContactStore } from "@/store/contact";
 import { feedbackToast } from "@/utils/common";
-import { GroupApplicationItem } from "@/utils/open-im-sdk-wasm/types/entity";
 
 export const GroupNotifications = () => {
   const currentUserID = useUserStore((state) => state.selfInfo.userID);

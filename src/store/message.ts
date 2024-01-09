@@ -1,10 +1,10 @@
 import { t } from "i18next";
+import { MessageType } from "open-im-sdk-wasm";
+import { MessageItem } from "open-im-sdk-wasm/lib/types/entity";
 import { create } from "zustand";
 
 import { IMSDK } from "@/layout/MainContentWrap";
 import { feedbackToast } from "@/utils/common";
-import { MessageItem } from "@/utils/open-im-sdk-wasm/types/entity";
-import { MessageType } from "@/utils/open-im-sdk-wasm/types/enum";
 
 import { useConversationStore } from "./conversation";
 import { MessageStore, PreViewImg } from "./type";

@@ -1,12 +1,12 @@
 import { Empty } from "antd";
 import { t } from "i18next";
+import { GroupMemberRole } from "open-im-sdk-wasm";
+import { GroupMemberItem } from "open-im-sdk-wasm/lib/types/entity";
 import { FC } from "react";
 import { Virtuoso } from "react-virtuoso";
 
 import OIMAvatar from "@/components/OIMAvatar";
 import useGroupMembers from "@/hooks/useGroupMembers";
-import { GroupMemberItem } from "@/utils/open-im-sdk-wasm/types/entity";
-import { GroupMemberRole } from "@/utils/open-im-sdk-wasm/types/enum";
 
 import styles from "./group-setting.module.scss";
 

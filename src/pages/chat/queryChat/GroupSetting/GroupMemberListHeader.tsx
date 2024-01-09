@@ -1,4 +1,5 @@
 import { LeftOutlined } from "@ant-design/icons";
+import { t } from "i18next";
 import { memo } from "react";
 
 import invite_header from "@/assets/images/chatSetting/invite_header.png";

@@ -1,11 +1,11 @@
 import { useLatest } from "ahooks";
+import { CbEvents } from "open-im-sdk-wasm";
+import { GroupMemberItem, WSEvent } from "open-im-sdk-wasm/lib/types/entity";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { IMSDK } from "@/layout/MainContentWrap";
 import { useConversationStore } from "@/store";
 import { feedbackToast } from "@/utils/common";
-import { CbEvents } from "@/utils/open-im-sdk-wasm/constant";
-import { GroupMemberItem, WSEvent } from "@/utils/open-im-sdk-wasm/types/entity";
 
 export const REACH_SEARCH_FLAG = "LAST_FLAG";
 

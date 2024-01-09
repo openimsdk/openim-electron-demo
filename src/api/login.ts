@@ -1,10 +1,10 @@
+import { MessageReceiveOptType } from "open-im-sdk-wasm";
 import { useMutation, useQuery } from "react-query";
 import { v4 as uuidv4 } from "uuid";
 
 import { USER_URL } from "@/config";
 import { useUserStore } from "@/store";
 import { AppConfig } from "@/store/type";
-import { MessageReceiveOptType } from "@/utils/open-im-sdk-wasm/types/enum";
 import createAxiosInstance from "@/utils/request";
 import { getChatToken } from "@/utils/storage";
 

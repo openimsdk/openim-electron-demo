@@ -1,16 +1,16 @@
 import { Badge, Popover } from "antd";
 import clsx from "clsx";
+import type {
+  ConversationItem,
+  ConversationItem as ConversationItemType,
+  MessageItem,
+} from "open-im-sdk-wasm/lib/types/entity";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import OIMAvatar from "@/components/OIMAvatar";
 import { useConversationStore } from "@/store";
 import { formatConversionTime, formatMessageByType } from "@/utils/imCommon";
-import type {
-  ConversationItem,
-  ConversationItem as ConversationItemType,
-  MessageItem,
-} from "@/utils/open-im-sdk-wasm/types/entity";
 
 import styles from "./conversation-item.module.scss";
 import ConversationMenuContent from "./ConversationMenuContent";

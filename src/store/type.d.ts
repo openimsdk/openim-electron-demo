@@ -1,4 +1,3 @@
-import { BusinessUserInfo } from "@/api/login";
 import {
   BlackUserItem,
   ConversationItem,
@@ -9,7 +8,9 @@ import {
   GroupMemberItem,
   MessageItem,
   SelfUserInfo,
-} from "@/utils/open-im-sdk-wasm/types/entity";
+} from "open-im-sdk-wasm/lib/types/entity";
+
+import { BusinessUserInfo } from "@/api/login";
 
 import { ExMessageItem } from "./message";
 

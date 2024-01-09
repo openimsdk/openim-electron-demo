@@ -1,4 +1,5 @@
 import { t } from "i18next";
+import { MessageType } from "open-im-sdk-wasm";
 import { memo } from "react";
 import { useCopyToClipboard } from "react-use";
 
@@ -17,7 +18,6 @@ import {
 } from "@/store";
 import { feedbackToast } from "@/utils/common";
 import emitter from "@/utils/events";
-import { MessageType } from "@/utils/open-im-sdk-wasm/types/enum";
 
 const messageMenuList = [
   {

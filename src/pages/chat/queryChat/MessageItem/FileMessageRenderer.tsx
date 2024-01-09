@@ -1,14 +1,14 @@
 import { useThrottleFn } from "ahooks";
 import { Spin } from "antd";
+import { CbEvents } from "open-im-sdk-wasm";
+import { MessageStatus } from "open-im-sdk-wasm";
+import { WSEvent } from "open-im-sdk-wasm/lib/types/entity";
 import { FC, useEffect, useRef, useState } from "react";
 
 import file_icon from "@/assets/images/messageItem/file_icon.png";
 import { IMSDK } from "@/layout/MainContentWrap";
 import FileDownloadIcon from "@/svg/FileDownloadIcon";
 import { bytesToSize, downloadFile } from "@/utils/common";
-import { CbEvents } from "@/utils/open-im-sdk-wasm/constant";
-import { WSEvent } from "@/utils/open-im-sdk-wasm/types/entity";
-import { MessageStatus } from "@/utils/open-im-sdk-wasm/types/enum";
 
 import { IMessageItemProps } from ".";
 
