@@ -86,7 +86,7 @@
     "localforage": "^1.10.0",
     "md5": "^2.3.0",
     "mitt": "^3.0.0",
-    "open-im-sdk-wasm": "^3.5.1-alpha.2.2",
+    "open-im-sdk-wasm": "^3.5.1-alpha.3",
     "react-draggable": "^4.4.5",
     "react-i18next": "^12.3.1",
     "react-query": "^3.39.3",
