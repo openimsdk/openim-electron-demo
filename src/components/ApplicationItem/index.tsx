@@ -91,7 +91,7 @@ const ApplicationItem = ({
               <Button
                 block={true}
                 size="small"
-                onClick={() => loadingWrap(false)}
+                onClick={() => loadingWrap(true)}
                 className="!h-full !rounded-md border-2 border-[#0089FF] text-[#0089FF]"
               >
                 {t("application.agree")}
@@ -103,7 +103,7 @@ const ApplicationItem = ({
                 size="small"
                 type="primary"
                 className="!h-full !rounded-md bg-[#0289fa]"
-                onClick={() => loadingWrap(true)}
+                onClick={() => loadingWrap(false)}
               >
                 {t("application.refuse")}
               </Button>
