@@ -1,27 +1,24 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { API_URL } from "@/config";
+import { USER_URL } from "@/config";
 import createAxiosInstance from "@/utils/request";
-import { getIMUserID } from "@/utils/storage";
+import { getChatToken } from "@/utils/storage";
 
-const request = createAxiosInstance(API_URL);
+const request = createAxiosInstance(USER_URL);
 
-interface UserOnlineState {
-  platformID: number;
-  status: 0 | 1;
-  userID: string;
-}
-
-export const getUserOnlineStatus = async (userIDs: string[]) =>
-  request.post<{ statusList: UserOnlineState[] }>(
-    "/user/get_users_status",
+export const getRtcConnectData = async (room: string, identity: string) => {
+  const token = (await getChatToken()) as string;
+  return request.post<{ serverUrl: string; token: string }>(
+    "/user/rtc/get_token",
     {
-      userID: await getIMUserID(),
-      userIDs,
+      room,
+      identity,
     },
     {
       headers: {
+        token,
         operationID: uuidv4(),
       },
     },
   );
+};

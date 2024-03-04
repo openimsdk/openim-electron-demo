@@ -15,7 +15,6 @@ import {
 } from "open-im-sdk-wasm/lib/types/entity";
 import { MessageType, SessionType } from "open-im-sdk-wasm";
 import { isThisYear } from "date-fns";
-import { getUserOnlineStatus } from "@/api/imApi";
 
 dayjs.extend(calendar);
 dayjs.extend(relativeTime);

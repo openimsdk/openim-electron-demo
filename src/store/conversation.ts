@@ -86,10 +86,6 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
       return;
     }
     const prevConversation = get().currentConversation;
-
-    console.log("prevConversation:::");
-    console.log(prevConversation);
-
     const toggleNewConversation =
       conversation.conversationID !== prevConversation?.conversationID;
     if (toggleNewConversation && isGroupSession(conversation.conversationType)) {

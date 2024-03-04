@@ -1,21 +1,32 @@
 import { Popover } from "antd";
 import i18n, { t } from "i18next";
-import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
+import { CbEvents, MessageType } from "open-im-sdk-wasm";
+import {
+  GroupItem,
+  MessageItem,
+  RtcInvite,
+  WSEvent,
+} from "open-im-sdk-wasm/lib/types/entity";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { getBusinessUserInfo } from "@/api/login";
 import add_friend from "@/assets/images/topSearchBar/add_friend.png";
 import add_group from "@/assets/images/topSearchBar/add_group.png";
 import create_group from "@/assets/images/topSearchBar/create_group.png";
 import search from "@/assets/images/topSearchBar/search.png";
 import show_more from "@/assets/images/topSearchBar/show_more.png";
 import WindowControlBar from "@/components/WindowControlBar";
+import { CustomType } from "@/constants";
 import { OverlayVisibleHandle } from "@/hooks/useOverlayVisible";
 import ChooseModal, { ChooseModalState } from "@/pages/common/ChooseModal";
 import GroupCardModal from "@/pages/common/GroupCardModal";
+import RtcCallModal from "@/pages/common/RtcCallModal";
+import { InviteData } from "@/pages/common/RtcCallModal/data";
 import UserCardModal, { CardInfo } from "@/pages/common/UserCardModal";
 import VideoPlayerModal from "@/pages/common/VideoPlayerModal";
 import emitter, { OpenUserCardParams } from "@/utils/events";
 
+import { IMSDK } from "../MainContentWrap";
 import SearchUserOrGroup from "./SearchUserOrGroup";
 
 type UserCardState = OpenUserCardParams & {
@@ -27,6 +38,7 @@ const TopSearchBar = () => {
   const groupCardRef = useRef<OverlayVisibleHandle>(null);
   const chooseModalRef = useRef<OverlayVisibleHandle>(null);
   const searchModalRef = useRef<OverlayVisibleHandle>(null);
+  const rtcRef = useRef<OverlayVisibleHandle>(null);
   const [chooseModalState, setChooseModalState] = useState<ChooseModalState>({
     type: "CRATE_GROUP",
   });
@@ -35,6 +47,7 @@ const TopSearchBar = () => {
   const [actionVisible, setActionVisible] = useState(false);
   const [isSearchGroup, setIsSearchGroup] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
+  const [inviteData, setInviteData] = useState<InviteData>({} as InviteData);
 
   useEffect(() => {
     const userCardHandler = (params: OpenUserCardParams) => {
@@ -48,16 +61,54 @@ const TopSearchBar = () => {
     const videoPlayerHandler = (url: string) => {
       setVideoUrl(url);
     };
+    const callRtcHandler = (inviteData: InviteData) => {
+      if (rtcRef.current?.isOverlayOpen) return;
+      setInviteData(inviteData);
+      rtcRef.current?.openOverlay();
+    };
+    const newMessageHandler = ({ data }: WSEvent<MessageItem[]>) => {
+      if (rtcRef.current?.isOverlayOpen) return;
+      let rtcInvite = undefined as undefined | RtcInvite;
+      data.map((message) => {
+        if (message.contentType === MessageType.CustomMessage) {
+          const customData = JSON.parse(message.customElem.data);
+          if (customData.customType === CustomType.CallingInvite) {
+            rtcInvite = customData.data;
+          }
+        }
+      });
+      if (rtcInvite) {
+        getBusinessUserInfo([rtcInvite.inviterUserID]).then(({ data: { users } }) => {
+          if (users.length === 0) return;
+          setInviteData({
+            invitation: rtcInvite,
+            participant: {
+              userInfo: {
+                nickname: users[0].nickname,
+                faceURL: users[0].faceURL,
+                userID: users[0].userID,
+                ex: "",
+              },
+            },
+          });
+          rtcRef.current?.openOverlay();
+        });
+      }
+    };
 
     emitter.on("OPEN_USER_CARD", userCardHandler);
     emitter.on("OPEN_GROUP_CARD", openGroupCardWithData);
     emitter.on("OPEN_CHOOSE_MODAL", chooseModalHandler);
     emitter.on("OPEN_VIDEO_PLAYER", videoPlayerHandler);
+    emitter.on("OPEN_RTC_MODAL", callRtcHandler);
+    IMSDK.on(CbEvents.OnRecvNewMessages, newMessageHandler);
     return () => {
       emitter.off("OPEN_USER_CARD", userCardHandler);
       emitter.off("OPEN_GROUP_CARD", openGroupCardWithData);
       emitter.off("OPEN_CHOOSE_MODAL", chooseModalHandler);
       emitter.off("OPEN_VIDEO_PLAYER", videoPlayerHandler);
+      emitter.off("OPEN_RTC_MODAL", callRtcHandler);
+      IMSDK.off(CbEvents.OnRecvNewMessages, newMessageHandler);
     };
   }, []);
 
@@ -129,6 +180,7 @@ const TopSearchBar = () => {
       {Boolean(videoUrl) && (
         <VideoPlayerModal url={videoUrl} closeOverlay={() => setVideoUrl("")} />
       )}
+      <RtcCallModal inviteData={inviteData} ref={rtcRef} />
     </div>
   );
 };

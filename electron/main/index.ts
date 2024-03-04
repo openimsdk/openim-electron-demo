@@ -10,6 +10,7 @@ import { initI18n } from "../i18n";
 
 const init = async () => {
   await initI18n();
+
   createMainWindow();
   createAppMenu();
   createTray();

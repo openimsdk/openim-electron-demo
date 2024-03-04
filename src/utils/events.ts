@@ -1,5 +1,5 @@
-import { ChooseModalState, ChooseModalType } from "@/pages/common/ChooseModal";
-import { CheckListItem } from "@/pages/common/ChooseModal/ChooseBox/CheckItem";
+import { ChooseModalState } from "@/pages/common/ChooseModal";
+import { InviteData } from "@/pages/common/RtcCallModal/data";
 import mitt from "mitt";
 import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
 
@@ -8,6 +8,7 @@ type EmitterEvents = {
   OPEN_GROUP_CARD: GroupItem;
   OPEN_CHOOSE_MODAL: ChooseModalState;
   OPEN_VIDEO_PLAYER: string;
+  OPEN_RTC_MODAL: InviteData;
   CHAT_LIST_SCROLL_TO_BOTTOM: boolean;
 };
 

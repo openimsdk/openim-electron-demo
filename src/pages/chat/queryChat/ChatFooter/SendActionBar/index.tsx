@@ -11,11 +11,13 @@ import card from "@/assets/images/chatFooter/card.png";
 import emoji from "@/assets/images/chatFooter/emoji.png";
 import file from "@/assets/images/chatFooter/file.png";
 import image from "@/assets/images/chatFooter/image.png";
+import rtc from "@/assets/images/chatFooter/rtc.png";
 import video from "@/assets/images/chatFooter/video.png";
 import { ExMessageItem } from "@/store";
 import emitter from "@/utils/events";
 
 import { SendMessageParams } from "../useSendMessage";
+import CallPopContent from "./CallPopContent";
 import EmojiPopContent from "./EmojiPopContent";
 
 const sendActionList = [
@@ -43,6 +45,14 @@ const sendActionList = [
     comp: null,
     placement: undefined,
   },
+  {
+    title: t("placeholder.call"),
+    icon: rtc,
+    key: "rtc",
+    accept: undefined,
+    comp: <CallPopContent />,
+    placement: "top",
+  },
 ];
 
 const SendActionBar = ({
@@ -58,7 +68,7 @@ const SendActionBar = ({
     rtc: false,
   });
 
-  const callClick = useCallback(
+  const closeAllPop = useCallback(
     () => setVisibleState({ cut: false, rtc: false, emoji: false }),
     [],
   );
@@ -84,7 +94,7 @@ const SendActionBar = ({
           content:
             action.comp &&
             React.cloneElement(action.comp as React.ReactElement, {
-              callClick,
+              closeAllPop,
               cutWithoutWindow,
             }),
           title: null,

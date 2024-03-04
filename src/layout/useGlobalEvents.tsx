@@ -1,7 +1,6 @@
-import { useLatest, useThrottleFn } from "ahooks";
 import { t } from "i18next";
 import { CbEvents } from "open-im-sdk-wasm";
-import { MessageReceiveOptType, MessageType, SessionType } from "open-im-sdk-wasm";
+import { MessageType, SessionType } from "open-im-sdk-wasm";
 import {
   BlackUserItem,
   ConversationItem,
@@ -18,9 +17,8 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { BusinessAllowType } from "@/api/login";
-import messageRing from "@/assets/audio/newMsg.mp3";
 import { API_URL, WS_URL } from "@/config";
+import { CustomType } from "@/constants";
 import {
   ExMessageItem,
   useConversationStore,
@@ -223,6 +221,16 @@ export function useGlobalEvent() {
       inCurrentConversation(newServerMsg) &&
       !notPushType.includes(newServerMsg.contentType)
     ) {
+      if (newServerMsg.contentType === MessageType.CustomMessage) {
+        const customData = JSON.parse(newServerMsg.customElem.data);
+        if (
+          CustomType.CallingInvite <= customData.customType &&
+          customData.customType <= CustomType.CallingHungup
+        ) {
+          return;
+        }
+      }
+
       pushNewMessage(newServerMsg);
       emitter.emit("CHAT_LIST_SCROLL_TO_BOTTOM", true);
     }
