@@ -55,7 +55,7 @@ export const RtcControl = ({
     const acceptHandler = async ({ roomID }: RtcInvite) => {
       if (invitation.roomID !== roomID) return;
       const { data } = await getRtcConnectData(
-        uuidV4(),
+        roomID,
         useUserStore.getState().selfInfo.userID,
       );
       connectRtc(data);
@@ -130,7 +130,7 @@ export const RtcControl = ({
     try {
       await sendCustomSignal(recvID, CustomType.CallingAccept);
       const { data } = await getRtcConnectData(
-        uuidV4(),
+        invitation.roomID,
         useUserStore.getState().selfInfo.userID,
       );
       connectRtc(data);
