@@ -83,7 +83,7 @@ const RtcCallModal: ForwardRefRenderFunction<
         recvID,
         message,
         groupID: "",
-        isOnlineonly: true,
+        isOnlineOnly: true,
       });
     },
     [invitation?.roomID],
