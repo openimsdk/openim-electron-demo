@@ -1,10 +1,10 @@
-module.exports = {
+export default {
   system: {
-    showWindow: "showWindow",
-    hideWindow: "hideWindow",
-    hide: "hide",
-    about: "about",
-    quit: "quit",
+    showWindow: "ShowWindow",
+    hideWindow: "HideWindow",
+    hide: "Hide",
+    about: "About",
+    quit: "Quit",
     window: "Window",
     minimize: "Minimize",
     close: "Close",
