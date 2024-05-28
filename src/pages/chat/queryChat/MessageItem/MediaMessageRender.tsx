@@ -21,13 +21,12 @@ const MediaMessageRender: FC<IMessageItemProps> = ({ message }) => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative" onClick={previewInAlbum}>
       <Image
         rootClassName="message-image cursor-pointer"
         className="max-w-[200px] rounded-md"
         src={sourceUrl}
         preview={!isVideoMessage}
-        onClick={previewInAlbum}
       />
       {isVideoMessage && (
         <img

@@ -37,10 +37,18 @@ export const setAppGlobalData = () => {
   const electronDistPath = join(__dirname, "../");
   const distPath = join(electronDistPath, "../dist");
   const publicPath = isProd ? distPath : join(electronDistPath, "../public");
+  const asarPath = join(distPath, "/../..");
+
   global.pathConfig = {
     electronDistPath,
     distPath,
     publicPath,
+    imsdkLibPath: isProd
+      ? join(
+          asarPath,
+          "/app.asar.unpacked/node_modules/@openim/electron-client-sdk/assets",
+        )
+      : join(__dirname, "../../node_modules/@openim/electron-client-sdk/assets"),
     trayIcon: join(publicPath, `/icons/${isWin ? "icon.ico" : "tray.png"}`),
     indexHtml: join(distPath, "index.html"),
     preload: join(__dirname, "../preload/index.js"),

@@ -3,6 +3,7 @@ import { closeWindow, minimize, updateMaximize } from "./windowManage";
 import { IpcRenderToMain } from "../constants";
 import { getStore } from "./storeManage";
 import { changeLanguage } from "../i18n";
+import { isProd } from "../utils";
 
 const store = getStore();
 
@@ -15,7 +16,7 @@ export const setIpcMainListener = () => {
       app.exit(0);
     });
   });
-  
+
   ipcMain.handle(IpcRenderToMain.minimizeWindow, () => {
     minimize();
   });
@@ -36,4 +37,8 @@ export const setIpcMainListener = () => {
   ipcMain.on(IpcRenderToMain.getKeyStoreSync, (e, { key }) => {
     e.returnValue = store.get(key);
   });
+
+  ipcMain.handle(IpcRenderToMain.getUserDataPath, () =>
+    isProd ? app.getPath("userData") : "./",
+  );
 };

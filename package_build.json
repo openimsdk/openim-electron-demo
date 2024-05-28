@@ -32,16 +32,44 @@
   },
   "build": {
     "extends": null,
-    "files": ["dist/**/*", "dist-electron/**/*"],
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "!node_modules/@openim/electron-client-sdk/assets/**/*",
+      "!dist/*.wasm"
+    ],
     "directories": {
       "output": "package"
     },
     "productName": "openim-pc-demo",
     "win": {
-      "icon": "./dist/icons/icon.ico"
+      "icon": "./dist/icons/icon.ico",
+      "extraResources": [
+        {
+          "from": "node_modules/@openim/electron-client-sdk/assets/win_${arch}/",
+          "to": "app.asar.unpacked/node_modules/@openim/electron-client-sdk/assets/win_${arch}"
+        }
+      ]
     },
     "mac": {
-      "icon": "./dist/icons/icon.png"
+      "icon": "./dist/icons/icon.png",
+      "extraResources": [
+        {
+          "from": "node_modules/@openim/electron-client-sdk/assets/mac_${arch}/",
+          "to": "app.asar.unpacked/node_modules/@openim/electron-client-sdk/assets/mac_${arch}"
+        }
+      ]
+    },
+    "linux": {
+      "icon": "./dist/icons/icon.png",
+      "target": "deb",
+      "maintainer": "openim-pc-demo",
+      "extraResources": [
+        {
+          "from": "node_modules/@openim/electron-client-sdk/assets/linux_${arch}/",
+          "to": "app.asar.unpacked/node_modules/@openim/electron-client-sdk/assets/linux_${arch}"
+        }
+      ]
     },
     "nsis": {
       "oneClick": false,
@@ -53,13 +81,16 @@
       "deleteAppDataOnUninstall": true,
       "shortcutName": "openim-pc-demo"
     },
-    "asar": false
+    "asar": true,
+    "asarUnpack": ["**/*.node"]
   },
   "lint-staged": {
     "src/**/*.{tsx,ts}": ["prettier --write", "eslint --fix"],
     "*.{json,html,css,scss,xml,md}": ["prettier --write"]
   },
   "dependencies": {
+    "@openim/electron-client-sdk": "^1.0.1",
+    "open-im-sdk-wasm": "^3.5.3-alpha.5",
     "electron-log": "^4.4.8",
     "electron-store": "^8.1.0",
     "i18next": "^22.5.0",

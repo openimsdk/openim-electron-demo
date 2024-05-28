@@ -52,7 +52,9 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
           message.warning(t("empty.noSearchResults"));
           return;
         }
-        const { data } = await IMSDK.getUsersInfo([users[0].userID]);
+        const { data } = await IMSDK.getUsersInfoWithCache({
+          userIDList: [users[0].userID],
+        });
         const friendInfo = data[0].friendInfo;
 
         openUserCardWithData({

@@ -41,7 +41,7 @@ const sendActionList = [
     title: t("placeholder.video"),
     icon: video,
     key: "video",
-    accept: !window.electronAPI ? ".mp4" : "video/*",
+    accept: ".mp4",
     comp: null,
     placement: undefined,
   },

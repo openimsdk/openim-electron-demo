@@ -100,7 +100,9 @@ const UserCardModal: ForwardRefRenderFunction<
     const {
       data: { users },
     } = await getBusinessUserInfo([userID!]);
-    const { data } = await IMSDK.getUsersInfo([userID!]);
+    const { data } = await IMSDK.getUsersInfoWithCache({
+      userIDList: [userID!],
+    });
     return {
       ...data[0]?.friendInfo,
       ...users[0],

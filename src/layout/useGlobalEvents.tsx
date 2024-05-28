@@ -97,13 +97,28 @@ export function useGlobalEvent() {
     const IMUserID = (await getIMUserID()) as string;
     if (IMToken && IMUserID) {
       try {
-        await IMSDK.login({
-          userID: IMUserID,
-          token: IMToken,
-          platformID: window.electronAPI?.getPlatform() ?? 5,
-          apiAddr: API_URL,
-          wsAddr: WS_URL,
-        });
+        if (window.electronAPI) {
+          await IMSDK.initSDK({
+            platformID: window.electronAPI?.getPlatform() ?? 5,
+            apiAddr: API_URL,
+            wsAddr: WS_URL,
+            dataDir: await window.electronAPI.ipcInvoke("getUserDataPath"),
+            logLevel: 5,
+            isLogStandardOutput: true,
+          });
+          await IMSDK.login({
+            userID: IMUserID,
+            token: IMToken,
+          });
+        } else {
+          await IMSDK.login({
+            userID: IMUserID,
+            token: IMToken,
+            platformID: 5,
+            apiAddr: API_URL,
+            wsAddr: WS_URL,
+          });
+        }
         initStore();
       } catch (error) {
         console.error(error);

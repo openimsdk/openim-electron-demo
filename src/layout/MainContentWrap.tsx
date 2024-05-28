@@ -1,4 +1,5 @@
-import { AllowType, getSDK } from "open-im-sdk-wasm";
+import { getWithRenderProcess } from "@openim/electron-client-sdk/lib/render";
+import { AllowType } from "open-im-sdk-wasm";
 import { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
@@ -8,10 +9,14 @@ import { getIMToken, getIMUserID } from "@/utils/storage";
 
 const isElectronProd = import.meta.env.MODE !== "development" && window.electronAPI;
 
-export const IMSDK = getSDK({
-  coreWasmPath: "./openIM.wasm",
-  sqlWasmPath: `${isElectronProd ? ".." : ""}/sql-wasm.wasm`,
+const { instance } = getWithRenderProcess({
+  wasmConfig: {
+    coreWasmPath: "./openIM.wasm",
+    sqlWasmPath: `${isElectronProd ? ".." : ""}/sql-wasm.wasm`,
+  },
 });
+
+export const IMSDK = instance;
 
 export const MainContentWrap = () => {
   const selfID = useUserStore((state) => state.selfInfo.userID);

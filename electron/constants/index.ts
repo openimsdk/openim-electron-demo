@@ -5,4 +5,5 @@ export const IpcRenderToMain = {
   setKeyStore: "setKeyStore",
   getKeyStore: "getKeyStore",
   getKeyStoreSync: "getKeyStoreSync",
+  getUserDataPath: "getUserDataPath",
 };

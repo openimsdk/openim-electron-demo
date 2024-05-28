@@ -1,5 +1,7 @@
 import { join } from "node:path";
+import os from "os";
 import { BrowserWindow, dialog } from "electron";
+import OpenIMSDKMain from "@openim/electron-client-sdk";
 import { isMac } from "../utils";
 import { destroyTray } from "./trayManage";
 import { getStore } from "./storeManage";
@@ -9,6 +11,20 @@ const url = process.env.VITE_DEV_SERVER_URL;
 let mainWindow: BrowserWindow | null = null;
 
 const store = getStore();
+
+const getLibPath = () => {
+  const platform = process.platform;
+  const arch = os.arch();
+  let dirName = "";
+  if (platform === "darwin") {
+    dirName = join(`mac_${arch === "arm64" ? "arm64" : "x64"}`, "libopenimsdk.dylib");
+  } else if (platform === "win32") {
+    dirName = join(`win_${arch === "ia32" ? "ia32" : "x64"}`, "libopenimsdk.dll");
+  } else {
+    dirName = join(`linux_${arch === "arm64" ? "arm64" : "x64"}`, "libopenimsdk.so");
+  }
+  return join(global.pathConfig.imsdkLibPath, dirName);
+};
 
 export function createMainWindow() {
   mainWindow = new BrowserWindow({
@@ -26,8 +42,11 @@ export function createMainWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: false,
+      webSecurity: false,
     },
   });
+
+  new OpenIMSDKMain(getLibPath(), mainWindow.webContents);
 
   if (process.env.VITE_DEV_SERVER_URL) {
     // Open devTool if the app is not packaged

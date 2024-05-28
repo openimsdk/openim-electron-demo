@@ -9,6 +9,7 @@ export interface IElectronAPI {
   unsubscribeAll: (channel: string) => void;
   ipcInvoke: <T = unknown>(channel: string, ...arg: any) => Promise<T>;
   ipcSendSync: <T = unknown>(channel: string, ...arg: any) => T;
+  saveFileToDisk: (params: { file: File; sync?: boolean }) => Promise<string>;
 }
 
 declare global {

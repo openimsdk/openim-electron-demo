@@ -1,6 +1,9 @@
-import { existsSync } from "original-fs";
+import fs from "fs";
+import path from "path";
+import { contextBridge, ipcRenderer } from "electron";
 import { IElectronAPI } from "./../../src/types/globalExpose.d";
-import { contextBridge, ipcRenderer, shell } from "electron";
+
+import "@openim/electron-client-sdk/lib/preload";
 
 const getPlatform = () => {
   if (process.platform === "darwin") {
@@ -36,6 +39,27 @@ const ipcSendSync = (channel: string, ...arg: any) => {
   return ipcRenderer.sendSync(channel, ...arg);
 };
 
+const saveFileToDisk = async ({
+  file,
+  sync,
+}: {
+  file: File;
+  sync?: boolean;
+}): Promise<string> => {
+  const arrayBuffer = await file.arrayBuffer();
+  const saveDir = await ipcInvoke("getUserDataPath");
+  const savePath = path.join(saveDir, file.name);
+  if (!fs.existsSync(saveDir)) {
+    fs.mkdirSync(saveDir, { recursive: true });
+  }
+  if (sync) {
+    await fs.promises.writeFile(savePath, Buffer.from(arrayBuffer));
+  } else {
+    fs.promises.writeFile(savePath, Buffer.from(arrayBuffer));
+  }
+  return savePath;
+};
+
 const Api: IElectronAPI = {
   getVersion: () => process.version,
   getPlatform,
@@ -45,6 +69,7 @@ const Api: IElectronAPI = {
   unsubscribeAll,
   ipcInvoke,
   ipcSendSync,
+  saveFileToDisk,
 };
 
 contextBridge.exposeInMainWorld("electronAPI", Api);
