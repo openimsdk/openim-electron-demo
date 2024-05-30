@@ -1,30 +1,29 @@
 import { SearchOutlined } from "@ant-design/icons";
 import { useLatest } from "ahooks";
-import { Breadcrumb, Input } from "antd";
+import { Breadcrumb, Input, Spin } from "antd";
 import { BreadcrumbItemType } from "antd/es/breadcrumb/Breadcrumb";
 import clsx from "clsx";
 import i18n, { t } from "i18next";
 import { GroupMemberItem } from "open-im-sdk-wasm/lib/types/entity";
 import {
+  FC,
   forwardRef,
   ForwardRefRenderFunction,
   memo,
   useCallback,
+  useEffect,
   useImperativeHandle,
-  useRef,
   useState,
 } from "react";
 import { Virtuoso } from "react-virtuoso";
 
 import friend from "@/assets/images/chooseModal/friend.png";
 import group from "@/assets/images/chooseModal/group.png";
-import recently from "@/assets/images/chooseModal/recently.png";
 import { useCurrentMemberRole } from "@/hooks/useCurrentMemberRole";
-import useGroupMembers, { REACH_SEARCH_FLAG } from "@/hooks/useGroupMembers";
+import useGroupMembers from "@/hooks/useGroupMembers";
 import { IMSDK } from "@/layout/MainContentWrap";
-import { useConversationStore, useUserStore } from "@/store";
+import { useConversationStore } from "@/store";
 import { useContactStore } from "@/store/contact";
-import { feedbackToast } from "@/utils/common";
 
 import CheckItem, { CheckListItem } from "./CheckItem";
 import MenuItem from "./MenuItem";
@@ -32,25 +31,19 @@ import MenuItem from "./MenuItem";
 const menuList = [
   {
     idx: 0,
-    title: t("placeholder.latestChat"),
-    icon: recently,
-  },
-  {
-    idx: 1,
     title: t("placeholder.myFriend"),
     icon: friend,
   },
   {
-    idx: 2,
+    idx: 1,
     title: t("placeholder.myGroup"),
     icon: group,
   },
 ];
 
 i18n.on("languageChanged", () => {
-  menuList[0].title = t("placeholder.latestChat");
-  menuList[1].title = t("placeholder.myFriend");
-  menuList[2].title = t("placeholder.myGroup");
+  menuList[0].title = t("placeholder.myFriend");
+  menuList[1].title = t("placeholder.myGroup");
 });
 
 export type ChooseMenuItem = (typeof menuList)[0];
@@ -58,7 +51,6 @@ export type ChooseMenuItem = (typeof menuList)[0];
 interface IChooseBoxProps {
   className?: string;
   isCheckInGroup?: boolean;
-  notConversation?: boolean;
   showGroupMember?: boolean;
   checkMemberRole?: boolean;
 }
@@ -73,23 +65,10 @@ const ChooseBox: ForwardRefRenderFunction<ChooseBoxHandle, IChooseBoxProps> = (
   props,
   ref,
 ) => {
-  const {
-    className,
-    isCheckInGroup,
-    notConversation,
-    showGroupMember,
-    checkMemberRole,
-  } = props;
+  const { className, checkMemberRole, isCheckInGroup, showGroupMember } = props;
 
   const [checkedList, setCheckedList] = useState<CheckListItem[]>([]);
   const latestCheckedList = useLatest(checkedList);
-
-  const [searchState, setSearchState] = useState({
-    keywords: "",
-    searching: false,
-  });
-
-  const memberListRef = useRef<MemberListHandle>(null);
 
   const checkClick = useCallback((data: CheckListItem) => {
     const idx = latestCheckedList.current.findIndex(
@@ -126,12 +105,6 @@ const ChooseBox: ForwardRefRenderFunction<ChooseBoxHandle, IChooseBoxProps> = (
     setCheckedList([...data]);
   };
 
-  const onEnterSearch = () => {
-    if (!searchState.keywords) return;
-    setSearchState((state) => ({ ...state, searching: true }));
-    memberListRef.current?.searchMember(searchState.keywords);
-  };
-
   useImperativeHandle(ref, () => ({
     getCheckedList: () => checkedList,
     resetState,
@@ -148,29 +121,21 @@ const ChooseBox: ForwardRefRenderFunction<ChooseBoxHandle, IChooseBoxProps> = (
       <div className="flex flex-1 flex-col border-r border-[var(--gap-text)]">
         <div className="p-5.5 pb-3">
           <Input
-            value={searchState.keywords}
             allowClear
-            onChange={(e) =>
-              setSearchState((state) => ({
-                searching: e.target.value ? state.searching : false,
-                keywords: e.target.value,
-              }))
+            spellCheck={false}
+            prefix={
+              <SearchOutlined rev={undefined} className="text-[var(--sub-text)]" />
             }
-            onPressEnter={onEnterSearch}
-            prefix={<SearchOutlined rev={undefined} className="text-[#8e9ab0]" />}
           />
         </div>
         {showGroupMember ? (
-          <ForwardMemberList
-            ref={memberListRef}
+          <MemoMemberList
             isChecked={isChecked}
-            checkClick={checkClick}
             checkMemberRole={checkMemberRole}
-            isSearching={searchState.searching}
+            checkClick={checkClick}
           />
         ) : (
-          <CommonLeft
-            notConversation={notConversation!}
+          <MemoCommonLeft
             isCheckInGroup={isCheckInGroup!}
             isChecked={isChecked}
             checkClick={checkClick}
@@ -198,157 +163,146 @@ const ChooseBox: ForwardRefRenderFunction<ChooseBoxHandle, IChooseBoxProps> = (
 
 export default memo(forwardRef(ChooseBox));
 
-const CommonLeft = memo(
-  ({
-    notConversation,
-    isCheckInGroup,
-    checkClick,
-    isChecked,
-  }: {
-    notConversation: boolean;
-    isCheckInGroup: boolean;
-    checkClick: (data: CheckListItem) => void;
-    isChecked: (data: CheckListItem) => boolean;
-  }) => {
-    const [breadcrumb, setBreadcrumb] = useState<BreadcrumbItemType[]>([]);
-    const [checkList, setCheckList] = useState<CheckListItem[]>([]);
+interface ICommonLeftProps {
+  isCheckInGroup: boolean;
+  checkClick: (data: CheckListItem) => void;
+  isChecked: (data: CheckListItem) => boolean;
+}
 
-    const conversationList = useConversationStore((state) => state.conversationList);
-    const currentGroupID = useConversationStore(
-      (state) => state.currentConversation?.groupID,
-    );
-    const friendList = useContactStore((state) => state.friendList);
-    const groupList = useContactStore((state) => state.groupList);
+const CommonLeft: FC<ICommonLeftProps> = (
+  { isCheckInGroup, checkClick, isChecked },
+  ref,
+) => {
+  const [breadcrumb, setBreadcrumb] = useState<BreadcrumbItemType[]>([]);
+  const [checkList, setCheckList] = useState<CheckListItem[]>([]);
 
-    const breadcrumbClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-      e.preventDefault();
-      setBreadcrumb([]);
-    };
+  const breadcrumbClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    e.preventDefault();
+    setBreadcrumb([]);
+  };
 
-    const checkInGroup = async (list: CheckListItem[]) => {
-      if (!isCheckInGroup || !currentGroupID) {
-        return list;
-      }
-      const tmpList = JSON.parse(JSON.stringify(list)) as CheckListItem[];
-      const userIDList = tmpList
-        .filter((item) => Boolean(item.userID))
-        .map((item) => item.userID!);
-      try {
-        const { data } = await IMSDK.getSpecifiedGroupMembersInfo({
-          groupID: currentGroupID,
-          userIDList,
-        });
-        const inGroupUserIDList = data.map((item) => item.userID);
-        tmpList.map((item) => {
-          item.disabled = inGroupUserIDList.includes(item.userID!);
-        });
-      } catch (error) {
-        console.log(error);
-      }
-      return tmpList;
-    };
-
-    const menuClick = useCallback(async (idx: number) => {
-      const pushItem = {
-        title: "",
-        className: "text-xs text-[var(--primary)]",
-      };
-      switch (idx) {
-        case 0:
-          setCheckList(await checkInGroup(conversationList));
-          pushItem.title = t("placeholder.latestChat");
-          break;
-        case 1:
-          setCheckList(await checkInGroup(friendList));
-          pushItem.title = t("placeholder.myFriend");
-          break;
-        case 2:
-          setCheckList(await checkInGroup(groupList));
-          pushItem.title = t("placeholder.myFriend");
-          break;
-        default:
-          break;
-      }
-      setBreadcrumb((state) => [...state, pushItem]);
-    }, []);
-
-    if (breadcrumb.length < 1) {
-      return (
-        <div className="flex-1 overflow-auto">
-          {menuList.map((menu) => {
-            if (notConversation && menu.idx !== 1) {
-              return null;
-            }
-            return <MenuItem menu={menu} key={menu.idx} menuClick={menuClick} />;
-          })}
-        </div>
-      );
+  const checkInGroup = async (list: CheckListItem[]) => {
+    const currentGroupID = useConversationStore.getState().currentConversation?.groupID;
+    if (!isCheckInGroup || !currentGroupID) {
+      return list;
     }
+    const tmpList = JSON.parse(JSON.stringify(list)) as CheckListItem[];
+    const userIDList = tmpList
+      .filter((item) => Boolean(item.userID))
+      .map((item) => item.userID!);
+    try {
+      const { data } = await IMSDK.getSpecifiedGroupMembersInfo({
+        groupID: currentGroupID,
+        userIDList,
+      });
+      const inGroupUserIDList = data.map((item) => item.userID);
+      tmpList.map((item) => {
+        item.disabled = inGroupUserIDList.includes(item.userID!);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+    return tmpList;
+  };
 
+  const menuClick = useCallback(async (idx: number) => {
+    const pushItem = {
+      title: "",
+      className: "text-xs text-[var(--primary)]",
+    };
+    switch (idx) {
+      case 0:
+        setCheckList(await checkInGroup(useContactStore.getState().friendList));
+        pushItem.title = t("placeholder.myFriend");
+        break;
+      case 1:
+        setCheckList(await checkInGroup(useContactStore.getState().groupList));
+        pushItem.title = t("placeholder.myGroup");
+        break;
+      default:
+        break;
+    }
+    setBreadcrumb((state) => [...state, pushItem]);
+  }, []);
+
+  if (breadcrumb.length < 1) {
     return (
-      <div className="flex flex-1 flex-col">
-        <Breadcrumb
-          className="mx-5.5"
-          separator=">"
-          items={[
-            {
-              title: t("placeholder.contacts"),
-              href: "",
-              className: "text-xs text-[var(--sub-text)]",
-              onClick: breadcrumbClick,
-            },
-            ...breadcrumb,
-          ]}
-        />
-        <div className="mb-3 flex-1 overflow-y-auto">
-          <Virtuoso
-            className="h-full"
-            data={checkList}
-            itemContent={(_, item) => (
-              <CheckItem
-                showCheck
-                isChecked={isChecked(item)}
-                data={item}
-                key={item.userID || item.groupID}
-                itemClick={checkClick}
-              />
-            )}
-          />
-        </div>
+      <div className="flex-1 overflow-auto">
+        {menuList.map((menu) => {
+          if (menu.idx !== 0) {
+            return null;
+          }
+          return <MenuItem menu={menu} key={menu.idx} menuClick={menuClick} />;
+        })}
       </div>
     );
-  },
-);
+  }
+
+  return (
+    <div className="flex flex-1 flex-col">
+      <Breadcrumb
+        className="mx-5.5"
+        separator=">"
+        items={[
+          {
+            title: t("placeholder.contacts"),
+            href: "",
+            className: "text-xs text-[var(--sub-text)]",
+            onClick: breadcrumbClick,
+          },
+          ...breadcrumb,
+        ]}
+      />
+      <div className="mb-3 flex-1 overflow-y-auto">
+        <Virtuoso
+          className="h-full"
+          data={checkList}
+          itemContent={(_, item) => (
+            <CheckItem
+              showCheck
+              isChecked={isChecked(item)}
+              data={item}
+              key={item.userID || item.groupID}
+              itemClick={checkClick}
+            />
+          )}
+        />
+      </div>
+    </div>
+  );
+};
+
+const MemoCommonLeft = memo(CommonLeft);
 
 interface IGroupMemberListProps {
-  isSearching?: boolean;
   checkMemberRole?: boolean;
   checkClick: (data: CheckListItem) => void;
   isChecked: (data: CheckListItem) => boolean;
 }
 
-interface MemberListHandle {
-  searchMember: (keywords: string) => void;
-}
-
-const GroupMemberList: ForwardRefRenderFunction<
-  MemberListHandle,
-  IGroupMemberListProps
-> = ({ isSearching, checkMemberRole, checkClick, isChecked }, ref) => {
-  const { currentRolevel } = useCurrentMemberRole();
-  const { fetchState, searchMember, getMemberData } = useGroupMembers({
+const GroupMemberList: FC<IGroupMemberListProps> = (
+  { checkMemberRole, checkClick, isChecked },
+  ref,
+) => {
+  const { currentRolevel, currentMemberInGroup } = useCurrentMemberRole();
+  const { fetchState, getMemberData, resetState } = useGroupMembers({
     notRefresh: true,
   });
+
+  useEffect(() => {
+    if (currentMemberInGroup?.groupID) {
+      getMemberData(true);
+    }
+    return () => {
+      resetState();
+    };
+  }, [currentMemberInGroup?.groupID]);
 
   const endReached = () => {
     if (fetchState.loading || !fetchState.hasMore) {
       return;
     }
-    if (!isSearching) {
-      getMemberData();
-    } else {
-      searchMember(REACH_SEARCH_FLAG);
-    }
+    getMemberData();
   };
 
   const isDisabled = (member: GroupMemberItem) => {
@@ -356,25 +310,13 @@ const GroupMemberList: ForwardRefRenderFunction<
     return member.roleLevel >= currentRolevel;
   };
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      searchMember,
-    }),
-    [],
-  );
-
-  const dataSource = isSearching
-    ? fetchState.searchMemberList
-    : fetchState.groupMemberList;
-
   return (
     <Virtuoso
       className="h-full overflow-x-hidden"
-      data={dataSource}
+      data={fetchState.groupMemberList}
       endReached={endReached}
       components={{
-        Header: () => (fetchState.loading ? <div>loading...</div> : null),
+        Header: () => (fetchState.loading ? <Spin /> : null),
       }}
       itemContent={(_, member) => (
         <CheckItem
@@ -390,4 +332,4 @@ const GroupMemberList: ForwardRefRenderFunction<
   );
 };
 
-const ForwardMemberList = memo(forwardRef(GroupMemberList));
+const MemoMemberList = memo(GroupMemberList);

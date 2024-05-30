@@ -22,7 +22,7 @@ function App() {
 
   return (
     <ConfigProvider
-      autoInsertSpaceInButton={false}
+      button={{ autoInsertSpace: false }}
       locale={locale === "zh-CN" ? zhCN : enUS}
       theme={{
         token: { colorPrimary: "#0089FF" },

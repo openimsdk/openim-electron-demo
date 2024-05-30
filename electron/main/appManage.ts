@@ -1,6 +1,7 @@
-import { app } from "electron";
+import { app, shell } from "electron";
 import { isExistMainWindow, showWindow } from "./windowManage";
 import { join } from "node:path";
+import { release } from "node:os";
 import { isMac, isProd, isWin } from "../utils";
 import { getStore } from "./storeManage";
 
@@ -18,6 +19,15 @@ export const setSingleInstance = () => {
 };
 
 export const setAppListener = (startApp: () => void) => {
+  app.on("web-contents-created", (event, contents) => {
+    contents.setWindowOpenHandler(({ url }) => {
+      if (!/^devtools/.test(url) && /^https?:\/\//.test(url)) {
+        shell.openExternal(url);
+      }
+      return { action: "deny" };
+    });
+  });
+
   app.on("activate", () => {
     if (isExistMainWindow()) {
       showWindow();
@@ -33,6 +43,19 @@ export const setAppListener = (startApp: () => void) => {
   });
 };
 
+export const performAppStartup = () => {
+  app.setAppUserModelId(app.getName());
+
+  app.commandLine.appendSwitch("--autoplay-policy", "no-user-gesture-required");
+  app.commandLine.appendSwitch(
+    "disable-features",
+    "HardwareMediaKeyHandling,MediaSessionService",
+  );
+
+  // Disable GPU Acceleration for Windows 7
+  if (release().startsWith("6.1")) app.disableHardwareAcceleration();
+};
+
 export const setAppGlobalData = () => {
   const electronDistPath = join(__dirname, "../");
   const distPath = join(electronDistPath, "../dist");
@@ -43,14 +66,10 @@ export const setAppGlobalData = () => {
     electronDistPath,
     distPath,
     publicPath,
-    imsdkLibPath: isProd
-      ? join(
-          asarPath,
-          "/app.asar.unpacked/node_modules/@openim/electron-client-sdk/assets",
-        )
-      : join(__dirname, "../../node_modules/@openim/electron-client-sdk/assets"),
+    asarPath,
     trayIcon: join(publicPath, `/icons/${isWin ? "icon.ico" : "tray.png"}`),
     indexHtml: join(distPath, "index.html"),
+    splashHtml: join(distPath, "splash.html"),
     preload: join(__dirname, "../preload/index.js"),
   };
 };

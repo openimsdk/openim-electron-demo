@@ -1,24 +1,20 @@
 import { Layout, Tooltip } from "antd";
 import clsx from "clsx";
-import { t } from "i18next";
-import { CbEvents } from "open-im-sdk-wasm";
-import { OnlineState, SessionType } from "open-im-sdk-wasm";
-import { UserOnlineState, WSEvent } from "open-im-sdk-wasm/lib/types/entity";
-import { useEffect, useRef, useState } from "react";
+import i18n, { t } from "i18next";
+import { SessionType } from "open-im-sdk-wasm";
+import { memo, useEffect, useRef } from "react";
 
 import group_member from "@/assets/images/chatHeader/group_member.png";
 import launch_group from "@/assets/images/chatHeader/launch_group.png";
 import settings from "@/assets/images/chatHeader/settings.png";
 import OIMAvatar from "@/components/OIMAvatar";
 import { OverlayVisibleHandle } from "@/hooks/useOverlayVisible";
-import { IMSDK } from "@/layout/MainContentWrap";
-import { useConversationStore } from "@/store";
+import { useConversationStore, useUserStore } from "@/store";
 import emitter from "@/utils/events";
 import { isGroupSession } from "@/utils/imCommon";
 
 import GroupSetting from "../GroupSetting";
 import SingleSetting from "../SingleSetting";
-import styles from "./chat-header.module.scss";
 
 const menuList = [
   {
@@ -38,6 +34,12 @@ const menuList = [
   },
 ];
 
+i18n.on("languageChanged", () => {
+  menuList[0].title = t("placeholder.createGroup");
+  menuList[1].title = t("placeholder.invitation");
+  menuList[2].title = t("placeholder.setting");
+});
+
 const ChatHeader = () => {
   const singleSettingRef = useRef<OverlayVisibleHandle>(null);
   const groupSettingRef = useRef<OverlayVisibleHandle>(null);
@@ -49,6 +51,18 @@ const ChatHeader = () => {
   const inGroup = useConversationStore((state) =>
     Boolean(state.currentMemberInGroup?.groupID),
   );
+
+  // locale re render
+  useUserStore((state) => state.appSettings.locale);
+
+  useEffect(() => {
+    if (singleSettingRef.current?.isOverlayOpen) {
+      singleSettingRef.current?.closeOverlay();
+    }
+    if (groupSettingRef.current?.isOverlayOpen) {
+      groupSettingRef.current?.closeOverlay();
+    }
+  }, [currentConversation?.conversationID]);
 
   const menuClick = (idx: number) => {
     switch (idx) {
@@ -73,27 +87,41 @@ const ChatHeader = () => {
     }
   };
 
+  const showCard = () => {
+    if (isSingle || isNotification) {
+      window.userClick(currentConversation?.userID);
+      return;
+    }
+    if (currentGroupInfo) {
+      emitter.emit("OPEN_GROUP_CARD", currentGroupInfo);
+    }
+  };
+
   const isNotification =
     currentConversation?.conversationType === SessionType.Notification;
   const isSingle = currentConversation?.conversationType === SessionType.Single;
 
   return (
     <Layout.Header className="relative border-b border-b-[var(--gap-text)] !bg-white !px-3">
-      <div className="flex h-full items-center justify-between leading-none">
-        <div className="flex items-center">
+      <div className="flex h-full items-center leading-none">
+        <div className="flex flex-1 items-center overflow-hidden">
           <OIMAvatar
             src={currentConversation?.faceURL}
             text={currentConversation?.showName}
             isgroup={Boolean(currentConversation?.groupID)}
             isnotification={isNotification}
+            onClick={showCard}
           />
-          <div className="ml-3 flex h-10.5 flex-col justify-between">
-            <div className="text-base font-semibold">
+          <div
+            className={clsx(
+              "ml-3 flex !h-10.5 flex-1 flex-col justify-between overflow-hidden",
+              isNotification && "!justify-center",
+            )}
+          >
+            <div className="truncate text-base font-semibold">
               {currentConversation?.showName}
             </div>
-            {isSingle ? (
-              <OnlineOrTypingStatus userID={currentConversation?.userID} />
-            ) : (
+            {!isSingle && !isNotification && (
               <div className="flex items-center text-xs text-[var(--sub-text)]">
                 <img width={20} src={group_member} alt="member" />
                 <span>{currentGroupInfo?.memberCount}</span>
@@ -102,28 +130,30 @@ const ChatHeader = () => {
           </div>
         </div>
 
-        <div className="mr-5 flex">
-          {menuList.map((menu) => {
-            if (menu.idx === 4 && (isSingle || (!inGroup && !isSingle))) {
-              return null;
-            }
-            if (menu.idx === 3 && !isSingle) {
-              return null;
-            }
+        {!isNotification && (
+          <div className="mr-5 flex">
+            {menuList.map((menu) => {
+              if (menu.idx === 4 && (isSingle || (!inGroup && !isSingle))) {
+                return null;
+              }
+              if (menu.idx === 3 && !isSingle) {
+                return null;
+              }
 
-            return (
-              <Tooltip title={menu.title} key={menu.idx}>
-                <img
-                  className="ml-5 cursor-pointer"
-                  width={20}
-                  src={menu.icon}
-                  alt=""
-                  onClick={() => menuClick(menu.idx)}
-                />
-              </Tooltip>
-            );
-          })}
-        </div>
+              return (
+                <Tooltip title={menu.title} key={menu.idx}>
+                  <img
+                    className="ml-5 cursor-pointer"
+                    width={20}
+                    src={menu.icon}
+                    alt=""
+                    onClick={() => menuClick(menu.idx)}
+                  />
+                </Tooltip>
+              );
+            })}
+          </div>
+        )}
       </div>
       <SingleSetting ref={singleSettingRef} />
       <GroupSetting ref={groupSettingRef} />
@@ -131,40 +161,4 @@ const ChatHeader = () => {
   );
 };
 
-export default ChatHeader;
-
-const OnlineOrTypingStatus = ({ userID }: { userID: string }) => {
-  const [online, setOnline] = useState(false);
-
-  useEffect(() => {
-    const userStatusChangeHandler = ({ data }: WSEvent<UserOnlineState>) => {
-      if (data.userID === userID) {
-        setOnline(data.status === OnlineState.Online);
-      }
-    };
-    IMSDK.on(CbEvents.OnUserStatusChanged, userStatusChangeHandler);
-    IMSDK.subscribeUsersStatus([userID]).then(({ data }) =>
-      setOnline(data[0].status === OnlineState.Online),
-    );
-    return () => {
-      IMSDK.off(CbEvents.OnUserStatusChanged, userStatusChangeHandler);
-      IMSDK.unsubscribeUsersStatus([userID]);
-    };
-  }, [userID]);
-
-  return (
-    <div className="flex items-center">
-      <i
-        className={clsx(
-          "mr-1.5 inline-block h-[6px] w-[6px] rounded-full bg-[#2ddd73]",
-          {
-            "bg-[#999]": !online,
-          },
-        )}
-      />
-      <span className="text-xs text-[var(--sub-text)]">
-        {online ? t("placeholder.online") : t("placeholder.offLine")}
-      </span>
-    </div>
-  );
-};
+export default memo(ChatHeader);

@@ -1,9 +1,8 @@
 import { app, ipcMain } from "electron";
-import { closeWindow, minimize, updateMaximize } from "./windowManage";
+import { closeWindow, minimize, splashEnd, updateMaximize } from "./windowManage";
 import { IpcRenderToMain } from "../constants";
 import { getStore } from "./storeManage";
 import { changeLanguage } from "../i18n";
-import { isProd } from "../utils";
 
 const store = getStore();
 
@@ -16,7 +15,9 @@ export const setIpcMainListener = () => {
       app.exit(0);
     });
   });
-
+  ipcMain.handle("main-win-ready", () => {
+    splashEnd();
+  });
   ipcMain.handle(IpcRenderToMain.minimizeWindow, () => {
     minimize();
   });
@@ -26,19 +27,23 @@ export const setIpcMainListener = () => {
   ipcMain.handle(IpcRenderToMain.closeWindow, () => {
     closeWindow();
   });
-
-  // data transfer
   ipcMain.handle(IpcRenderToMain.setKeyStore, (_, { key, data }) => {
     store.set(key, data);
   });
-  ipcMain.handle(IpcRenderToMain.getKeyStore, (e, { key }) => {
+  ipcMain.handle(IpcRenderToMain.getKeyStore, (_, { key }) => {
     return store.get(key);
   });
   ipcMain.on(IpcRenderToMain.getKeyStoreSync, (e, { key }) => {
     e.returnValue = store.get(key);
   });
-
-  ipcMain.handle(IpcRenderToMain.getUserDataPath, () =>
-    isProd ? app.getPath("userData") : "./",
-  );
+  ipcMain.on(IpcRenderToMain.getDataPath, (e, key: string) => {
+    switch (key) {
+      case "public":
+        e.returnValue = global.pathConfig.publicPath;
+        break;
+      default:
+        e.returnValue = global.pathConfig.publicPath;
+        break;
+    }
+  });
 };

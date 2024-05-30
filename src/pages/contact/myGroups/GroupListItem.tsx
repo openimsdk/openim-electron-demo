@@ -11,7 +11,7 @@ const GroupListItem = ({
 }) => {
   return (
     <div
-      className="flex flex-row rounded-md px-3.5 py-3 transition-colors hover:bg-[#f3f9ff]"
+      className="flex flex-row rounded-md px-3.5 py-3 transition-colors hover:bg-[var(--primary-active)]"
       onClick={() => showGroupCard(source)}
     >
       <OIMAvatar src={source?.faceURL} isgroup />

@@ -73,6 +73,7 @@ const SendRequest = ({
               maxLength={50}
               bordered={false}
               placeholder={t("placeholder.pleaseEnter")}
+              spellCheck={false}
               style={{ padding: "8px 6px" }}
               autoSize={{ minRows: 6, maxRows: 6 }}
               onChange={(e) => setReqMsg(e.target.value)}

@@ -1,5 +1,6 @@
-import { SessionType } from "open-im-sdk-wasm";
+import type { SessionType } from "open-im-sdk-wasm";
 import { ConversationItem } from "open-im-sdk-wasm/lib/types/entity";
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { IMSDK } from "@/layout/MainContentWrap";
@@ -8,10 +9,6 @@ import { feedbackToast } from "@/utils/common";
 
 export function useConversationToggle() {
   const navigate = useNavigate();
-
-  const conversationID = useConversationStore(
-    (state) => state.currentConversation?.conversationID,
-  );
   const updateCurrentConversation = useConversationStore(
     (state) => state.updateCurrentConversation,
   );
@@ -43,15 +40,26 @@ export function useConversationToggle() {
     return conversation;
   };
 
-  const toSpecifiedConversation = async (data: {
-    sourceID: string;
-    sessionType: SessionType;
-  }) => {
-    const conversation = await getConversation(data);
-    if (!conversation || conversationID === conversation.conversationID) return;
-    updateCurrentConversation({ ...conversation });
-    navigate(`/chat/${conversation.conversationID}`);
-  };
+  const toSpecifiedConversation = useCallback(
+    async (
+      data: {
+        sourceID: string;
+        sessionType: SessionType;
+      },
+      isJump?: boolean,
+    ) => {
+      const conversation = await getConversation(data);
+      if (
+        !conversation ||
+        useConversationStore.getState().currentConversation?.conversationID ===
+          conversation.conversationID
+      )
+        return;
+      updateCurrentConversation({ ...conversation });
+      navigate(`/chat/${conversation.conversationID}`);
+    },
+    [],
+  );
 
   return {
     toSpecifiedConversation,

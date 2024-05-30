@@ -3,9 +3,9 @@ import { useRequest } from "ahooks";
 import { Button, Input } from "antd";
 import dayjs from "dayjs";
 import { t } from "i18next";
-import { GroupJoinSource, SessionType } from "open-im-sdk-wasm";
+import { GroupJoinSource, GroupVerificationType, SessionType } from "open-im-sdk-wasm";
 import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
-import { forwardRef, ForwardRefRenderFunction, memo, useState } from "react";
+import { forwardRef, ForwardRefRenderFunction, memo, useEffect, useState } from "react";
 
 import clock from "@/assets/images/common/clock.png";
 import member_etc from "@/assets/images/common/member_etc.png";
@@ -29,7 +29,9 @@ const GroupCardModal: ForwardRefRenderFunction<
   const [reqMsg, setReqMsg] = useState("");
   const [isSendRequest, setIsSendRequest] = useState(false);
 
-  const { fetchState, resetState } = useGroupMembers({ groupID: groupData?.groupID });
+  const { fetchState, getMemberData, resetState } = useGroupMembers({
+    groupID: groupData?.groupID,
+  });
 
   const { toSpecifiedConversation } = useConversationToggle();
   const { isOverlayOpen, closeOverlay } = useOverlayVisible(ref);
@@ -38,23 +40,36 @@ const GroupCardModal: ForwardRefRenderFunction<
     manual: true,
   });
 
+  useEffect(() => {
+    if (isOverlayOpen) {
+      getMemberData(true);
+    }
+  }, [isOverlayOpen]);
+
   const createTimeStr = dayjs(groupData?.createTime ?? 0).format("YYYY/M/D");
   const inThisGroup = fetchState.groupMemberList.length > 0;
 
+  const sliceNum = groupData?.memberCount === 8 ? 8 : 7;
   const renderList = inThisGroup
-    ? fetchState.groupMemberList.slice(0, 7)
-    : new Array(7).fill(1).map((_, idx) => ({
+    ? fetchState.groupMemberList.slice(0, sliceNum)
+    : new Array(sliceNum).fill(1).map((_, idx) => ({
         userID: idx,
         nickname: "",
         faceURL: getDefaultAvatar(`ic_avatar_0${idx === 6 ? 1 : idx + 1}`),
       }));
 
-  const joinOrSendMessage = () => {
+  const joinOrSendMessage = async () => {
     if (inThisGroup) {
       toSpecifiedConversation({
         sourceID: groupData!.groupID,
         sessionType: SessionType.WorkingGroup,
       });
+      closeOverlay();
+      return;
+    }
+
+    if (groupData?.needVerification === GroupVerificationType.AllNot) {
+      await sendApplication();
       closeOverlay();
       return;
     }
@@ -84,9 +99,12 @@ const GroupCardModal: ForwardRefRenderFunction<
       width={484}
       onCancel={closeOverlay}
       afterClose={resetState}
-      maskStyle={{
-        opacity: 0,
-        transition: "none",
+      destroyOnClose
+      styles={{
+        mask: {
+          opacity: 0,
+          transition: "none",
+        },
       }}
       ignoreClasses=".ignore-drag, .no-padding-modal, .cursor-pointer"
       className="no-padding-modal"
@@ -128,6 +146,7 @@ const GroupCardModal: ForwardRefRenderFunction<
                 value={reqMsg}
                 maxLength={50}
                 bordered={false}
+                spellCheck={false}
                 placeholder={t("placeholder.pleaseEnter")}
                 style={{ padding: "8px 6px" }}
                 autoSize={{ minRows: 4, maxRows: 4 }}
@@ -148,9 +167,11 @@ const GroupCardModal: ForwardRefRenderFunction<
           </div>
         ) : (
           <div className="bg-[#F2F8FF] p-5.5">
-            <div className="mb-3">{`${t("placeholder.groupMember")}：${
-              groupData?.memberCount
-            }`}</div>
+            {inThisGroup && (
+              <div className="mb-3">{`${t("placeholder.groupMember")}：${
+                groupData?.memberCount
+              }`}</div>
+            )}
             <div className="flex items-center">
               {renderList.map((item) => (
                 <OIMAvatar
@@ -160,7 +181,7 @@ const GroupCardModal: ForwardRefRenderFunction<
                   key={item.userID}
                 />
               ))}
-              {(groupData?.memberCount ?? 0) < 8 && <OIMAvatar src={member_etc} />}
+              {renderList.length === 7 && <OIMAvatar src={member_etc} />}
             </div>
             <div className="mt-28 flex justify-center">
               <Button

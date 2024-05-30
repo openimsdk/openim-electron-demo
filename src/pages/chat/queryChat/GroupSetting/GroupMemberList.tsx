@@ -1,17 +1,28 @@
-import { Empty } from "antd";
+import { Empty, Spin } from "antd";
 import { t } from "i18next";
 import { GroupMemberRole } from "open-im-sdk-wasm";
 import { GroupMemberItem } from "open-im-sdk-wasm/lib/types/entity";
-import { FC } from "react";
+import { forwardRef, memo, useEffect } from "react";
 import { Virtuoso } from "react-virtuoso";
 
 import OIMAvatar from "@/components/OIMAvatar";
+import { useCurrentMemberRole } from "@/hooks/useCurrentMemberRole";
 import useGroupMembers from "@/hooks/useGroupMembers";
 
 import styles from "./group-setting.module.scss";
 
 const GroupMemberList = () => {
-  const { fetchState, getMemberData } = useGroupMembers();
+  const { currentMemberInGroup } = useCurrentMemberRole();
+  const { fetchState, getMemberData, resetState } = useGroupMembers();
+
+  useEffect(() => {
+    if (currentMemberInGroup?.groupID) {
+      getMemberData(true);
+    }
+    return () => {
+      resetState();
+    };
+  }, [currentMemberInGroup?.groupID]);
 
   const endReached = () => {
     getMemberData();
@@ -30,8 +41,9 @@ const GroupMemberList = () => {
           data={fetchState.groupMemberList}
           endReached={endReached}
           components={{
-            Header: () => (fetchState.loading ? <div>loading...</div> : null),
+            Header: () => (fetchState.loading ? <Spin /> : null),
           }}
+          computeItemKey={(_, member) => member.userID}
           itemContent={(_, member) => <MemberItem member={member} />}
         />
       )}
@@ -39,23 +51,20 @@ const GroupMemberList = () => {
   );
 };
 
-export default GroupMemberList;
+export default forwardRef(GroupMemberList);
 
 interface IMemberItemProps {
   member: GroupMemberItem;
 }
 
-const MemberItem: FC<IMemberItemProps> = ({ member }) => {
+const MemberItem = memo(({ member }: IMemberItemProps) => {
   const isOwner = member.roleLevel === GroupMemberRole.Owner;
   const isAdmin = member.roleLevel === GroupMemberRole.Admin;
 
   return (
     <div className={styles["list-member-item"]}>
-      <div
-        className="flex items-center overflow-hidden"
-        onClick={() => window.userClick(member.userID, member.groupID)}
-      >
-        <OIMAvatar src={member.nickname} text={member.nickname} />
+      <div className="flex items-center overflow-hidden">
+        <OIMAvatar src={member.faceURL} text={member.nickname} />
         <div className="ml-3 flex items-center">
           <div className="max-w-[120px] truncate">{member.nickname}</div>
           {isOwner && (
@@ -72,4 +81,4 @@ const MemberItem: FC<IMemberItemProps> = ({ member }) => {
       </div>
     </div>
   );
-};
+});

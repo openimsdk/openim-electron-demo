@@ -7,9 +7,8 @@ import clsx from "clsx";
 import { t } from "i18next";
 import { RemoteParticipant, RoomEvent, Track } from "livekit-client";
 import { CbEvents, MessageType } from "open-im-sdk-wasm";
-import { RtcInvite, WSEvent } from "open-im-sdk-wasm/lib/types/entity";
+import { MessageItem, RtcInvite, WSEvent } from "open-im-sdk-wasm/lib/types/entity";
 import { useEffect, useRef } from "react";
-import { v4 as uuidV4 } from "uuid";
 
 import { getRtcConnectData } from "@/api/imApi";
 import rtc_accept from "@/assets/images/rtc/rtc_accept.png";
@@ -20,7 +19,7 @@ import rtc_mic from "@/assets/images/rtc/rtc_mic.png";
 import rtc_mic_off from "@/assets/images/rtc/rtc_mic_off.png";
 import { CustomType } from "@/constants";
 import { IMSDK } from "@/layout/MainContentWrap";
-import { ExMessageItem, useUserStore } from "@/store";
+import { useUserStore } from "@/store";
 import { feedbackToast } from "@/utils/common";
 
 import { CounterHandle, ForwardCounter } from "./Counter";
@@ -84,7 +83,7 @@ export const RtcControl = ({
       }
     };
 
-    const newMessageHandler = ({ data }: WSEvent<ExMessageItem[]>) => {
+    const newMessageHandler = ({ data }: WSEvent<MessageItem[]>) => {
       data.map((message) => {
         if (message.contentType === MessageType.CustomMessage) {
           const customData = JSON.parse(message.customElem.data) as {

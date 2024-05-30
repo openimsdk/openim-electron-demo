@@ -1,8 +1,15 @@
 import { CloseOutlined } from "@ant-design/icons";
-import { Button, Input } from "antd";
+import { Button, Input, InputRef } from "antd";
 import { t } from "i18next";
-import { FullUserItem, GroupItem, WSEvent } from "open-im-sdk-wasm/lib/types/entity";
-import { forwardRef, ForwardRefRenderFunction, memo, useState } from "react";
+import { GroupItem, WSEvent } from "open-im-sdk-wasm/lib/types/entity";
+import {
+  forwardRef,
+  ForwardRefRenderFunction,
+  memo,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { message } from "@/AntdGlobalComp";
 import { searchBusinessUserInfo } from "@/api/login";
@@ -24,9 +31,18 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
   ISearchUserOrGroupProps
 > = ({ isSearchGroup, openUserCardWithData, openGroupCardWithData }, ref) => {
   const [keyword, setKeyword] = useState("");
+  const inputRef = useRef<InputRef>(null);
   const { isOverlayOpen, closeOverlay } = useOverlayVisible(ref);
 
+  useEffect(() => {
+    if (isOverlayOpen) {
+      setTimeout(() => inputRef.current?.focus());
+    }
+  }, [isOverlayOpen]);
+
   const searchData = async () => {
+    if (!keyword) return;
+
     if (isSearchGroup) {
       try {
         const { data } = await IMSDK.getSpecifiedGroupsInfo([keyword]);
@@ -48,7 +64,10 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
         const {
           data: { total, users },
         } = await searchBusinessUserInfo(keyword);
-        if (!total) {
+        if (
+          !total ||
+          (users[0].userID !== keyword && users[0].phoneNumber !== keyword)
+        ) {
           message.warning(t("empty.noSearchResults"));
           return;
         }
@@ -79,9 +98,11 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
       closable={false}
       width={332}
       onCancel={closeOverlay}
-      maskStyle={{
-        opacity: 0,
-        transition: "none",
+      styles={{
+        mask: {
+          opacity: 0,
+          transition: "none",
+        },
       }}
       afterClose={() => {
         setKeyword("");
@@ -95,7 +116,7 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
           {isSearchGroup ? t("placeholder.addGroup") : t("placeholder.addFriends")}
         </div>
         <CloseOutlined
-          className="cursor-pointer text-[#8e9ab0]"
+          className="cursor-pointer text-[var(--sub-text)]"
           rev={undefined}
           onClick={closeOverlay}
         />
@@ -103,16 +124,23 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
       <div className="ignore-drag">
         <div className="border-b border-[var(--gap-text)] px-5.5 py-6">
           <Input.Search
+            ref={inputRef}
             className="no-addon-search"
             placeholder={t("placeholder.pleaseEnter")}
             value={keyword}
             addonAfter={null}
+            spellCheck={false}
             onChange={(e) => setKeyword(e.target.value)}
             onSearch={searchData}
           />
         </div>
         <div className="flex justify-end px-5.5 py-2.5">
-          <Button className="px-6" type="primary" onClick={searchData}>
+          <Button
+            className="px-6"
+            type="primary"
+            disabled={!keyword}
+            onClick={searchData}
+          >
             {t("confirm")}
           </Button>
           <Button

@@ -1,7 +1,7 @@
 import { Button, DatePicker, Form, Input, Modal, Select } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { t } from "i18next";
-import { forwardRef, ForwardRefRenderFunction, memo, useState } from "react";
+import { forwardRef, ForwardRefRenderFunction, memo } from "react";
 import { useMutation } from "react-query";
 
 import { errorHandle } from "@/api/errorHandle";
@@ -45,11 +45,14 @@ const EditSelfInfo: ForwardRefRenderFunction<
       footer={null}
       closable={false}
       open={isOverlayOpen}
+      centered
       onCancel={closeOverlay}
       destroyOnClose
-      maskStyle={{
-        opacity: 0,
-        transition: "none",
+      styles={{
+        mask: {
+          opacity: 0,
+          transition: "none",
+        },
       }}
       width={484}
       className="no-padding-modal"
@@ -73,9 +76,9 @@ const EditSelfInfo: ForwardRefRenderFunction<
             <Form.Item
               label={t("placeholder.nickName")}
               name="nickname"
-              rules={[{ required: true, max: 20, message: t("toast.inputNickName") }]}
+              rules={[{ required: true, message: t("toast.inputNickName") }]}
             >
-              <Input />
+              <Input maxLength={20} spellCheck={false} />
             </Form.Item>
             <Form.Item label={t("placeholder.gender")} name="gender">
               <Select>
@@ -83,11 +86,6 @@ const EditSelfInfo: ForwardRefRenderFunction<
                 <Select.Option value={2}>{t("placeholder.female")}</Select.Option>
                 <Select.Option value={0}>{t("placeholder.unknown")}</Select.Option>
               </Select>
-            </Form.Item>
-            <Form.Item label={t("placeholder.birth")} name="birth">
-              <DatePicker
-                disabledDate={(current) => current && current > dayjs().endOf("day")}
-              />
             </Form.Item>
             <Form.Item
               label={t("placeholder.phoneNumber")}
@@ -100,9 +98,15 @@ const EditSelfInfo: ForwardRefRenderFunction<
             <Form.Item
               label={t("placeholder.email")}
               name="email"
-              rules={[{ type: "email", message: t("placeholder.inputCorrectEmail") }]}
+              rules={[{ type: "email", message: t("toast.inputCorrectEmail") }]}
             >
-              <Input />
+              <Input spellCheck={false} placeholder={t("toast.inputEmail")} />
+            </Form.Item>
+
+            <Form.Item label={t("placeholder.birth")} name="birth">
+              <DatePicker
+                disabledDate={(current) => current && current > dayjs().endOf("day")}
+              />
             </Form.Item>
 
             <Form.Item className="mb-0">

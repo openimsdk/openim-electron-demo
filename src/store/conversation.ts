@@ -3,7 +3,6 @@ import {
   ConversationItem,
   GroupItem,
   GroupMemberItem,
-  MessageItem,
 } from "open-im-sdk-wasm/lib/types/entity";
 import { create } from "zustand";
 
@@ -14,19 +13,20 @@ import { conversationSort, isGroupSession } from "@/utils/imCommon";
 import { ConversationListUpdateType, ConversationStore } from "./type";
 import { useUserStore } from "./user";
 
+const CONVERSATION_SPLIT_COUNT = 500;
+
 export const useConversationStore = create<ConversationStore>()((set, get) => ({
   conversationList: [],
   currentConversation: undefined,
   unReadCount: 0,
   currentGroupInfo: undefined,
   currentMemberInGroup: undefined,
-  quoteMessage: undefined,
   getConversationListByReq: async (isOffset?: boolean) => {
     let tmpConversationList = [] as ConversationItem[];
     try {
       const { data } = await IMSDK.getConversationListSplit({
         offset: isOffset ? get().conversationList.length : 0,
-        count: 20,
+        count: CONVERSATION_SPLIT_COUNT,
       });
       tmpConversationList = data;
     } catch (error) {
@@ -39,7 +39,7 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
         ...tmpConversationList,
       ],
     }));
-    return tmpConversationList.length === 20;
+    return tmpConversationList.length === CONVERSATION_SPLIT_COUNT;
   },
   updateConversationList: (
     list: ConversationItem[],
@@ -86,6 +86,7 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
       return;
     }
     const prevConversation = get().currentConversation;
+
     const toggleNewConversation =
       conversation.conversationID !== prevConversation?.conversationID;
     if (toggleNewConversation && isGroupSession(conversation.conversationType)) {
@@ -98,8 +99,10 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
     try {
       const { data } = await IMSDK.getTotalUnreadMsgCount();
       set(() => ({ unReadCount: data }));
+      return data;
     } catch (error) {
       console.error(error);
+      return 0;
     }
   },
   updateUnReadCount: (count: number) => {
@@ -110,7 +113,6 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
     try {
       const { data } = await IMSDK.getSpecifiedGroupsInfo([groupID]);
       groupInfo = data[0];
-      console.info(`getCurrentGroupInfoByReq: ${groupInfo.groupID}`);
     } catch (error) {
       feedbackToast({ error, msg: t("toast.getGroupInfoFailed") });
       return;
@@ -129,7 +131,6 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
         userIDList: [selfID],
       });
       memberInfo = data[0];
-      console.info(`getCurrentMemberInGroupByReq: ${memberInfo?.groupID}`);
     } catch (error) {
       feedbackToast({ error, msg: t("toast.getGroupMemberFailed") });
       return;
@@ -144,9 +145,6 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
     ) {
       set(() => ({ currentMemberInGroup: { ...member } }));
     }
-  },
-  updateQuoteMessage: (message?: MessageItem) => {
-    set(() => ({ quoteMessage: message }));
   },
   clearConversationStore: () => {
     set(() => ({

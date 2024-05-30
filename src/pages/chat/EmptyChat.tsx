@@ -1,10 +1,11 @@
 import { Button, Layout } from "antd";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 import empty_chat_bg from "@/assets/images/empty_chat_bg.png";
 import emitter from "@/utils/events";
 
 export const EmptyChat = () => {
+  const { t } = useTranslation();
   const createNow = () => {
     emitter.emit("OPEN_CHOOSE_MODAL", {
       type: "CRATE_GROUP",

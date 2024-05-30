@@ -1,57 +1,62 @@
-import { useRequest, useUnmount } from "ahooks";
+import { useUnmount } from "ahooks";
 import { Layout } from "antd";
-import { t } from "i18next";
-import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { SessionType } from "open-im-sdk-wasm";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
-import { useConversationStore, useMessageStore } from "@/store";
+import { useConversationStore } from "@/store";
 
 import ChatContent from "./ChatContent";
 import ChatFooter from "./ChatFooter";
-import MultipleActionBar from "./ChatFooter/MultipleActionBar";
 import ChatHeader from "./ChatHeader";
 import useConversationState from "./useConversationState";
 
 export const QueryChat = () => {
-  const { conversationID } = useParams();
-
-  const isCheckMode = useMessageStore((state) => state.isCheckMode);
+  const currentConversation = useConversationStore(
+    (state) => state.currentConversation,
+  );
   const updateCurrentConversation = useConversationStore(
     (state) => state.updateCurrentConversation,
   );
-  const getHistoryMessageList = useMessageStore(
-    (state) => state.getHistoryMessageListByReq,
-  );
-
-  const { loading, run, cancel } = useRequest(getHistoryMessageList, {
-    manual: true,
-  });
 
   useConversationState();
 
-  useEffect(() => {
-    run();
-    return () => {
-      cancel();
-    };
-  }, [conversationID]);
+  const isNotificationSession =
+    currentConversation?.conversationType === SessionType.Notification;
 
   useUnmount(() => {
     updateCurrentConversation();
   });
 
   const switchFooter = () => {
-    if (isCheckMode) {
-      return <MultipleActionBar />;
+    if (isNotificationSession) {
+      return null;
     }
-    return <ChatFooter />;
+
+    return (
+      <>
+        <PanelResizeHandle />
+        <Panel
+          id="chat-footer"
+          order={1}
+          defaultSize={25}
+          maxSize={60}
+          className="min-h-[200px]"
+        >
+          <ChatFooter />
+        </Panel>
+      </>
+    );
   };
 
   return (
-    <Layout id="chat-container">
+    <Layout id="chat-container" className="relative overflow-hidden">
       <ChatHeader />
-      {loading ? <div className="h-full">loading..</div> : <ChatContent />}
-      {switchFooter()}
+      <PanelGroup direction="vertical">
+        <Panel id="chat-main" order={0}>
+          <ChatContent isNotificationSession={isNotificationSession} />
+        </Panel>
+        {switchFooter()}
+      </PanelGroup>
     </Layout>
   );
 };

@@ -30,9 +30,9 @@ i18n
       escapeValue: false,
     },
   })
-  .then(() => {
-    dayjs.locale(i18n.language);
-  })
-  .catch(() => console.log("i18n init error"));
+  .then(() => dayjs.locale(i18n.language))
+  .catch(() => console.error("i18n init error"));
+
+i18n.on("languageChanged", () => dayjs.locale(i18n.language));
 
 export default i18n;

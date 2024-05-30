@@ -4,7 +4,6 @@ import {
   BlackUserItem,
   FriendApplicationItem,
   FriendUserItem,
-  FullUserItem,
   GroupApplicationItem,
   GroupItem,
 } from "open-im-sdk-wasm/lib/types/entity";
@@ -28,7 +27,9 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
   getFriendListByReq: async () => {
     try {
       const { data } = await IMSDK.getFriendList();
-      set(() => ({ friendList: data.map((item) => item.friendInfo!) }));
+      set(() => ({
+        friendList: data.map((item) => item.friendInfo!),
+      }));
     } catch (error) {
       feedbackToast({ error, msg: t("toast.getFriendListFailed") });
     }
@@ -43,7 +44,7 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
       return;
     }
     if (remove) {
-      tmpList.splice(idx);
+      tmpList.splice(idx, 1);
     } else {
       tmpList[idx] = { ...friend };
     }
@@ -67,7 +68,7 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
       return;
     }
     if (remove) {
-      tmpList.splice(idx);
+      tmpList.splice(idx, 1);
     } else {
       tmpList[idx] = { ...black };
     }
@@ -94,7 +95,7 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
       return;
     }
     if (remove) {
-      tmpList.splice(idx);
+      tmpList.splice(idx, 1);
     } else {
       tmpList[idx] = { ...group };
     }
@@ -106,7 +107,10 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
   getRecvFriendApplicationListByReq: async () => {
     try {
       const { data } = await IMSDK.getFriendApplicationListAsRecipient();
-      set(() => ({ recvFriendApplicationList: data }));
+      const unHandleFriendApplicationCount = data.filter(
+        (application) => application.handleResult === 0,
+      ).length;
+      set(() => ({ recvFriendApplicationList: data, unHandleFriendApplicationCount }));
     } catch (error) {
       console.error(error);
     }
@@ -118,14 +122,13 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
     if (idx < 0) {
       tmpList = [...tmpList, application];
     } else {
-      isHandleResultUpdate = tmpList[idx].handleResult !== application.handleResult;
+      isHandleResultUpdate = true;
       tmpList[idx] = { ...application };
     }
     if (idx < 0 || isHandleResultUpdate) {
       const unHandleFriendApplicationCount = tmpList.filter(
         (application) => application.handleResult === 0,
       ).length;
-
       set(() => ({
         recvFriendApplicationList: tmpList,
         unHandleFriendApplicationCount,
@@ -155,7 +158,10 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
   getRecvGroupApplicationListByReq: async () => {
     try {
       const { data } = await IMSDK.getGroupApplicationListAsRecipient();
-      set(() => ({ recvGroupApplicationList: data }));
+      const unHandleGroupApplicationCount = data.filter(
+        (application) => application.handleResult === 0,
+      ).length;
+      set(() => ({ recvGroupApplicationList: data, unHandleGroupApplicationCount }));
     } catch (error) {
       console.error(error);
     }
@@ -167,10 +173,10 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
     if (idx < 0) {
       tmpList = [...tmpList, application];
     } else {
-      isHandleResultUpdate = tmpList[idx].handleResult !== application.handleResult;
+      isHandleResultUpdate = true;
       tmpList[idx] = { ...application };
     }
-    if (idx < 0 || isHandleResultUpdate) {
+    if (idx < 0 || application.handleResult === ApplicationHandleResult.Unprocessed) {
       const unHandleGroupApplicationCount = tmpList.filter(
         (application) => application.handleResult === 0,
       ).length;

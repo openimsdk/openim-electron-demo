@@ -1,4 +1,5 @@
 import {
+  AtTextElem,
   BlackUserItem,
   ConversationItem,
   FriendApplicationItem,
@@ -14,15 +15,19 @@ import { BusinessUserInfo } from "@/api/login";
 
 import { ExMessageItem } from "./message";
 
+export type IMConnectState = "success" | "loading" | "failed";
+
 export interface UserStore {
+  syncing: IMConnectState;
   selfInfo: BusinessUserInfo;
   appConfig: AppConfig;
   appSettings: AppSettings;
+  updateSyncState: (syncing: IMConnectState) => void;
   updateSelfInfo: (info: Partial<BusinessUserInfo>) => void;
-  getSelfInfoByReq: () => Promise<void>;
+  getSelfInfoByReq: () => void;
   getAppConfigByReq: () => Promise<void>;
   updateAppSettings: (settings: Partial<AppSettings>) => void;
-  userLogout: () => Promise<void>;
+  userLogout: (force?: boolean) => Promise<void>;
 }
 
 export interface AppConfig {
@@ -47,44 +52,25 @@ export interface ConversationStore {
   unReadCount: number;
   currentGroupInfo?: GroupItem;
   currentMemberInGroup?: GroupMemberItem;
-  quoteMessage?: MessageItem;
   getConversationListByReq: (isOffset?: boolean) => Promise<boolean>;
   updateConversationList: (
     list: ConversationItem[],
     type: ConversationListUpdateType,
   ) => void;
   delConversationByCID: (conversationID: string) => void;
-  // getCurrentConversationByReq: (conversationID?: string) => Promise<void>;
   updateCurrentConversation: (conversation?: ConversationItem) => void;
-  getUnReadCountByReq: () => Promise<void>;
+  getUnReadCountByReq: () => Promise<number>;
   updateUnReadCount: (count: number) => void;
   getCurrentGroupInfoByReq: (groupID: string) => Promise<void>;
   updateCurrentGroupInfo: (groupInfo: GroupItem) => void;
   getCurrentMemberInGroupByReq: (groupID: string) => Promise<void>;
   tryUpdateCurrentMemberInGroup: (member: GroupMemberItem) => void;
-  updateQuoteMessage: (message?: MessageItem) => void;
   clearConversationStore: () => void;
 }
 
-export type PreViewImg = {
-  url: string;
-  clientMsgID: string;
-};
-
-export interface MessageStore {
-  historyMessageList: ExMessageItem[];
-  previewImgList: PreViewImg[];
-  lastMinSeq: number;
-  hasMore: boolean;
-  isCheckMode: boolean;
-  getHistoryMessageListByReq: (loadMore?: boolean) => Promise<unknown>;
-  pushNewMessage: (message: ExMessageItem) => void;
-  updateOneMessage: (message: ExMessageItem, fromSuccessCallBack?: boolean) => void;
-  deleteOneMessage: (clientMsgID: string) => void;
-  clearHistoryMessage: () => void;
-  updatePreviewImgList: (list: PreViewImg[]) => void;
-  updateCheckMode: (isCheckMode: boolean) => void;
-  tryUpdatePreviewImg: (messageList: ExMessageItem[]) => void;
+export interface GetMessageReverseParams {
+  message: ExMessageItem;
+  conversationID: string;
 }
 
 export interface ContactStore {

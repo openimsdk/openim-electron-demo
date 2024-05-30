@@ -1,18 +1,8 @@
 import { MessageType, SessionType } from "open-im-sdk-wasm";
 
-export enum CustomType {
-  CallingInvite = 200,
-  CallingAccept = 201,
-  CallingReject = 202,
-  CallingCancel = 203,
-  CallingHungup = 204,
-}
-
 export const GroupSessionTypes = [SessionType.Group, SessionType.WorkingGroup];
 
-export const SystemMessageTypes = [
-  MessageType.RevokeMessage,
-  MessageType.FriendAdded,
+export const GroupSystemMessageTypes = [
   MessageType.GroupCreated,
   MessageType.GroupInfoUpdated,
   MessageType.MemberQuit,
@@ -27,3 +17,35 @@ export const SystemMessageTypes = [
   MessageType.GroupMemberCancelMuted,
   MessageType.GroupNameUpdated,
 ];
+
+export const SystemMessageTypes = [
+  MessageType.RevokeMessage,
+  MessageType.FriendAdded,
+  MessageType.BurnMessageChange,
+  ...GroupSystemMessageTypes,
+];
+
+export const CustomMessageType = {
+  MassMsg: 903,
+};
+
+export const canSearchMessageTypes = [
+  MessageType.TextMessage,
+  MessageType.AtTextMessage,
+  MessageType.FileMessage,
+  MessageType.QuoteMessage,
+  MessageType.PictureMessage,
+  MessageType.VideoMessage,
+  MessageType.CardMessage,
+  MessageType.LocationMessage,
+  MessageType.VoiceMessage,
+  MessageType.CustomMessage,
+];
+
+export enum CustomType {
+  CallingInvite = 200,
+  CallingAccept = 201,
+  CallingReject = 202,
+  CallingCancel = 203,
+  CallingHungup = 204,
+}

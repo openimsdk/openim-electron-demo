@@ -1,20 +1,18 @@
-import { DownOutlined } from "@ant-design/icons";
 import { Popover, PopoverProps, Upload } from "antd";
 import { TooltipPlacement } from "antd/es/tooltip";
 import clsx from "clsx";
-import { t } from "i18next";
+import i18n, { t } from "i18next";
+import { MessageItem } from "open-im-sdk-wasm/lib/types/entity";
 import { UploadRequestOption } from "rc-upload/lib/interface";
-import { memo, ReactNode, useCallback, useRef, useState } from "react";
+import { memo, ReactNode, useCallback, useState } from "react";
 import React from "react";
 
-import card from "@/assets/images/chatFooter/card.png";
+import { message as antdMessage } from "@/AntdGlobalComp";
 import emoji from "@/assets/images/chatFooter/emoji.png";
-import file from "@/assets/images/chatFooter/file.png";
 import image from "@/assets/images/chatFooter/image.png";
 import rtc from "@/assets/images/chatFooter/rtc.png";
 import video from "@/assets/images/chatFooter/video.png";
-import { ExMessageItem } from "@/store";
-import emitter from "@/utils/events";
+import { EmojiData } from "@/components/CKEditor";
 
 import { SendMessageParams } from "../useSendMessage";
 import CallPopContent from "./CallPopContent";
@@ -55,32 +53,39 @@ const sendActionList = [
   },
 ];
 
+i18n.on("languageChanged", () => {
+  sendActionList[0].title = t("placeholder.emoji");
+  sendActionList[1].title = t("placeholder.image");
+  sendActionList[2].title = t("placeholder.video");
+  sendActionList[3].title = t("placeholder.call");
+});
+
 const SendActionBar = ({
+  sendEmoji,
   sendMessage,
-  createFileMessage,
+  createImageOrVideoMessage,
 }: {
+  sendEmoji: (emoji: EmojiData) => void;
   sendMessage: (params: SendMessageParams) => Promise<void>;
-  createFileMessage: (file: File) => Promise<ExMessageItem>;
+  createImageOrVideoMessage: (file: File) => Promise<MessageItem>;
 }) => {
   const [visibleState, setVisibleState] = useState({
-    emoji: false,
-    cut: false,
     rtc: false,
+    emoji: false,
   });
 
   const closeAllPop = useCallback(
-    () => setVisibleState({ cut: false, rtc: false, emoji: false }),
-    [],
-  );
-  const cutWithoutWindow = useCallback(
-    () => setVisibleState({ cut: false, rtc: false, emoji: false }),
+    () => setVisibleState({ rtc: false, emoji: false }),
     [],
   );
 
   const fileHandle = async (options: UploadRequestOption) => {
     const fileEl = options.file as File;
-
-    const message = await createFileMessage(fileEl);
+    if (fileEl.size === 0) {
+      antdMessage.warning(t("empty.fileContentEmpty"));
+      return;
+    }
+    const message = await createImageOrVideoMessage(fileEl);
     sendMessage({
       message,
     });
@@ -94,8 +99,8 @@ const SendActionBar = ({
           content:
             action.comp &&
             React.cloneElement(action.comp as React.ReactElement, {
+              sendEmoji,
               closeAllPop,
-              cutWithoutWindow,
             }),
           title: null,
           arrow: false,
@@ -150,6 +155,7 @@ const ActionWrap = ({
       showUploadList={false}
       customRequest={fileHandle}
       accept={accept}
+      multiple
       className="mr-5 flex"
     >
       {children}

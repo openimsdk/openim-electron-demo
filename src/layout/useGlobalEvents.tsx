@@ -1,6 +1,7 @@
+import { useLatest } from "ahooks";
 import { t } from "i18next";
 import { CbEvents } from "open-im-sdk-wasm";
-import { MessageType, SessionType } from "open-im-sdk-wasm";
+import { LogLevel, MessageType, SessionType } from "open-im-sdk-wasm";
 import {
   BlackUserItem,
   ConversationItem,
@@ -9,7 +10,7 @@ import {
   GroupApplicationItem,
   GroupItem,
   GroupMemberItem,
-  RevokedInfo,
+  MessageItem,
   SelfUserInfo,
   WSEvent,
   WsResponse,
@@ -17,19 +18,15 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { API_URL, WS_URL } from "@/config";
+import { getApiUrl, getWsUrl } from "@/config";
 import { CustomType } from "@/constants";
-import {
-  ExMessageItem,
-  useConversationStore,
-  useMessageStore,
-  useUserStore,
-} from "@/store";
+import { pushNewMessage } from "@/pages/chat/queryChat/useHistoryMessageList";
+import { useConversationStore, useUserStore } from "@/store";
 import { useContactStore } from "@/store/contact";
 import { feedbackToast } from "@/utils/common";
 import emitter from "@/utils/events";
-import { initStore, isGroupSession } from "@/utils/imCommon";
-import { getIMToken, getIMUserID } from "@/utils/storage";
+import { initStore } from "@/utils/imCommon";
+import { clearIMProfile, getIMToken, getIMUserID } from "@/utils/storage";
 
 import { IMSDK } from "./MainContentWrap";
 
@@ -38,14 +35,18 @@ export function useGlobalEvent() {
   const [connectState, setConnectState] = useState({
     isSyncing: false,
     isLogining: false,
-    isConnecting: false,
   });
-
+  const latestConnectState = useLatest(connectState);
+  // user
+  const updateSyncState = useUserStore((state) => state.updateSyncState);
   const updateSelfInfo = useUserStore((state) => state.updateSelfInfo);
   const userLogout = useUserStore((state) => state.userLogout);
   // conversation
   const updateConversationList = useConversationStore(
     (state) => state.updateConversationList,
+  );
+  const updateCurrentConversation = useConversationStore(
+    (state) => state.updateCurrentConversation,
   );
   const updateUnReadCount = useConversationStore((state) => state.updateUnReadCount);
   const updateCurrentGroupInfo = useConversationStore(
@@ -60,9 +61,6 @@ export function useGlobalEvent() {
   const tryUpdateCurrentMemberInGroup = useConversationStore(
     (state) => state.tryUpdateCurrentMemberInGroup,
   );
-  // message
-  const pushNewMessage = useMessageStore((state) => state.pushNewMessage);
-  const updateOneMessage = useMessageStore((state) => state.updateOneMessage);
   // contact
   const updateFriend = useContactStore((state) => state.updateFriend);
   const pushNewFriend = useContactStore((state) => state.pushNewFriend);
@@ -84,47 +82,42 @@ export function useGlobalEvent() {
   );
 
   useEffect(() => {
+    loginCheck();
     setIMListener();
-    tryLogin();
     return () => {
       disposeIMListener();
     };
   }, []);
 
+  const loginCheck = async () => {
+    const IMToken = (await getIMToken()) as string;
+    const IMUserID = (await getIMUserID()) as string;
+    if (!IMToken || !IMUserID) {
+      clearIMProfile();
+      navigate("/login");
+      return;
+    }
+    tryLogin();
+  };
+
   const tryLogin = async () => {
     setConnectState((state) => ({ ...state, isLogining: true }));
     const IMToken = (await getIMToken()) as string;
     const IMUserID = (await getIMUserID()) as string;
-    if (IMToken && IMUserID) {
-      try {
-        if (window.electronAPI) {
-          await IMSDK.initSDK({
-            platformID: window.electronAPI?.getPlatform() ?? 5,
-            apiAddr: API_URL,
-            wsAddr: WS_URL,
-            dataDir: await window.electronAPI.ipcInvoke("getUserDataPath"),
-            logLevel: 5,
-            isLogStandardOutput: true,
-          });
-          await IMSDK.login({
-            userID: IMUserID,
-            token: IMToken,
-          });
-        } else {
-          await IMSDK.login({
-            userID: IMUserID,
-            token: IMToken,
-            platformID: 5,
-            apiAddr: API_URL,
-            wsAddr: WS_URL,
-          });
-        }
-        initStore();
-      } catch (error) {
-        console.error(error);
-        if ((error as WsResponse).errCode !== 10102) {
-          navigate("/login");
-        }
+    try {
+      await IMSDK.login({
+        userID: IMUserID,
+        token: IMToken,
+        platformID: window.electronAPI?.getPlatform() ?? 5,
+        apiAddr: getApiUrl(),
+        wsAddr: getWsUrl(),
+        logLevel: LogLevel.Debug,
+      });
+      initStore();
+    } catch (error) {
+      console.error(error);
+      if ((error as WsResponse).errCode !== 10102) {
+        navigate("/login");
       }
     }
     setConnectState((state) => ({ ...state, isLogining: false }));
@@ -143,9 +136,7 @@ export function useGlobalEvent() {
     IMSDK.on(CbEvents.OnSyncServerFinish, syncFinishHandler);
     IMSDK.on(CbEvents.OnSyncServerFailed, syncFailedHandler);
     // message
-    IMSDK.on(CbEvents.OnRecvNewMessage, newMessageHandler);
     IMSDK.on(CbEvents.OnRecvNewMessages, newMessageHandler);
-    IMSDK.on(CbEvents.OnNewRecvMessageRevoked, revokedMessageHandler);
     // conversation
     IMSDK.on(CbEvents.OnConversationChanged, conversationChnageHandler);
     IMSDK.on(CbEvents.OnNewConversation, newConversationHandler);
@@ -160,6 +151,7 @@ export function useGlobalEvent() {
     // group
     IMSDK.on(CbEvents.OnJoinedGroupAdded, joinedGroupAddedHandler);
     IMSDK.on(CbEvents.OnJoinedGroupDeleted, joinedGroupDeletedHandler);
+    IMSDK.on(CbEvents.OnGroupDismissed, joinedGroupDismissHandler);
     IMSDK.on(CbEvents.OnGroupInfoChanged, groupInfoChangedHandler);
     IMSDK.on(CbEvents.OnGroupMemberAdded, groupMemberAddedHandler);
     IMSDK.on(CbEvents.OnGroupMemberDeleted, groupMemberDeletedHandler);
@@ -180,7 +172,11 @@ export function useGlobalEvent() {
     console.log("connecting...");
   };
   const connectFailedHandler = ({ errCode, errMsg }: WSEvent) => {
-    console.log(errCode, errMsg);
+    console.error("connectFailedHandler", errCode, errMsg);
+
+    if (errCode === 705) {
+      tryOut(t("toast.loginExpiration"));
+    }
   };
   const connectSuccessHandler = () => {
     console.log("connect success...");
@@ -193,51 +189,35 @@ export function useGlobalEvent() {
       msg,
       error: msg,
       onClose: () => {
-        userLogout();
+        userLogout(true);
       },
     });
 
   // sync
   const syncStartHandler = () => {
+    updateSyncState("loading");
     setConnectState((state) => ({ ...state, isSyncing: true }));
   };
   const syncFinishHandler = () => {
+    updateSyncState("success");
     setConnectState((state) => ({ ...state, isSyncing: false }));
   };
   const syncFailedHandler = () => {
+    updateSyncState("failed");
     feedbackToast({ msg: t("toast.syncFailed"), error: t("toast.syncFailed") });
     setConnectState((state) => ({ ...state, isSyncing: false }));
   };
 
   // message
-  const newMessageHandler = ({ data }: WSEvent<ExMessageItem | ExMessageItem[]>) => {
-    if (connectState.isSyncing) return;
-    if (Array.isArray(data)) {
-      data.map((message) => handleNewMessage(message));
-      return;
-    }
-    handleNewMessage(data);
-  };
-
-  const revokedMessageHandler = ({ data }: WSEvent<RevokedInfo>) => {
-    updateOneMessage({
-      clientMsgID: data.clientMsgID,
-      contentType: MessageType.RevokeMessage,
-      notificationElem: {
-        detail: JSON.stringify(data),
-      },
-    } as ExMessageItem);
-  };
-
   const notPushType = [MessageType.TypingMessage, MessageType.RevokeMessage];
 
-  const handleNewMessage = (newServerMsg: ExMessageItem) => {
-    if (
-      inCurrentConversation(newServerMsg) &&
-      !notPushType.includes(newServerMsg.contentType)
-    ) {
-      if (newServerMsg.contentType === MessageType.CustomMessage) {
-        const customData = JSON.parse(newServerMsg.customElem.data);
+  const newMessageHandler = ({ data }: WSEvent<MessageItem[]>) => {
+    if (latestConnectState.current.isSyncing) {
+      return;
+    }
+    data.map((message) => {
+      if (message.contentType === MessageType.CustomMessage) {
+        const customData = JSON.parse(message.customElem.data);
         if (
           CustomType.CallingInvite <= customData.customType &&
           customData.customType <= CustomType.CallingHungup
@@ -245,13 +225,17 @@ export function useGlobalEvent() {
           return;
         }
       }
-
-      pushNewMessage(newServerMsg);
-      emitter.emit("CHAT_LIST_SCROLL_TO_BOTTOM", true);
-    }
+      if (
+        !notPushType.includes(message.contentType) &&
+        inCurrentConversation(message)
+      ) {
+        pushNewMessage(message);
+        emitter.emit("CHAT_LIST_SCROLL_TO_BOTTOM", false);
+      }
+    });
   };
 
-  const inCurrentConversation = (newServerMsg: ExMessageItem) => {
+  const inCurrentConversation = (newServerMsg: MessageItem) => {
     switch (newServerMsg.sessionType) {
       case SessionType.Single:
         return (
@@ -311,6 +295,7 @@ export function useGlobalEvent() {
   const joinedGroupAddedHandler = ({ data }: WSEvent<GroupItem>) => {
     if (data.groupID === useConversationStore.getState().currentConversation?.groupID) {
       updateCurrentGroupInfo(data);
+      // getCurrentMemberInGroupByReq(group.groupID);
     }
     pushNewGroup(data);
   };
@@ -320,6 +305,11 @@ export function useGlobalEvent() {
       getCurrentMemberInGroupByReq(data.groupID);
     }
     updateGroup(data, true);
+  };
+  const joinedGroupDismissHandler = ({ data }: WSEvent<GroupItem>) => {
+    if (data.groupID === useConversationStore.getState().currentConversation?.groupID) {
+      getCurrentMemberInGroupByReq(data.groupID);
+    }
   };
   const groupInfoChangedHandler = ({ data }: WSEvent<GroupItem>) => {
     updateGroup(data);
@@ -334,13 +324,19 @@ export function useGlobalEvent() {
     ) {
       getCurrentMemberInGroupByReq(data.groupID);
     }
-    console.log("groupMemberAddedHandler");
   };
-  const groupMemberDeletedHandler = () => {
-    console.log("groupMemberDeletedHandler");
+  const groupMemberDeletedHandler = ({ data }: WSEvent<GroupMemberItem>) => {
+    if (
+      data.groupID === useConversationStore.getState().currentConversation?.groupID &&
+      data.userID === useUserStore.getState().selfInfo.userID
+    ) {
+      getCurrentMemberInGroupByReq(data.groupID);
+    }
   };
   const groupMemberInfoChangedHandler = ({ data }: WSEvent<GroupMemberItem>) => {
-    tryUpdateCurrentMemberInGroup(data);
+    if (data.groupID === useConversationStore.getState().currentConversation?.groupID) {
+      tryUpdateCurrentMemberInGroup(data);
+    }
   };
 
   //application
@@ -377,7 +373,6 @@ export function useGlobalEvent() {
     IMSDK.off(CbEvents.OnSyncServerFinish, syncFinishHandler);
     IMSDK.off(CbEvents.OnSyncServerFailed, syncFailedHandler);
     // message
-    IMSDK.off(CbEvents.OnRecvNewMessage, newMessageHandler);
     IMSDK.off(CbEvents.OnRecvNewMessages, newMessageHandler);
     // conversation
     IMSDK.off(CbEvents.OnConversationChanged, conversationChnageHandler);
@@ -393,6 +388,7 @@ export function useGlobalEvent() {
     // group
     IMSDK.off(CbEvents.OnJoinedGroupAdded, joinedGroupAddedHandler);
     IMSDK.off(CbEvents.OnJoinedGroupDeleted, joinedGroupDeletedHandler);
+    IMSDK.off(CbEvents.OnGroupDismissed, joinedGroupDismissHandler);
     IMSDK.off(CbEvents.OnGroupInfoChanged, groupInfoChangedHandler);
     IMSDK.off(CbEvents.OnGroupMemberAdded, groupMemberAddedHandler);
     IMSDK.off(CbEvents.OnGroupMemberDeleted, groupMemberDeletedHandler);

@@ -1,12 +1,12 @@
 import { ExclamationCircleFilled, LoadingOutlined } from "@ant-design/icons";
 import { Spin } from "antd";
-import { MessageStatus } from "open-im-sdk-wasm";
+import { MessageStatus, MessageType } from "open-im-sdk-wasm";
 import { FC, useEffect, useState } from "react";
 
 import { IMessageItemProps } from ".";
 import styles from "./message-item.module.scss";
 
-const MessageSuffix: FC<IMessageItemProps> = ({ message, conversationID }) => {
+const MessageSuffix: FC<IMessageItemProps> = ({ message }) => {
   const [showSending, setShowSending] = useState(false);
 
   useEffect(() => {
@@ -23,17 +23,18 @@ const MessageSuffix: FC<IMessageItemProps> = ({ message, conversationID }) => {
 
   return (
     <div className={styles.suffix}>
-      {showSending && message.status === MessageStatus.Sending && (
-        <Spin
-          className="flex"
-          indicator={<LoadingOutlined style={{ fontSize: 16 }} spin rev={undefined} />}
-        />
-      )}
+      {showSending &&
+        message.status === MessageStatus.Sending &&
+        message.contentType === MessageType.TextMessage && (
+          <Spin
+            className="flex"
+            indicator={
+              <LoadingOutlined style={{ fontSize: 16 }} spin rev={undefined} />
+            }
+          />
+        )}
       {message.status === MessageStatus.Failed && (
-        <ExclamationCircleFilled
-          className="text-base text-[var(--warn-text)]"
-          rev={undefined}
-        />
+        <ExclamationCircleFilled className="text-base text-[var(--warn-text)]" />
       )}
     </div>
   );

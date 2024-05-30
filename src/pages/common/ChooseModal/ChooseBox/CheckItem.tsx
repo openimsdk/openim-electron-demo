@@ -1,6 +1,7 @@
 import { CloseOutlined, RightOutlined } from "@ant-design/icons";
 import { Checkbox } from "antd";
 import clsx from "clsx";
+import { SessionType } from "open-im-sdk-wasm";
 import {
   ConversationItem,
   FriendUserItem,
@@ -25,7 +26,7 @@ export type CheckListItem = Partial<
 
 const CheckItem: FC<ICheckItemProps> = (props) => {
   const { data, isChecked, showCheck, disabled, itemClick, cancelClick } = props;
-  const showName = data.nickname || data.groupName || data.showName;
+  const showName = data.remark || data.nickname || data.groupName || data.showName;
   const isDisabled = disabled ?? data.disabled;
   return (
     <div
@@ -39,14 +40,24 @@ const CheckItem: FC<ICheckItemProps> = (props) => {
         {showCheck && (
           <Checkbox className="mr-3" checked={isChecked} disabled={isDisabled} />
         )}
-        <OIMAvatar src={data.faceURL} text={showName} isgroup={Boolean(data.groupID)} />
+        <OIMAvatar
+          src={data.faceURL}
+          text={showName}
+          isgroup={
+            Boolean(data.groupName) ||
+            data.conversationType === SessionType.WorkingGroup
+          }
+        />
         <div className="ml-3 max-w-[120px] truncate">{showName}</div>
       </div>
       {showCheck ? (
-        <RightOutlined className="cursor-pointer text-[#8e9ab0]" rev={undefined} />
+        <RightOutlined
+          className="cursor-pointer text-[var(--sub-text)]"
+          rev={undefined}
+        />
       ) : (
         <CloseOutlined
-          className="cursor-pointer text-[#8e9ab0]"
+          className="cursor-pointer text-[var(--sub-text)]"
           rev={undefined}
           onClick={(e) => {
             e.stopPropagation();

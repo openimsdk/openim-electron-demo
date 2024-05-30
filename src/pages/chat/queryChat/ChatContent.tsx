@@ -1,82 +1,96 @@
-import { useRequest } from "ahooks";
-import { Layout } from "antd";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Layout, Spin } from "antd";
+import clsx from "clsx";
+import { memo, useEffect, useRef } from "react";
 import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
 
 import { SystemMessageTypes } from "@/constants/im";
-import { useMessageStore, useUserStore } from "@/store";
+import { useUserStore } from "@/store";
 import emitter from "@/utils/events";
 
 import MessageItem from "./MessageItem";
-import SystemNotification from "./SystemNotification";
+import NotificationMessage from "./NotificationMessage";
+import { useHistoryMessageList } from "./useHistoryMessageList";
 
-const START_INDEX = 10000;
-const INITIAL_ITEM_COUNT = 20;
-
-const ChatContent = () => {
-  const { conversationID } = useParams();
+const ChatContent = ({ isNotificationSession }: { isNotificationSession: boolean }) => {
   const virtuoso = useRef<VirtuosoHandle>(null);
-
-  const [firstItemIndex, setFirstItemIndex] = useState(START_INDEX);
   const selfUserID = useUserStore((state) => state.selfInfo.userID);
-  const messageList = useMessageStore((state) => state.historyMessageList);
-  const hasMoreMessage = useMessageStore((state) => state.hasMore);
-  const getHistoryMessageList = useMessageStore(
-    (state) => state.getHistoryMessageListByReq,
-  );
 
-  const { loading, runAsync, cancel } = useRequest(getHistoryMessageList, {
-    manual: true,
-  });
+  const { SPLIT_COUNT, conversationID, loadState, loading, getMoreMessages } =
+    useHistoryMessageList();
 
   useEffect(() => {
-    const toBottomHandle = () => {
-      setTimeout(() =>
-        virtuoso.current?.scrollToIndex({
-          index: START_INDEX,
-          behavior: "smooth",
-        }),
-      );
+    const toBottomHandle = (forceScroll: boolean) => {
+      if (isNotificationSession) return;
+
+      scrollToBottom(forceScroll ? "auto" : "smooth");
     };
     emitter.on("CHAT_LIST_SCROLL_TO_BOTTOM", toBottomHandle);
     return () => {
-      cancel();
       emitter.off("CHAT_LIST_SCROLL_TO_BOTTOM", toBottomHandle);
     };
-  }, []);
+  }, [isNotificationSession]);
 
-  const loadMoreMessage = useCallback(() => {
-    if (loading || !hasMoreMessage) return;
-    runAsync(true).then((count) => {
-      setFirstItemIndex((idx) => idx - (count as number));
+  const scrollToBottom = (behavior?: "smooth" | "auto") => {
+    setTimeout(() => {
+      virtuoso.current?.scrollToIndex({
+        index: 999999,
+        behavior,
+      });
     });
-  }, [loading, hasMoreMessage]);
+  };
+
+  const loadMoreMessage = () => {
+    if (!loadState.hasMore || loading) return;
+
+    getMoreMessages();
+  };
+
+  if (loadState.initLoading) {
+    return (
+      <div className="flex h-full items-center justify-center bg-white pt-1">
+        <Spin spinning />
+      </div>
+    );
+  }
 
   return (
-    <Layout.Content className="!bg-white">
+    <Layout.Content
+      className="relative flex h-full overflow-hidden !bg-white"
+      id="chat-main"
+    >
       <Virtuoso
-        className="h-full overflow-x-hidden"
-        firstItemIndex={firstItemIndex}
-        initialTopMostItemIndex={INITIAL_ITEM_COUNT - 1}
+        id="chat-list"
+        className="w-full overflow-x-hidden"
+        firstItemIndex={loadState.firstItemIndex}
+        initialTopMostItemIndex={SPLIT_COUNT - 1}
         ref={virtuoso}
-        data={messageList}
+        data={loadState.messageList}
         startReached={loadMoreMessage}
         components={{
-          Header: () => (loading ? <div>loading...</div> : null),
+          Header: () =>
+            loadState.hasMore ? (
+              <div
+                className={clsx(
+                  "flex justify-center py-2 opacity-0",
+                  loading && "opacity-100",
+                )}
+              >
+                <Spin />
+              </div>
+            ) : null,
         }}
         computeItemKey={(_, item) => item.clientMsgID}
         itemContent={(_, message) => {
           if (SystemMessageTypes.includes(message.contentType)) {
-            return <SystemNotification message={message} />;
+            return <NotificationMessage key={message.clientMsgID} message={message} />;
           }
           const isSender = selfUserID === message.sendID;
           return (
             <MessageItem
+              key={message.clientMsgID}
               conversationID={conversationID}
               message={message}
               isSender={isSender}
-              key={message.clientMsgID}
             />
           );
         }}
@@ -85,4 +99,4 @@ const ChatContent = () => {
   );
 };
 
-export default ChatContent;
+export default memo(ChatContent);

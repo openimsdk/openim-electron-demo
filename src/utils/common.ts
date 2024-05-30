@@ -1,8 +1,6 @@
 import { t } from "i18next";
 
-import PinYin from "./pinyin";
 import { message } from "../AntdGlobalComp";
-import { FriendUserItem } from "open-im-sdk-wasm/lib/types/entity";
 
 type FeedbackToastParams = {
   msg?: string | null;
@@ -11,11 +9,18 @@ type FeedbackToastParams = {
   onClose?: () => void;
 };
 
+interface FeedbackError extends Error {
+  errMsg?: string;
+  errDlt?: string;
+}
 export const feedbackToast = (config?: FeedbackToastParams) => {
   const { msg, error, duration, onClose } = config ?? {};
   let content = "";
   if (error) {
-    content = (error as Error)?.message ?? t("toast.accessFailed");
+    content =
+      (error as FeedbackError)?.message ??
+      (error as FeedbackError)?.errDlt ??
+      t("toast.accessFailed");
   }
   message.open({
     type: error ? "error" : "success",
@@ -77,108 +82,6 @@ export const secondsToMS = (duration: number) => {
   return minutes + ":" + seconds;
 };
 
-export const formatContacts = (data: FriendUserItem[], key = "nickname") => {
-  const ucfirst = (l1: string) => {
-    if (l1.length > 0) {
-      const first = l1.substr(0, 1).toUpperCase();
-      const spare = l1.substr(1, l1.length);
-      return first + spare;
-    }
-  };
-
-  const arraySearch = (l1: string) => {
-    for (const name in PinYin) {
-      // @ts-ignore
-      if ((PinYin[name] as string).indexOf(l1) !== -1) {
-        return ucfirst(name);
-        break;
-      }
-    }
-    return false;
-  };
-
-  const codefans = (l1: string) => {
-    l1 = l1 ?? "unkown";
-    const l2 = l1.length;
-    let I1 = "";
-    const reg = new RegExp("[a-zA-Z0-9- ]");
-    for (let i = 0; i < l2; i++) {
-      const val = l1.substr(i, 1);
-      const name = arraySearch(val);
-      if (reg.test(val)) {
-        I1 += val;
-      } else if (name !== false) {
-        I1 += name;
-      }
-    }
-    I1 = I1.replace(/ /g, "-");
-    while (I1.indexOf("--") > 0) {
-      I1 = I1.replace("--", "-");
-    }
-    return I1;
-  };
-
-  const arr = [];
-
-  for (i = 0; i < data.length; i++) {
-    // @ts-ignore
-    const firstName = (data[i].initial = codefans(data[i][key]).substr(0, 1));
-    arr.push(firstName.toUpperCase());
-  }
-
-  const arrlist = [];
-  for (i = 0; i < arr.length; i++) {
-    if (arrlist.indexOf(arr[i]) === -1) {
-      arrlist.push(arr[i]);
-    }
-  }
-
-  // @ts-ignore
-  const dataSort = [] as any[];
-  for (i = 0; i < arrlist.length; i++) {
-    dataSort[i] = {
-      initial: arrlist[i],
-    };
-    dataSort[i].data = [];
-    for (j = 0; j < data.length; j++) {
-      // @ts-ignore
-      if (data[j].initial.toUpperCase() === dataSort[i].initial) {
-        dataSort[i].data.push(data[j]);
-      }
-    }
-  }
-  for (var i = 0; i < dataSort.length - 1; i++) {
-    for (var j = 1; j < dataSort.length - i; j++) {
-      if (dataSort[j - 1].initial > dataSort[j].initial) {
-        const a = dataSort[j];
-        dataSort[j] = dataSort[j - 1];
-        dataSort[j - 1] = a;
-      }
-    }
-  }
-  const NomalInitial = "QWERTYUIOPLKJHGFDSAZXCVBNM".split("");
-  const special = {
-    initial: "#",
-    data: [] as any[],
-  };
-  const newFilterData = dataSort.filter((d) => {
-    if (!NomalInitial.includes(d.initial)) {
-      special.data = [...special.data, ...d.data];
-    } else {
-      return d;
-    }
-  });
-  if (special.data.length > 0) {
-    newFilterData.push(special);
-  }
-  const indexList = newFilterData.map((item) => item.initial as string);
-  const dataList = newFilterData.map((item) => item.data as FriendUserItem[]);
-  return {
-    indexList,
-    dataList,
-  };
-};
-
 export const filterEmptyValue = (obj: Record<string, unknown>) => {
   for (const key in obj) {
     if (obj[key] === "") {
@@ -190,94 +93,6 @@ export const filterEmptyValue = (obj: Record<string, unknown>) => {
 export const checkIsSafari = () =>
   /^((?!chrome|android).)*safari/i.test(navigator.userAgent) &&
   /iPad|iPhone|iPod/.test(navigator.userAgent);
-
-type DownloadFileParams = {
-  fileUrl: string;
-  filename: string;
-  onProgress?: (downloadProgress: number) => void;
-};
-export const downloadFile = ({ filename, fileUrl, onProgress }: DownloadFileParams) => {
-  const controller = new AbortController();
-  const { signal } = controller;
-
-  let isPaused = false;
-  let isCancelled = false;
-
-  fetch(fileUrl, { signal })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok.");
-      }
-
-      const totalLength = Number(response.headers.get("content-length") as string);
-      let downloadedLength = 0;
-
-      const reader = response.clone().body?.getReader();
-
-      const read = () => {
-        if (!reader) return;
-        reader
-          .read()
-          .then(({ done, value }) => {
-            if (isCancelled) {
-              console.log("Download cancelled.");
-              return;
-            }
-
-            if (done) {
-              response.blob().then((blob) => {
-                const link = document.createElement("a");
-                link.href = `${window.URL.createObjectURL(blob)}`;
-                link.download = filename;
-                link.click();
-              });
-              return;
-            }
-
-            if (isPaused) {
-              setTimeout(read, 1000);
-              return;
-            }
-
-            downloadedLength += value.length;
-            const percentComplete = (downloadedLength / totalLength) * 100;
-            onProgress?.(Number(percentComplete.toFixed()));
-            read();
-          })
-          .catch((error) => {
-            console.error("Error while reading stream:", error);
-          });
-      };
-
-      read();
-    })
-    .catch((error) => {
-      console.error("There has been a problem with your fetch operation:", error);
-    });
-
-  return {
-    pause: () => {
-      isPaused = true;
-    },
-    resume: () => {
-      isPaused = false;
-    },
-    cancel: () => {
-      isCancelled = true;
-      controller.abort();
-    },
-  };
-};
-
-export const getFileData = (data: Blob): Promise<ArrayBuffer> => {
-  return new Promise((resolve, reject) => {
-    let reader = new FileReader();
-    reader.onload = function () {
-      resolve(reader.result as ArrayBuffer);
-    };
-    reader.readAsArrayBuffer(data);
-  });
-};
 
 export const base64toFile = (base64Str: string) => {
   var arr = base64Str.split(","),
@@ -295,67 +110,25 @@ export const base64toFile = (base64Str: string) => {
   });
 };
 
-export const blobToDataURL = (blob: File, cb: (base64: string) => void) => {
-  const reader = new FileReader();
-  reader.onload = function (evt) {
-    const base64 = evt.target?.result;
-    cb(base64 as string);
-  };
-  reader.readAsDataURL(blob);
-};
-
 export const formatBr = (str: string) => str.replace(/\n/g, "<br>");
 
-const longestCommonSubsequence = (str1: string, str2: string) => {
-  const dp = Array.from({ length: str1.length + 1 }, () =>
-    Array(str2.length + 1).fill(0),
-  );
-
-  for (let i = 1; i <= str1.length; i++) {
-    for (let j = 1; j <= str2.length; j++) {
-      if (str1[i - 1] === str2[j - 1]) {
-        dp[i][j] = dp[i - 1][j - 1] + 1;
-      } else {
-        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
-      }
-    }
-  }
-
-  let lcs = "";
-  let i = str1.length;
-  let j = str2.length;
-  while (i > 0 && j > 0) {
-    if (str1[i - 1] === str2[j - 1]) {
-      lcs = str1[i - 1] + lcs;
-      i--;
-      j--;
-    } else if (dp[i - 1][j] > dp[i][j - 1]) {
-      i--;
-    } else {
-      j--;
-    }
-  }
-
-  return lcs;
+export const generateAvatar = (str: string, size = 40) => {
+  str = !str ? t("placeholder.unknown") : str.split("")[0];
+  let colors = ["#0072E3"];
+  let cvs = document.createElement("canvas");
+  cvs.setAttribute("width", size as unknown as string);
+  cvs.setAttribute("height", size as unknown as string);
+  let ctx = cvs.getContext("2d");
+  ctx!.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+  ctx!.fillRect(0, 0, size, size);
+  ctx!.fillStyle = "rgb(255,255,255)";
+  ctx!.font = size * 0.4 + "px Arial";
+  ctx!.textBaseline = "middle";
+  ctx!.textAlign = "center";
+  ctx!.fillText(str, size / 2, size / 2);
+  return cvs.toDataURL("image/png", 1);
 };
 
-export const getExtraStr = (str1: string, str2: string) => {
-  const lcs = longestCommonSubsequence(str1, str2);
-  let extraPart = "";
-  let lcsIndex = 0;
-
-  for (let i = 0; i < str2.length; i++) {
-    if (lcsIndex < lcs.length && str2[i] === lcs[lcsIndex]) {
-      lcsIndex++;
-    } else {
-      extraPart += str2[i];
-    }
-  }
-
-  return extraPart.slice(1);
-};
-
-export const getFileType = (name: string) => {
-  const idx = name.lastIndexOf(".");
-  return name.slice(idx + 1);
-};
+export async function sleep(duration: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, duration));
+}

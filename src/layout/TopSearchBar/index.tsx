@@ -23,7 +23,6 @@ import GroupCardModal from "@/pages/common/GroupCardModal";
 import RtcCallModal from "@/pages/common/RtcCallModal";
 import { InviteData } from "@/pages/common/RtcCallModal/data";
 import UserCardModal, { CardInfo } from "@/pages/common/UserCardModal";
-import VideoPlayerModal from "@/pages/common/VideoPlayerModal";
 import emitter, { OpenUserCardParams } from "@/utils/events";
 
 import { IMSDK } from "../MainContentWrap";
@@ -46,7 +45,6 @@ const TopSearchBar = () => {
   const [groupCardData, setGroupCardData] = useState<GroupItem>();
   const [actionVisible, setActionVisible] = useState(false);
   const [isSearchGroup, setIsSearchGroup] = useState(false);
-  const [videoUrl, setVideoUrl] = useState("");
   const [inviteData, setInviteData] = useState<InviteData>({} as InviteData);
 
   useEffect(() => {
@@ -57,9 +55,6 @@ const TopSearchBar = () => {
     const chooseModalHandler = (params: ChooseModalState) => {
       setChooseModalState({ ...params });
       chooseModalRef.current?.openOverlay();
-    };
-    const videoPlayerHandler = (url: string) => {
-      setVideoUrl(url);
     };
     const callRtcHandler = (inviteData: InviteData) => {
       if (rtcRef.current?.isOverlayOpen) return;
@@ -99,14 +94,12 @@ const TopSearchBar = () => {
     emitter.on("OPEN_USER_CARD", userCardHandler);
     emitter.on("OPEN_GROUP_CARD", openGroupCardWithData);
     emitter.on("OPEN_CHOOSE_MODAL", chooseModalHandler);
-    emitter.on("OPEN_VIDEO_PLAYER", videoPlayerHandler);
     emitter.on("OPEN_RTC_MODAL", callRtcHandler);
     IMSDK.on(CbEvents.OnRecvNewMessages, newMessageHandler);
     return () => {
       emitter.off("OPEN_USER_CARD", userCardHandler);
       emitter.off("OPEN_GROUP_CARD", openGroupCardWithData);
       emitter.off("OPEN_CHOOSE_MODAL", chooseModalHandler);
-      emitter.off("OPEN_VIDEO_PLAYER", videoPlayerHandler);
       emitter.off("OPEN_RTC_MODAL", callRtcHandler);
       IMSDK.off(CbEvents.OnRecvNewMessages, newMessageHandler);
     };
@@ -177,9 +170,6 @@ const TopSearchBar = () => {
         openUserCardWithData={openUserCardWithData}
         openGroupCardWithData={openGroupCardWithData}
       />
-      {Boolean(videoUrl) && (
-        <VideoPlayerModal url={videoUrl} closeOverlay={() => setVideoUrl("")} />
-      )}
       <RtcCallModal inviteData={inviteData} ref={rtcRef} />
     </div>
   );

@@ -18,7 +18,7 @@ const MenuItem = ({
       <img width={42} src={menu.icon} alt="" />
       <div className="ml-3.5">{menu.title}</div>
     </div>
-    <RightOutlined className="text-[#8e9ab0]" rev={undefined} />
+    <RightOutlined className="text-[var(--sub-text)]" rev={undefined} />
   </div>
 );
 

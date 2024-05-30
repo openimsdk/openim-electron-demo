@@ -1,25 +1,19 @@
-import { getWithRenderProcess } from "@openim/electron-client-sdk/lib/render";
-import { AllowType } from "open-im-sdk-wasm";
+import { getSDK } from "open-im-sdk-wasm";
 import { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
-import { useConversationStore, useUserStore } from "@/store";
+import { useUserStore } from "@/store";
 import emitter from "@/utils/events";
 import { getIMToken, getIMUserID } from "@/utils/storage";
 
 const isElectronProd = import.meta.env.MODE !== "development" && window.electronAPI;
 
-const { instance } = getWithRenderProcess({
-  wasmConfig: {
-    coreWasmPath: "./openIM.wasm",
-    sqlWasmPath: `${isElectronProd ? ".." : ""}/sql-wasm.wasm`,
-  },
+export const IMSDK = getSDK({
+  coreWasmPath: "./openIM.wasm",
+  sqlWasmPath: `${isElectronProd ? ".." : ""}/sql-wasm.wasm`,
 });
 
-export const IMSDK = instance;
-
 export const MainContentWrap = () => {
-  const selfID = useUserStore((state) => state.selfInfo.userID);
   const updateAppSettings = useUserStore((state) => state.updateAppSettings);
   const getAppConfigByReq = useUserStore((state) => state.getAppConfigByReq);
 
@@ -40,25 +34,13 @@ export const MainContentWrap = () => {
   }, [location.pathname]);
 
   useEffect(() => {
-    window.userClick = (userID: string, groupID: string) => {
-      if (!userID || userID === "AtAllTag") return;
-
-      const currentGroupInfo = useConversationStore.getState().currentGroupInfo;
-
-      if (groupID && currentGroupInfo?.lookMemberInfo === AllowType.NotAllowed) {
-        return;
-      }
-
+    window.userClick = (userID?: string) => {
       emitter.emit("OPEN_USER_CARD", {
         userID,
-        groupID,
-        isSelf: userID === selfID,
-        notAdd:
-          Boolean(groupID) &&
-          currentGroupInfo?.applyMemberFriend === AllowType.NotAllowed,
+        isSelf: userID === useUserStore.getState().selfInfo.userID,
       });
     };
-  }, [selfID]);
+  }, []);
 
   useEffect(() => {
     const initSettingStore = async () => {
@@ -67,8 +49,9 @@ export const MainContentWrap = () => {
         closeAction:
           (await window.electronAPI?.ipcInvoke("getKeyStore", {
             key: "closeAction",
-          })) || "miniSize",
+          })) || "quit",
       });
+      window.electronAPI?.ipcInvoke("main-win-ready");
     };
 
     initSettingStore();

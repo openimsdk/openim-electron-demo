@@ -3,7 +3,6 @@ import { t } from "i18next";
 import { hideWindow, showWindow } from "./windowManage";
 
 let appTray: Tray;
-let timer: NodeJS.Timeout | null = null;
 
 export const createTray = () => {
   const trayMenu = Menu.buildFromTemplate([
@@ -16,8 +15,8 @@ export const createTray = () => {
       click: hideWindow,
     },
     {
-      label: t("system.about"),
-      role: "about",
+      label: t("system.toggleDevTools"),
+      role: "toggleDevTools",
     },
     {
       label: t("system.quit"),
@@ -30,6 +29,7 @@ export const createTray = () => {
   appTray = new Tray(global.pathConfig.trayIcon);
   appTray.setToolTip(app.getName());
   appTray.setIgnoreDoubleClickEvents(true);
+  appTray.on("click", showWindow);
 
   appTray.setContextMenu(trayMenu);
 };

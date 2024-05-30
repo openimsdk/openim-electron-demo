@@ -1,7 +1,6 @@
 import { RightOutlined } from "@ant-design/icons";
 import { Button, Divider, Drawer } from "antd";
 import { t } from "i18next";
-import { MessageReceiveOptType } from "open-im-sdk-wasm";
 import { forwardRef, ForwardRefRenderFunction, memo } from "react";
 
 import { modal } from "@/AntdGlobalComp";
@@ -14,18 +13,12 @@ import { useContactStore } from "@/store/contact";
 import { feedbackToast } from "@/utils/common";
 import emitter from "@/utils/events";
 
-// export interface SingleSettingProps {}
-
 const SingleSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
   _,
   ref,
 ) => {
-  const {
-    currentConversation,
-    updateConversationPin,
-    updateConversationMessageRemind,
-    clearConversationMessages,
-  } = useConversationSettings();
+  const { currentConversation, updateConversationPin, clearConversationMessages } =
+    useConversationSettings();
 
   const isBlack = useContactStore((state) => state.blackList).some(
     (black) => currentConversation?.userID === black.userID,
@@ -39,9 +32,12 @@ const SingleSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
   const updateBlack = async () => {
     if (!currentConversation) return;
     const execFunc = async () => {
-      const funcName = isBlack ? "removeBlack" : "addBlack";
       try {
-        await IMSDK[funcName](currentConversation?.userID);
+        isBlack
+          ? await IMSDK.removeBlack(currentConversation?.userID)
+          : await IMSDK.addBlack({
+              toUserID: currentConversation?.userID,
+            });
       } catch (error) {
         feedbackToast({ error, msg: t("toast.updateBlackStateFailed") });
       }
@@ -117,22 +113,6 @@ const SingleSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
         title={t("placeholder.sticky")}
         value={currentConversation?.isPinned}
         tryChange={updateConversationPin}
-      />
-      <SettingRow
-        className="pb-2"
-        title={t("placeholder.notNotify")}
-        value={currentConversation?.recvMsgOpt === MessageReceiveOptType.NotNotify}
-        tryChange={(checked) =>
-          updateConversationMessageRemind(checked, MessageReceiveOptType.NotNotify)
-        }
-      />
-      <SettingRow
-        className="pb-2"
-        title={t("placeholder.shieldConversation")}
-        value={currentConversation?.recvMsgOpt === MessageReceiveOptType.NotReceive}
-        tryChange={(checked) =>
-          updateConversationMessageRemind(checked, MessageReceiveOptType.NotReceive)
-        }
       />
       <SettingRow
         title={t("placeholder.moveBlacklist")}

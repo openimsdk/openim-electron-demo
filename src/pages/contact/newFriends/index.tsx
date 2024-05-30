@@ -1,7 +1,6 @@
-import { useDeepCompareEffect } from "ahooks";
-import { t } from "i18next";
 import { FriendApplicationItem } from "open-im-sdk-wasm/lib/types/entity";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { Virtuoso } from "react-virtuoso";
 
 import ApplicationItem, { AccessFunction } from "@/components/ApplicationItem";
@@ -11,6 +10,7 @@ import { useContactStore } from "@/store/contact";
 import { feedbackToast } from "@/utils/common";
 
 export const NewFriends = () => {
+  const { t } = useTranslation();
   const currentUserID = useUserStore((state) => state.selfInfo.userID);
 
   const recvFriendApplicationList = useContactStore(
@@ -72,10 +72,14 @@ export const NewFriends = () => {
 
 const sortArray = (list: FriendApplicationItem[]) => {
   list.sort((a, b) => {
-    if (a.handleResult === b.handleResult) {
+    if (a.handleResult === 0 && b.handleResult === 0) {
       return b.createTime - a.createTime;
+    } else if (a.handleResult === 0) {
+      return -1;
+    } else if (b.handleResult === 0) {
+      return 1;
     }
-    return a.handleResult - b.handleResult;
+    return 0;
   });
   return list;
 };

@@ -1,7 +1,7 @@
 import { Badge } from "antd";
 import clsx from "clsx";
-import { t } from "i18next";
-import { useState } from "react";
+import i18n, { t } from "i18next";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import group_notifications from "@/assets/images/contact/group_notifications.png";
@@ -34,6 +34,13 @@ const Links = [
   },
 ];
 
+i18n.on("languageChanged", () => {
+  Links[0].label = t("placeholder.newFriends");
+  Links[1].label = t("placeholder.groupNotification");
+  Links[2].label = t("placeholder.myFriend");
+  Links[3].label = t("placeholder.myGroup");
+});
+
 const ContactSider = () => {
   const [selectIndex, setSelectIndex] = useState(2);
   const unHandleFriendApplicationCount = useContactStore(
@@ -43,6 +50,18 @@ const ContactSider = () => {
     (state) => state.unHandleGroupApplicationCount,
   );
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.hash.includes("/contact/newFriends")) {
+      setSelectIndex(0);
+    }
+    if (location.hash.includes("/contact/groupNotifications")) {
+      setSelectIndex(1);
+    }
+    if (location.hash.includes("/contact/myGroups")) {
+      setSelectIndex(3);
+    }
+  }, []);
 
   const getBadge = (index: number) => {
     if (index === 0) {
@@ -66,7 +85,7 @@ const ContactSider = () => {
               <li
                 key={item.path}
                 className={clsx(
-                  "mx-2 flex cursor-pointer items-center rounded-md p-3 text-sm hover:bg-[#f3f8fe]",
+                  "mx-2 flex cursor-pointer items-center rounded-md p-3 text-sm hover:bg-[var(--primary-active)]",
                   {
                     "bg-[#f3f8fe]": index === selectIndex,
                   },

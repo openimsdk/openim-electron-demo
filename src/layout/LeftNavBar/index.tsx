@@ -4,11 +4,8 @@ import clsx from "clsx";
 import i18n, { t } from "i18next";
 import { UploadRequestOption } from "rc-upload/lib/interface";
 import React, { memo, useRef, useState } from "react";
-import {
-  UNSAFE_NavigationContext,
-  useNavigate,
-  useResolvedPath,
-} from "react-router-dom";
+import ImageResizer from "react-image-file-resizer";
+import { UNSAFE_NavigationContext, useResolvedPath } from "react-router-dom";
 import { v4 as uuidV4 } from "uuid";
 
 import { modal } from "@/AntdGlobalComp";
@@ -20,7 +17,9 @@ import message_icon_active from "@/assets/images/nav/nav_bar_message_active.png"
 import change_avatar from "@/assets/images/profile/change_avatar.png";
 import OIMAvatar from "@/components/OIMAvatar";
 import { useContactStore, useConversationStore, useUserStore } from "@/store";
-import { feedbackToast, getFileType } from "@/utils/common";
+import { ChildWindowOptions } from "@/types/common";
+import { openAbout, openPersonalSettings } from "@/utils/childWindows";
+import { feedbackToast } from "@/utils/common";
 import emitter from "@/utils/events";
 
 import { OverlayVisibleHandle } from "../../hooks/useOverlayVisible";
@@ -50,6 +49,22 @@ i18n.on("languageChanged", () => {
   NavList[0].title = t("placeholder.chat");
   NavList[1].title = t("placeholder.contact");
 });
+
+const resizeFile = (file: File): Promise<File> =>
+  new Promise((resolve) => {
+    ImageResizer.imageFileResizer(
+      file,
+      400,
+      400,
+      "webp",
+      90,
+      0,
+      (uri) => {
+        resolve(uri as File);
+      },
+      "file",
+    );
+  });
 
 type NavItemType = (typeof NavList)[0];
 
@@ -129,6 +144,13 @@ const profileMenuList = [
   },
 ];
 
+i18n.on("languageChanged", () => {
+  profileMenuList[0].title = t("placeholder.myInfo");
+  profileMenuList[1].title = t("placeholder.accountSetting");
+  profileMenuList[2].title = t("placeholder.about");
+  profileMenuList[3].title = t("placeholder.logOut");
+});
+
 const LeftNavBar = memo(() => {
   const aboutRef = useRef<OverlayVisibleHandle>(null);
   const personalSettingsRef = useRef<OverlayVisibleHandle>(null);
@@ -143,9 +165,17 @@ const LeftNavBar = memo(() => {
         emitter.emit("OPEN_USER_CARD", { isSelf: true });
         break;
       case 1:
+        // if (window.electronAPI) {
+        //   openPersonalSettings();
+        //   return;
+        // }
         personalSettingsRef.current?.openOverlay();
         break;
       case 2:
+        // if (window.electronAPI) {
+        //   openAbout();
+        //   return;
+        // }
         aboutRef.current?.openOverlay();
         break;
       case 3:
@@ -172,14 +202,15 @@ const LeftNavBar = memo(() => {
   };
 
   const customUpload = async ({ file }: { file: File }) => {
+    const resizedFile = await resizeFile(file);
     try {
       const {
         data: { url },
       } = await IMSDK.uploadFile({
-        name: file.name,
-        contentType: getFileType(file.name),
+        name: resizedFile.name,
+        contentType: resizedFile.type,
         uuid: uuidV4(),
-        file,
+        file: resizedFile,
       });
       const newInfo = {
         faceURL: url,
@@ -195,7 +226,7 @@ const LeftNavBar = memo(() => {
     <div className="w-72 px-2.5 pb-3 pt-5.5">
       <div className="mb-4.5 ml-3 flex items-center">
         <Upload
-          accept="image/*"
+          accept=".jpeg,.png,.webp"
           showUploadList={false}
           customRequest={customUpload as any}
         >
@@ -207,7 +238,7 @@ const LeftNavBar = memo(() => {
           </div>
         </Upload>
         <div className="flex-1 overflow-hidden">
-          <div className="mb-1 text-base font-medium">{selfInfo.nickname}</div>
+          <div className="mb-1 truncate text-base font-medium">{selfInfo.nickname}</div>
         </div>
       </div>
       {profileMenuList.map((menu) => (

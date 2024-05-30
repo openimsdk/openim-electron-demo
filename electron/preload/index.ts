@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
-import { contextBridge, ipcRenderer } from "electron";
-import { IElectronAPI } from "./../../src/types/globalExpose.d";
-
-import "@openim/electron-client-sdk/lib/preload";
+import os from "os";
+import { DataPath, IElectronAPI } from "./../../src/types/globalExpose.d";
+import { contextBridge, ipcRenderer, shell } from "electron";
+import { isProd } from "../utils";
 
 const getPlatform = () => {
   if (process.platform === "darwin") {
@@ -15,16 +15,23 @@ const getPlatform = () => {
   return 7;
 };
 
+const getDataPath = (key: DataPath) => {
+  switch (key) {
+    case "public":
+      return isProd ? ipcRenderer.sendSync("getDataPath", "public") : "";
+    default:
+      return "";
+  }
+};
+
 const subscribe = (channel: string, callback: (...args: any[]) => void) => {
-  ipcRenderer.on(channel, callback);
+  const subscription = (_, ...args) => callback(...args);
+  ipcRenderer.on(channel, subscription);
+  return () => ipcRenderer.removeListener(channel, subscription);
 };
 
 const subscribeOnce = (channel: string, callback: (...args: any[]) => void) => {
-  ipcRenderer.once(channel, callback);
-};
-
-const unsubscribe = (channel: string, callback: (...args: any[]) => void) => {
-  ipcRenderer.removeListener(channel, callback);
+  ipcRenderer.once(channel, (_, ...args) => callback(...args));
 };
 
 const unsubscribeAll = (channel: string) => {
@@ -47,7 +54,7 @@ const saveFileToDisk = async ({
   sync?: boolean;
 }): Promise<string> => {
   const arrayBuffer = await file.arrayBuffer();
-  const saveDir = await ipcInvoke("getUserDataPath");
+  const saveDir = ipcRenderer.sendSync("getDataPath", "userData");
   const savePath = path.join(saveDir, file.name);
   if (!fs.existsSync(saveDir)) {
     fs.mkdirSync(saveDir, { recursive: true });
@@ -61,11 +68,12 @@ const saveFileToDisk = async ({
 };
 
 const Api: IElectronAPI = {
+  getDataPath,
   getVersion: () => process.version,
   getPlatform,
+  getSystemVersion: process.getSystemVersion,
   subscribe,
   subscribeOnce,
-  unsubscribe,
   unsubscribeAll,
   ipcInvoke,
   ipcSendSync,

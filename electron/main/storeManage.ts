@@ -4,7 +4,7 @@ let store: Store;
 
 export const getStore = () => {
   if (!store) {
-    store = new Store({ cwd: global.dataPath });
+    store = new Store();
   }
   return store;
 };

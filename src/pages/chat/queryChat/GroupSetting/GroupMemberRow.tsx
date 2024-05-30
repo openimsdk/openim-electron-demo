@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { t } from "i18next";
 import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
-import { memo } from "react";
+import { memo, useEffect } from "react";
 
 import invite from "@/assets/images/chatSetting/invite.png";
 import kick from "@/assets/images/chatSetting/kick.png";
@@ -20,8 +20,16 @@ const GroupMemberRow = ({
   isNomal: boolean;
   updateTravel: () => void;
 }) => {
-  const { fetchState } = useGroupMembers();
-  console.log("render in GroupMemberRow");
+  const { fetchState, getMemberData, resetState } = useGroupMembers();
+
+  useEffect(() => {
+    if (currentGroupInfo?.groupID) {
+      getMemberData(true);
+    }
+    return () => {
+      resetState();
+    };
+  }, [currentGroupInfo?.groupID]);
 
   const sliceCount = isNomal ? 17 : 16;
 
@@ -51,11 +59,14 @@ const GroupMemberRow = ({
         {fetchState.groupMemberList.slice(0, sliceCount).map((member) => (
           <div
             key={member.userID}
+            title={member.nickname}
             className={styles["member-item"]}
-            onClick={() => window.userClick(member.userID, member.groupID)}
+            onClick={() => window.userClick(member.userID)}
           >
             <OIMAvatar src={member.faceURL} text={member.nickname} size={36} />
-            <div className="mt-2 max-w-full truncate text-xs">{member.nickname}</div>
+            <div className="mt-2 min-h-[16px] max-w-full truncate text-xs">
+              {member.nickname}
+            </div>
           </div>
         ))}
         <div

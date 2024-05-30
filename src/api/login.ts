@@ -1,8 +1,8 @@
-import { MessageReceiveOptType } from "open-im-sdk-wasm";
+import type { MessageReceiveOptType } from "open-im-sdk-wasm";
 import { useMutation, useQuery } from "react-query";
 import { v4 as uuidv4 } from "uuid";
 
-import { USER_URL } from "@/config";
+import { getChatUrl } from "@/config";
 import { useUserStore } from "@/store";
 import { AppConfig } from "@/store/type";
 import createAxiosInstance from "@/utils/request";
@@ -10,12 +10,14 @@ import { getChatToken } from "@/utils/storage";
 
 import { errorHandle } from "./errorHandle";
 
-const request = createAxiosInstance(USER_URL);
+const request = createAxiosInstance(getChatUrl());
 
 const platform = window.electronAPI?.getPlatform() ?? 5;
 
-const getAreaCode = (code: string) => (code.includes("+") ? code : `+${code}`);
+const getAreaCode = (code?: string) =>
+  code ? (code.includes("+") ? code : `+${code}`) : code;
 
+// Send verification code
 export const useSendSms = () => {
   return useMutation(
     (params: API.Login.SendSmsParams) =>
@@ -36,6 +38,7 @@ export const useSendSms = () => {
   );
 };
 
+// Verify mobile phone number
 export const useVerifyCode = () => {
   return useMutation(
     (params: API.Login.VerifyCodeParams) =>
@@ -61,7 +64,7 @@ export const useVerifyCode = () => {
 export const useRegister = () => {
   return useMutation(
     (params: API.Login.DemoRegisterType) =>
-      request.post(
+      request.post<{ chatToken: string; imToken: string; userID: string }>(
         "/account/register",
         {
           ...params,
@@ -83,6 +86,7 @@ export const useRegister = () => {
   );
 };
 
+// reset passwords
 export const useReset = () => {
   return useMutation(
     (params: API.Login.ResetParams) =>
@@ -104,27 +108,24 @@ export const useReset = () => {
   );
 };
 
-export const useModifyPassword = () => {
-  return useMutation(
-    async (params: API.Login.ModifyParams) =>
-      request.post(
-        "/account/password/change",
-        {
-          ...params,
-        },
-        {
-          headers: {
-            token: (await getChatToken()) as string,
-            operationID: uuidv4(),
-          },
-        },
-      ),
+// change password
+export const modifyPassword = async (params: API.Login.ModifyParams) => {
+  const token = (await getChatToken()) as string;
+  return request.post(
+    "/account/password/change",
     {
-      onError: errorHandle,
+      ...params,
+    },
+    {
+      headers: {
+        token,
+        operationID: uuidv4(),
+      },
     },
   );
 };
 
+// log in
 export const useLogin = () => {
   return useMutation(
     (params: API.Login.LoginParams) =>
@@ -147,6 +148,7 @@ export const useLogin = () => {
   );
 };
 
+// Get user information
 export interface BusinessUserInfo {
   userID: string;
   password: string;
@@ -194,7 +196,7 @@ export const searchBusinessUserInfo = async (keyword: string) => {
       keyword,
       pagination: {
         pageNumber: 1,
-        showNumber: 10,
+        showNumber: 1,
       },
     },
     {
@@ -226,7 +228,7 @@ export const updateBusinessUserInfo = async (
     "/user/update",
     {
       ...params,
-      userID: useUserStore.getState().selfInfo.userID,
+      userID: useUserStore.getState().selfInfo?.userID,
     },
     {
       headers: {

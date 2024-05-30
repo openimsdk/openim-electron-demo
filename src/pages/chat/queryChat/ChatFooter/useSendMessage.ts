@@ -1,44 +1,44 @@
 import { MessageStatus } from "open-im-sdk-wasm";
+import { MessageItem } from "open-im-sdk-wasm/lib/types/entity";
 import { SendMsgParams } from "open-im-sdk-wasm/lib/types/params";
 import { useCallback } from "react";
 
 import { IMSDK } from "@/layout/MainContentWrap";
-import { ExMessageItem, useConversationStore, useMessageStore } from "@/store";
+import { useConversationStore } from "@/store";
 import emitter from "@/utils/events";
 
+import { pushNewMessage, updateOneMessage } from "../useHistoryMessageList";
+
 export type SendMessageParams = Partial<Omit<SendMsgParams, "message">> & {
-  message: ExMessageItem;
+  message: MessageItem;
   needPush?: boolean;
 };
 
 export function useSendMessage() {
-  const pushNewMessage = useMessageStore((state) => state.pushNewMessage);
-  const updateOneMessage = useMessageStore((state) => state.updateOneMessage);
-
   const sendMessage = useCallback(
     async ({ recvID, groupID, message, needPush }: SendMessageParams) => {
+      const currentConversation = useConversationStore.getState().currentConversation;
       const sourceID = recvID || groupID;
-      const currentUserID = useConversationStore.getState().currentConversation?.userID;
-      const currentGroupID =
-        useConversationStore.getState().currentConversation?.groupID;
       const inCurrentConversation =
-        currentUserID === sourceID || currentGroupID === sourceID || !sourceID;
+        currentConversation?.userID === sourceID ||
+        currentConversation?.groupID === sourceID ||
+        !sourceID;
       needPush = needPush ?? inCurrentConversation;
 
       if (needPush) {
         pushNewMessage(message);
-        emitter.emit("CHAT_LIST_SCROLL_TO_BOTTOM", false);
+        emitter.emit("CHAT_LIST_SCROLL_TO_BOTTOM", true);
       }
 
       const options = {
-        recvID: recvID ?? currentUserID ?? "",
-        groupID: groupID ?? currentGroupID ?? "",
+        recvID: recvID ?? currentConversation?.userID ?? "",
+        groupID: groupID ?? currentConversation?.groupID ?? "",
         message,
       };
 
       try {
         const { data: successMessage } = await IMSDK.sendMessage(options);
-        updateOneMessage(successMessage as ExMessageItem, true);
+        updateOneMessage(successMessage);
       } catch (error) {
         updateOneMessage({
           ...message,
@@ -51,6 +51,5 @@ export function useSendMessage() {
 
   return {
     sendMessage,
-    updateOneMessage,
   };
 }

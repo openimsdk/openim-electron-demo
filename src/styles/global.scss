@@ -34,6 +34,7 @@ body,
 #root {
   height: var(--full-height);
   overflow: hidden;
+  user-select: none;
 }
 
 ::-webkit-scrollbar {
@@ -55,23 +56,31 @@ body,
   background-color: rgba(245, 238, 238, 1);
 }
 
+#chat-list {
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+}
+
 .no-scrollbar {
   &::-webkit-scrollbar {
     display: none;
   }
 }
 
-.emoji-inline {
-  width: 30px;
-  height: 30px;
+.emojione {
+  width: 16px !important;
+  height: 16px !important;
   display: inline-block;
 }
 
 .image-el {
   vertical-align: bottom;
   display: inline-block;
-  width: 48px;
-  height: 48px;
+  max-width: 30vw;
+  max-height: 15vh;
+  object-fit: contain;
+  cursor: pointer;
 }
 
 .at-el {
@@ -85,6 +94,10 @@ body,
   cursor: pointer;
 }
 
+.member-el {
+  margin: 0 4px;
+}
+
 .app-drag {
   -webkit-app-region: drag;
 }
@@ -93,12 +106,68 @@ body,
   -webkit-app-region: no-drag;
 }
 
-.text-cut {
+.text-break {
   word-wrap: break-word;
   word-break: break-all;
   white-space: pre-wrap;
 }
 
+#scrollableDiv {
+  position: relative;
+}
+
+.growable::before {
+  content: "";
+  flex-grow: 1;
+}
+
 #video_player {
   position: unset !important;
+}
+
+.video-img {
+  position: relative;
+  display: inline-block;
+}
+
+.video-image-mask:hover {
+  opacity: 1;
+}
+
+.video-image-mask {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s;
+  inset: 0;
+}
+
+.no-scrollbar {
+  ::-webkit-scrollbar {
+    width: 0px;
+    display: none;
+  }
+}
+
+img {
+  -webkit-user-drag: none;
+}
+
+@font-face {
+  font-family: "MozillaTwemojiColr";
+  src: url("/font/twemoji.woff2") format("woff2");
+}
+
+emoji-picker {
+  --emoji-font-family: MozillaTwemojiColr;
+}
+
+.custom-form-item > label {
+  color: var(--sub-text) !important;
+  margin-bottom: 4px !important;
 }

@@ -3,8 +3,10 @@ import clsx from "clsx";
 import * as React from "react";
 import { useMemo } from "react";
 
-// import default_group from "@/assets/images/contact/group.png";
-import default_group from "@/assets/images/contact/my_groups.png";
+import default_group from "@/assets/images/contact/group.png";
+import { avatarList, getDefaultAvatar } from "@/utils/avatar";
+
+const default_avatars = avatarList.map((item) => item.name);
 
 interface IOIMAvatarProps extends AvatarProps {
   text?: string;
@@ -21,18 +23,36 @@ const OIMAvatar: React.FC<IOIMAvatarProps> = (props) => {
     text,
     size = 42,
     color = "#fff",
-    bgColor = "#2074de",
+    bgColor = "#0289FA",
     isgroup = false,
     isnotification,
   } = props;
+  const [errorHolder, setErrorHolder] = React.useState<string>();
+
   const getAvatarUrl = useMemo(() => {
     if (src) {
+      if (default_avatars.includes(src as string))
+        return getDefaultAvatar(src as string);
+
       return src;
     }
     return isgroup ? default_group : undefined;
   }, [src, isgroup, isnotification]);
 
   const avatarProps = { ...props, isgroup: undefined, isnotification: undefined };
+
+  React.useEffect(() => {
+    if (!isgroup) {
+      setErrorHolder(undefined);
+    }
+  }, [isgroup]);
+
+  const errorHandler = () => {
+    if (isgroup) {
+      setErrorHolder(default_group);
+    }
+  };
+
   return (
     <AntdAvatar
       style={{
@@ -50,7 +70,8 @@ const OIMAvatar: React.FC<IOIMAvatarProps> = (props) => {
         },
         props.className,
       )}
-      src={getAvatarUrl}
+      src={errorHolder ?? getAvatarUrl}
+      onError={errorHandler as any}
     >
       {text}
     </AntdAvatar>

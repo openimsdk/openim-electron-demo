@@ -23,9 +23,11 @@ const BlackList: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (_, r
       onCancel={closeOverlay}
       centered
       destroyOnClose
-      maskStyle={{
-        opacity: 0,
-        transition: "none",
+      styles={{
+        mask: {
+          opacity: 0,
+          transition: "none",
+        },
       }}
       width={420}
       className="no-padding-modal"
@@ -79,7 +81,7 @@ export const BlackListContent = ({ closeOverlay }: { closeOverlay?: () => void }
 
   return (
     <div className="flex h-[468px] flex-col bg-[var(--chat-bubble)]">
-      <div className="app-drag flex items-center justify-between p-5">
+      <div className="flex items-center justify-between bg-[var(--gap-text)] p-5">
         <span className="text-base font-medium">{t("placeholder.blackList")}</span>
         <CloseOutlined
           className="app-no-drag cursor-pointer text-[#8e9aaf]"

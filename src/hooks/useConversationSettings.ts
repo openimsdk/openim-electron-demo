@@ -1,10 +1,9 @@
 import { App } from "antd";
 import { t } from "i18next";
-import { MessageReceiveOptType } from "open-im-sdk-wasm";
 import { useCallback } from "react";
 
 import { IMSDK } from "@/layout/MainContentWrap";
-import { useConversationStore, useMessageStore } from "@/store";
+import { useConversationStore } from "@/store";
 import { feedbackToast } from "@/utils/common";
 
 export function useConversationSettings() {
@@ -13,7 +12,6 @@ export function useConversationSettings() {
   const currentConversation = useConversationStore(
     (state) => state.currentConversation,
   );
-  const clearHistoryMessage = useMessageStore((state) => state.clearHistoryMessage);
 
   const updateConversationPin = useCallback(
     async (isPinned: boolean) => {
@@ -31,22 +29,6 @@ export function useConversationSettings() {
     [currentConversation?.conversationID],
   );
 
-  const updateConversationMessageRemind = useCallback(
-    async (checked: boolean, option: MessageReceiveOptType) => {
-      if (!currentConversation) return;
-
-      try {
-        await IMSDK.setConversationRecvMessageOpt({
-          conversationID: currentConversation.conversationID,
-          opt: checked ? option : MessageReceiveOptType.Nomal,
-        });
-      } catch (error) {
-        feedbackToast({ error, msg: t("toast.setConversationRecvMessageOptFailed") });
-      }
-    },
-    [currentConversation?.conversationID],
-  );
-
   const clearConversationMessages = useCallback(() => {
     if (!currentConversation) return;
     modal.confirm({
@@ -57,7 +39,6 @@ export function useConversationSettings() {
           await IMSDK.clearConversationAndDeleteAllMsg(
             currentConversation.conversationID,
           );
-          clearHistoryMessage();
         } catch (error) {
           feedbackToast({ error, msg: t("toast.clearConversationMessagesFailed") });
         }
@@ -68,7 +49,6 @@ export function useConversationSettings() {
   return {
     currentConversation,
     updateConversationPin,
-    updateConversationMessageRemind,
     clearConversationMessages,
   };
 }

@@ -10,6 +10,10 @@
   color: var(--primary);
 }
 
+.ant-empty-description {
+  color: var(--sub-text) !important;
+}
+
 .ant-app {
   height: var(--full-height);
   & > .ant-spin-nested-loading {
@@ -40,12 +44,6 @@
   }
 }
 
-.quote-image {
-  .ant-image-mask {
-    opacity: 0 !important;
-  }
-}
-
 .conversation-popover {
   .ant-popover-content {
     transform: translateY(-36px);
@@ -69,6 +67,7 @@
 
   .ant-drawer-content-wrapper {
     box-shadow: -7px 0px 7px 1px rgba(30, 116, 222, 0.05);
+    min-width: 460px;
   }
 
   .ant-drawer-header {
@@ -149,27 +148,6 @@
   }
 }
 
-.global-search-modal {
-  .ant-modal-content {
-    border-radius: 16px;
-  }
-
-  .message-drawer-tab {
-    .ant-tabs-nav {
-      padding: 0 32px;
-      margin-bottom: 0;
-      border-bottom: 1px solid var(--gap-text);
-    }
-  }
-
-  .ant-tabs-content-holder {
-    .ant-tabs-content {
-      padding: 0 12px;
-      overflow-y: hidden;
-    }
-  }
-}
-
 .bold-label-form {
   .ant-form-item-label {
     label {
@@ -213,4 +191,25 @@
 
 .flex-1 > .ant-spin-container {
   height: 100%;
+  width: 100%;
+}
+
+.h-full > .ant-spin-container {
+  height: 100%;
+  width: 100%;
+}
+
+.ant-skeleton-with-avatar
+  .ant-skeleton-content
+  .ant-skeleton-title
+  + .ant-skeleton-paragraph {
+  margin-block-start: 12px;
+}
+
+.ant-skeleton-with-avatar .ant-skeleton-content .ant-skeleton-title {
+  margin-block-start: 0;
+}
+
+.ant-skeleton .ant-skeleton-header .ant-skeleton-avatar {
+  border-radius: 6px;
 }

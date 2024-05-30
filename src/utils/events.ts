@@ -1,7 +1,7 @@
 import { ChooseModalState } from "@/pages/common/ChooseModal";
 import { InviteData } from "@/pages/common/RtcCallModal/data";
 import mitt from "mitt";
-import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
+import { GroupItem, MessageItem } from "open-im-sdk-wasm/lib/types/entity";
 
 type EmitterEvents = {
   OPEN_USER_CARD: OpenUserCardParams;
@@ -10,13 +10,18 @@ type EmitterEvents = {
   OPEN_VIDEO_PLAYER: string;
   OPEN_RTC_MODAL: InviteData;
   CHAT_LIST_SCROLL_TO_BOTTOM: boolean;
+
+  // message store
+  PUSH_NEW_MSG: MessageItem;
+  UPDATE_ONE_MSG: MessageItem;
+  DELETE_ONE_MSG: string;
+  LOAD_HISTORY_MSGS: void;
+  CLEAR_MSGS: void;
 };
 
 export type OpenUserCardParams = {
   userID?: string;
-  groupID?: string;
   isSelf?: boolean;
-  notAdd?: boolean;
 };
 
 const emitter = mitt<EmitterEvents>();

@@ -1,0 +1,42 @@
+{
+  "name": "OpenIM-Demo",
+  "version": "3.5.1",
+  "main": "dist-electron/main/index.js",
+  "description": "OpenIM Electron Demo.",
+  "author": "blooming",
+  "private": true,
+  "debug": {
+    "env": {
+      "VITE_DEV_SERVER_URL": "http://127.0.0.1:7777/"
+    }
+  },
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc && vite build && electron-builder",
+    "preview": "vite preview",
+    "build:mac": "vite build  &&  electron-builder --macos --x64",
+    "build:mac-arm": "vite build  &&  electron-builder --macos --arm64",
+    "build:win": "vite build  &&  electron-builder --win --x64",
+    "build:win-arm": "vite build  &&  electron-builder --win --arm64",
+    "build:linux": "vite build  &&  electron-builder --linux --x64",
+    "build:linux-arm": "vite build  &&  electron-builder --linux --arm64",
+    "pree2e": "vite build --mode=test",
+    "e2e": "playwright test",
+    "format": "prettier --write .",
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
+    "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx --fix --quiet src",
+    "prepare": "husky install"
+  },
+  "engines": {
+    "node": "^14.18.0 || >=16.0.0"
+  },
+  "lint-staged": {
+    "src/**/*.{tsx,ts}": ["prettier --write", "eslint --fix"],
+    "*.{json,html,css,scss,xml,md}": ["prettier --write"]
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0",
+    "i18next": "^22.5.0",
+    "i18next-fs-backend": "^2.2.0"
+  }
+}

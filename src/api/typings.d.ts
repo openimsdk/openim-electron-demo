@@ -13,7 +13,7 @@ declare namespace API {
       email?: string;
       account?: string;
       areaCode: string;
-      phoneNumber: string;
+      phoneNumber?: string;
       password: string;
     };
     type DemoRegisterType = {
@@ -24,9 +24,10 @@ declare namespace API {
       user: RegisterUserInfo;
     };
     type LoginParams = {
+      email?: string;
       verifyCode: string;
       deviceID?: string;
-      phoneNumber: string;
+      phoneNumber?: string;
       areaCode: string;
       account?: string;
       password: string;
@@ -37,19 +38,22 @@ declare namespace API {
       newPassword: string;
     };
     type ResetParams = {
-      phoneNumber: string;
+      email?: string;
+      phoneNumber?: string;
       areaCode: string;
       verifyCode: string;
       password: string;
     };
     type VerifyCodeParams = {
-      phoneNumber: string;
+      email?: string;
+      phoneNumber?: string;
       areaCode: string;
       verifyCode: string;
       usedFor: UsedFor;
     };
     type SendSmsParams = {
-      phoneNumber: string;
+      email?: string;
+      phoneNumber?: string;
       areaCode: string;
       deviceID?: string;
       usedFor: UsedFor;

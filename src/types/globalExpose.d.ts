@@ -1,21 +1,28 @@
 import { Platform } from "open-im-sdk-wasm";
 
+export type DataPath = "public";
+
 export interface IElectronAPI {
+  getDataPath: (key: DataPath) => string;
   getVersion: () => string;
   getPlatform: () => Platform;
-  subscribe: (channel: string, callback: (...args: any[]) => void) => void;
+  getSystemVersion: () => string;
+  subscribe: (channel: string, callback: (...args: any[]) => void) => () => void;
   subscribeOnce: (channel: string, callback: (...args: any[]) => void) => void;
-  unsubscribe: (channel: string, callback: (...args: any[]) => void) => void;
   unsubscribeAll: (channel: string) => void;
   ipcInvoke: <T = unknown>(channel: string, ...arg: any) => Promise<T>;
   ipcSendSync: <T = unknown>(channel: string, ...arg: any) => T;
-  saveFileToDisk: (params: { file: File; sync?: boolean }) => Promise<string>;
+  saveFileToDisk: (params: {
+    file: File;
+    type: "fileCache" | "sentFileCache";
+    sync?: boolean;
+  }) => Promise<string>;
 }
 
 declare global {
   interface Window {
     electronAPI?: IElectronAPI;
-    userClick: (userID: string, groupID: string) => void;
+    userClick: (userID?: string, isSelf?: boolean) => void;
   }
 }
 

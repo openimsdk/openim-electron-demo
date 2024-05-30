@@ -1,7 +1,7 @@
 import { Select } from "antd";
-import { t } from "i18next";
 import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Virtuoso } from "react-virtuoso";
 
 import { useContactStore, useUserStore } from "@/store";
@@ -15,6 +15,7 @@ export enum GroupTypeEnum {
 }
 
 export const MyGroups = () => {
+  const { t } = useTranslation();
   const [selectGroup, setSelectGroup] = useState(GroupTypeEnum.CreatedGroup);
 
   const joinedGroupList = useContactStore((state) => state.groupList);

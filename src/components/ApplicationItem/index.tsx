@@ -5,10 +5,12 @@ import {
   FriendApplicationItem,
   GroupApplicationItem,
 } from "open-im-sdk-wasm/lib/types/entity";
-import { memo, useState } from "react";
+import { memo, useCallback, useState } from "react";
 
 import arrow from "@/assets/images/contact/arrowTopRight.png";
 import OIMAvatar from "@/components/OIMAvatar";
+import { IMSDK } from "@/layout/MainContentWrap";
+import emitter from "@/utils/events";
 
 type ApplicationItemSource = FriendApplicationItem & GroupApplicationItem;
 
@@ -32,9 +34,9 @@ const ApplicationItem = ({
 
   const getApplicationDesc = () => {
     if (isGroup) {
-      return `${isRecv ? "" : `${t("me")}：`}${t("application.applyToJoin")} `;
+      return t("application.applyToJoin");
     }
-    return `${isRecv ? "" : `${t("me")}：`}${t("application.applyToFriend")} `;
+    return t(isRecv ? "application.applyToFriend" : "application.applyToAdd");
   };
 
   const getTitle = () => {
@@ -67,21 +69,39 @@ const ApplicationItem = ({
     setLoading(false);
   };
 
+  const tryShowCard = useCallback(async () => {
+    if (isGroup) {
+      const { data } = await IMSDK.getSpecifiedGroupsInfo([source.groupID!]);
+      emitter.emit("OPEN_GROUP_CARD", data[0]);
+      return;
+    }
+    window.userClick(isRecv ? source.fromUserID : source.toUserID);
+  }, []);
+
   return (
     <Spin spinning={loading}>
-      <div className="flex flex-row items-center justify-between p-3.5 transition-colors hover:bg-[#f3f9ff]">
+      <div className="flex flex-row items-center justify-between p-3.5 transition-colors hover:bg-[var(--primary-active)]">
         <div className="flex flex-row">
-          <OIMAvatar src={getAvatarUrl()} text={getTitle()} isgroup={isGroup} />
+          <OIMAvatar
+            src={getAvatarUrl()}
+            text={getTitle()}
+            isgroup={isGroup}
+            onClick={tryShowCard}
+          />
           <div className="ml-3">
             <p className="text-sm">{getTitle()}</p>
             <p className="pb-2.5 pt-[5px] text-xs ">
               {getApplicationDesc()}
-              {isGroup && (
-                <span className="text-xs text-[#0289FAFF]">{source.groupName}</span>
+              {(isGroup || (!isGroup && !isRecv)) && (
+                <span className="ml-1 text-xs text-[#0289FAFF]">
+                  {source.groupName || source.toNickname}
+                </span>
               )}
             </p>
-            <p className="text-xs text-[#8E9AB0]">{t("application.information")}:</p>
-            <p className="text-xs text-[#8E9AB0]">{source.reqMsg}</p>
+            <p className="text-xs text-[var(--sub-text)]">
+              {t("application.information")}:
+            </p>
+            <p className="text-xs text-[var(--sub-text)]">{source.reqMsg}</p>
           </div>
         </div>
 
@@ -91,10 +111,10 @@ const ApplicationItem = ({
               <Button
                 block={true}
                 size="small"
-                onClick={() => loadingWrap(true)}
+                onClick={() => loadingWrap(false)}
                 className="!h-full !rounded-md border-2 border-[#0089FF] text-[#0089FF]"
               >
-                {t("application.agree")}
+                {t("application.refuse")}
               </Button>
             </div>
             <div className="h-8 w-[60px]">
@@ -103,9 +123,9 @@ const ApplicationItem = ({
                 size="small"
                 type="primary"
                 className="!h-full !rounded-md bg-[#0289fa]"
-                onClick={() => loadingWrap(false)}
+                onClick={() => loadingWrap(true)}
               >
-                {t("application.refuse")}
+                {t("application.agree")}
               </Button>
             </div>
           </div>
@@ -114,7 +134,7 @@ const ApplicationItem = ({
         {!showActionBtn && (
           <div className="flex flex-row items-center">
             {!isRecv && <img className="mr-2 h-4 w-4" src={arrow} alt="" />}
-            <p className="text-sm text-[#8E9AB0]">{getStatusStr()}</p>
+            <p className="text-sm text-[var(--sub-text)]">{getStatusStr()}</p>
           </div>
         )}
       </div>

@@ -1,0 +1,44 @@
+/**
+ * @see https://www.electron.build/configuration/configuration
+ */
+{
+  appId: "io.openim.desktop.demo",
+  asar: true,
+  extends: null,
+  directories: {
+    output: "release/Demo/${version}",
+  },
+  files: ["dist-electron", "dist"],
+  productName: "OpenIM-Demo",
+  mac: {
+    artifactName: "${productName}_${version}_${arch}.${ext}",
+    target: ["dmg"],
+    icon: "./dist/icons/mac_icon.png",
+  },
+  win: {
+    target: [
+      {
+        target: "nsis",
+        arch: ["x64"],
+      },
+    ],
+    artifactName: "${productName}_${version}.${ext}",
+    icon: "./dist/icons/icon.ico",
+  },
+  linux: {
+    icon: "./dist/icons/icon.png",
+    target: "deb",
+    maintainer: "openim-demo",
+    artifactName: "${productName}_${version}_${arch}.${ext}",
+  },
+  nsis: {
+    oneClick: false,
+    perMachine: true,
+    allowElevation: true,
+    allowToChangeInstallationDirectory: true,
+    createDesktopShortcut: true,
+    createStartMenuShortcut: true,
+    deleteAppDataOnUninstall: true,
+    shortcutName: "OpenIM-Demo",
+  },
+}

@@ -1,55 +1,12 @@
 import { t } from "i18next";
-import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
-import { useCallback } from "react";
 
 import { modal } from "@/AntdGlobalComp";
 import { IMSDK } from "@/layout/MainContentWrap";
 import { useConversationStore } from "@/store";
 import { feedbackToast } from "@/utils/common";
 
-export type PermissionMethods = "setGroupLookMemberInfo" | "setGroupApplyMemberFriend";
-
 export function useGroupSettings({ closeOverlay }: { closeOverlay: () => void }) {
   const currentGroupInfo = useConversationStore((state) => state.currentGroupInfo);
-
-  const updateGroupInfo = useCallback(
-    async (value: Partial<GroupItem>) => {
-      if (!currentGroupInfo) return;
-      try {
-        await IMSDK.setGroupInfo({
-          ...value,
-          groupID: currentGroupInfo.groupID,
-        });
-      } catch (error) {
-        feedbackToast({ error, msg: t("toast.updateGroupInfoFailed") });
-      }
-    },
-    [currentGroupInfo?.groupID],
-  );
-
-  const tryDismissGroup = () => {
-    if (!currentGroupInfo) return;
-
-    modal.confirm({
-      title: t("placeholder.disbandGroup"),
-      content: (
-        <div className="flex items-baseline">
-          <div>{t("toast.confirmDisbandGroup")}</div>
-          <span className="text-xs text-[var(--sub-text)]">
-            {t("placeholder.disbandGroupToast")}
-          </span>
-        </div>
-      ),
-      onOk: async () => {
-        try {
-          await IMSDK.dismissGroup(currentGroupInfo.groupID);
-          closeOverlay();
-        } catch (error) {
-          feedbackToast({ error });
-        }
-      },
-    });
-  };
 
   const tryQuitGroup = () => {
     if (!currentGroupInfo) return;
@@ -77,8 +34,6 @@ export function useGroupSettings({ closeOverlay }: { closeOverlay: () => void })
 
   return {
     currentGroupInfo,
-    updateGroupInfo,
     tryQuitGroup,
-    tryDismissGroup,
   };
 }

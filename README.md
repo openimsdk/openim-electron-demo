@@ -53,16 +53,15 @@ Follow these steps to set up a local development environment:
 
 ### Web Application
 
-1. Replace the contents of the `package_build_web.json` file with `package.json`, removing dependencies required for Electron to run. Also, modify the build script.
-2. Run the following command to build the web application:
+1. Run the following command to build the web application:
    ```bash
    npm run build
    ```
-3. The build result will be located in the `dist` folder.
+2. The build result will be located in the `dist` folder.
 
 ### Electron Application
 
-1. Replace the contents of the `package_build.json` file with `package.json`, keeping only the dependencies required for Electron to function. This significantly reduces the package size. Also, modify the packaging script.
+1. Replace the contents of the `package_electron.json` file with `package.json`, keeping only the dependencies required for Electron to function. This significantly reduces the package size. Also, modify the packaging script.
 2. Run one of the following commands to build the Electron application:
    - macOS:
      ```bash

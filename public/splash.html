@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        cursor: default;
+      }
+
+      .logo {
+        font-size: 32px;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+
+      .letter {
+        opacity: 0;
+        color: lightgreen;
+      }
+
+      .fade-in-animation {
+        animation: fade-in 4s infinite;
+      }
+
+      @keyframes fade-in {
+        0% {
+          opacity: 0;
+          color: lightgreen;
+        }
+        50% {
+          opacity: 1;
+          color: lightblue;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="logo">
+      <span class="letter">O</span>
+      <span class="letter">p</span>
+      <span class="letter">e</span>
+      <span class="letter">n</span>
+      <span class="letter">I</span>
+      <span class="letter">M</span>
+    </div>
+
+    <script>
+      const letters = document.querySelectorAll(".letter");
+
+      function animateLetters() {
+        letters.forEach((letter, index) => {
+          setTimeout(() => {
+            letter.classList.add("fade-in-animation");
+          }, index * 300);
+        });
+      }
+
+      animateLetters();
+    </script>
+  </body>
+</html>

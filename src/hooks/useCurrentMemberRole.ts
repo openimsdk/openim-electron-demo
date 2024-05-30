@@ -1,5 +1,4 @@
 import { GroupMemberRole } from "open-im-sdk-wasm";
-import { useMemo } from "react";
 
 import { useConversationStore } from "@/store";
 
@@ -8,26 +7,12 @@ export function useCurrentMemberRole() {
     (state) => state.currentMemberInGroup,
   );
 
-  const isOwner = useMemo(
-    () => currentMemberInGroup?.roleLevel === GroupMemberRole.Owner,
-    [currentMemberInGroup?.groupID, currentMemberInGroup?.roleLevel],
-  );
-  const isAdmin = useMemo(
-    () => currentMemberInGroup?.roleLevel === GroupMemberRole.Admin,
-    [currentMemberInGroup?.groupID, currentMemberInGroup?.roleLevel],
-  );
-  const isNomal = useMemo(
-    () => currentMemberInGroup?.roleLevel === GroupMemberRole.Nomal,
-    [currentMemberInGroup?.groupID, currentMemberInGroup?.roleLevel],
-  );
-  const isJoinGroup = useMemo(
-    () => Boolean(currentMemberInGroup?.groupID),
-    [currentMemberInGroup?.groupID],
-  );
-  const currentRolevel = useMemo(
-    () => currentMemberInGroup?.roleLevel ?? 0,
-    [currentMemberInGroup?.groupID, currentMemberInGroup?.roleLevel],
-  );
+  const isOwner = currentMemberInGroup?.roleLevel === GroupMemberRole.Owner;
+  const isAdmin = currentMemberInGroup?.roleLevel === GroupMemberRole.Admin;
+  const isNomal = currentMemberInGroup?.roleLevel === GroupMemberRole.Nomal;
+  const isJoinGroup = Boolean(currentMemberInGroup?.groupID);
+  const currentRolevel = currentMemberInGroup?.roleLevel ?? 0;
+  const currentIsMuted = (currentMemberInGroup?.muteEndTime ?? 0) > Date.now();
 
   return {
     isOwner,
@@ -35,5 +20,7 @@ export function useCurrentMemberRole() {
     isNomal,
     isJoinGroup,
     currentRolevel,
+    currentIsMuted,
+    currentMemberInGroup,
   };
 }

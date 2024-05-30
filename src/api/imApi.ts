@@ -1,10 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { USER_URL } from "@/config";
+import { getChatUrl } from "@/config";
 import createAxiosInstance from "@/utils/request";
 import { getChatToken } from "@/utils/storage";
 
-const request = createAxiosInstance(USER_URL);
+const request = createAxiosInstance(getChatUrl());
 
 export const getRtcConnectData = async (room: string, identity: string) => {
   const token = (await getChatToken()) as string;

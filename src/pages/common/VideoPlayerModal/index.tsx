@@ -1,11 +1,10 @@
 import "xgplayer/dist/index.min.css";
 
-import { CloseCircleOutlined, CloseOutlined } from "@ant-design/icons";
-import { Modal } from "antd";
-import { FC, memo, useEffect } from "react";
+import { CloseOutlined } from "@ant-design/icons";
+import { App } from "antd";
 import { SimplePlayer } from "xgplayer";
 import { I18N } from "xgplayer";
-import ZH from "xgplayer/es/lang/zh-cn";
+import EN from "xgplayer/es/lang/en";
 import Error from "xgplayer/es/plugins/error";
 import Fullscreen from "xgplayer/es/plugins/fullscreen";
 import Mobile from "xgplayer/es/plugins/mobile";
@@ -15,38 +14,46 @@ import Progress from "xgplayer/es/plugins/progress";
 import Start from "xgplayer/es/plugins/start";
 import Time from "xgplayer/es/plugins/time";
 
-I18N.use(ZH);
+I18N.use(EN);
 
-const VideoPlayerModal: FC<{ url: string; closeOverlay: () => void }> = ({
-  url,
-  closeOverlay,
-}) => {
-  useEffect(() => {
-    new SimplePlayer({
-      id: "video_player",
-      url,
-      plugins: [Start, PC, Mobile, Progress, Play, Time, Error, Fullscreen],
+export const useVideoPlayer = () => {
+  const { modal } = App.useApp();
+
+  const showVideoPlayer = (url: string) => {
+    const current = modal.confirm({
+      title: null,
+      icon: null,
+      footer: null,
+      width: 600,
+      centered: true,
+      maskTransitionName: "",
+      className: "no-padding-modal",
+      styles: {
+        mask: {
+          opacity: 0,
+          transition: "none",
+        },
+      },
+      content: (
+        <div id="video_player_modal">
+          <div
+            className="absolute right-4 top-4 flex h-6 w-6 cursor-pointer items-center justify-center rounded-lg bg-black bg-opacity-15 "
+            onClick={() => current.destroy()}
+          >
+            <CloseOutlined className="text-[var(--sub-text)]" rev={undefined} />
+          </div>
+        </div>
+      ),
     });
-  }, []);
+    setTimeout(() => {
+      new SimplePlayer({
+        id: "video_player_modal",
+        url,
+        autoplay: true,
+        plugins: [Start, PC, Mobile, Progress, Play, Time, Error, Fullscreen],
+      });
+    }, 50);
+  };
 
-  return (
-    <Modal
-      title={null}
-      footer={null}
-      closeIcon={<CloseOutlined className="text-lg font-medium text-gray-400" />}
-      open
-      centered
-      onCancel={closeOverlay}
-      maskStyle={{
-        opacity: 0,
-        transition: "none",
-      }}
-      className="no-padding-modal"
-      maskTransitionName=""
-    >
-      <div id="video_player"></div>
-    </Modal>
-  );
+  return { showVideoPlayer };
 };
-
-export default memo(VideoPlayerModal);

@@ -5,7 +5,6 @@ import { MessageReceiveOptType } from "open-im-sdk-wasm";
 import { forwardRef, ForwardRefRenderFunction, memo, useRef } from "react";
 import { useMutation } from "react-query";
 
-import { modal } from "@/AntdGlobalComp";
 import { errorHandle } from "@/api/errorHandle";
 import {
   BusinessAllowType,
@@ -13,21 +12,17 @@ import {
   updateBusinessUserInfo,
 } from "@/api/login";
 import i18n from "@/i18n";
-import { useMessageStore, useUserStore } from "@/store";
+import { useUserStore } from "@/store";
 import { LocaleString } from "@/store/type";
-import { feedbackToast } from "@/utils/common";
 
 import { OverlayVisibleHandle, useOverlayVisible } from "../../hooks/useOverlayVisible";
-import { IMSDK } from "../MainContentWrap";
 import BlackList from "./BlackList";
-import ChangePassword from "./ChangePassword";
 
 const PersonalSettings: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
   _,
   ref,
 ) => {
   const backListRef = useRef<OverlayVisibleHandle>(null);
-  const changePasswordRef = useRef<OverlayVisibleHandle>(null);
 
   const { isOverlayOpen, closeOverlay } = useOverlayVisible(ref);
 
@@ -40,9 +35,11 @@ const PersonalSettings: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> 
       onCancel={closeOverlay}
       centered
       destroyOnClose
-      maskStyle={{
-        opacity: 0,
-        transition: "none",
+      styles={{
+        mask: {
+          opacity: 0,
+          transition: "none",
+        },
       }}
       width={600}
       className="no-padding-modal max-w-[70vw]"
@@ -51,10 +48,8 @@ const PersonalSettings: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> 
       <PersonalSettingsContent
         closeOverlay={closeOverlay}
         openBackListOverlay={() => backListRef.current?.openOverlay()}
-        openChangePasswordOverlay={() => changePasswordRef.current?.openOverlay()}
       />
       <BlackList ref={backListRef} />
-      <ChangePassword ref={changePasswordRef} />
     </Modal>
   );
 };
@@ -64,25 +59,18 @@ export default memo(forwardRef(PersonalSettings));
 export const PersonalSettingsContent = ({
   closeOverlay,
   openBackListOverlay,
-  openChangePasswordOverlay,
 }: {
   closeOverlay?: () => void;
   openBackListOverlay?: () => void;
-  openChangePasswordOverlay?: () => void;
 }) => {
   const selfInfo = useUserStore((state) => state.selfInfo);
   const localeStr = useUserStore((state) => state.appSettings.locale);
   const closeAction = useUserStore((state) => state.appSettings.closeAction);
   const updateAppSettings = useUserStore((state) => state.updateAppSettings);
   const updateSelfInfo = useUserStore((state) => state.updateSelfInfo);
-  const clearHistoryMessage = useMessageStore((state) => state.clearHistoryMessage);
 
   const { isLoading: businessSettingUpdating, mutate: updateBusinessSetting } =
     useMutation(updateBusinessUserInfo, {
-      onError: errorHandle,
-    });
-  const { isLoading: recvMessageOptUpdating, mutate: updateRecvMessageOpt } =
-    useMutation((opt: MessageReceiveOptType) => IMSDK.setGlobalRecvMessageOpt(opt), {
       onError: errorHandle,
     });
 
@@ -107,44 +95,19 @@ export const PersonalSettingsContent = ({
     }
   };
 
-  const tryClearChatLogs = () => {
-    modal.confirm({
-      title: t("toast.clearChatHistory"),
-      content: t("toast.confirmClearChatHistory"),
-      onOk: async () => {
-        try {
-          await IMSDK.deleteAllMsgFromLocalAndSvr();
-          clearHistoryMessage();
-        } catch (error) {
-          feedbackToast({ error });
-        }
-      },
-    });
-  };
-
   const toBlackList = () => {
     openBackListOverlay?.();
   };
 
-  const toChangePassword = () => {
-    openChangePasswordOverlay?.();
-  };
-
   const businessSettingsUpdate = (vaule: boolean, key: keyof BusinessUserInfo) => {
     const updateInfo: Partial<BusinessUserInfo> = {};
+    if (key === "allowBeep") {
+      updateInfo[key] = vaule ? BusinessAllowType.Allow : BusinessAllowType.NotAllow;
+    }
     if (key === "globalRecvMsgOpt") {
       updateInfo[key] = vaule
         ? MessageReceiveOptType.NotNotify
         : MessageReceiveOptType.Nomal;
-      updateRecvMessageOpt(updateInfo[key]!, {
-        onSuccess: () => {
-          updateSelfInfo(updateInfo);
-        },
-      });
-      return;
-    }
-    if (key === "allowAddFriend") {
-      updateInfo[key] = !vaule ? BusinessAllowType.Allow : BusinessAllowType.NotAllow;
     }
 
     updateBusinessSetting(updateInfo, {
@@ -156,7 +119,7 @@ export const PersonalSettingsContent = ({
 
   return (
     <div className="flex max-h-[80vh] flex-col bg-[var(--chat-bubble)]">
-      <div className="app-drag flex items-center justify-between bg-[var(--gap-text)] p-5">
+      <div className="flex items-center justify-between bg-[var(--gap-text)] p-5">
         <span className="text-base font-medium">{t("placeholder.accountSetting")}</span>
         <CloseOutlined
           className="app-no-drag cursor-pointer text-[#8e9aaf]"
@@ -175,7 +138,7 @@ export const PersonalSettingsContent = ({
               <div>
                 <Checkbox
                   checked={localeStr === "zh-CN"}
-                  className="w-36"
+                  className="mr-4"
                   onChange={(e) => localeChange(e.target.checked, "zh-CN")}
                 >
                   简体中文
@@ -196,7 +159,7 @@ export const PersonalSettingsContent = ({
                 <div>
                   <Checkbox
                     checked={closeAction === "quit"}
-                    className="w-36"
+                    className="mr-4"
                     onChange={(e) => closeActionChange(e.target.checked, "quit")}
                   >
                     {t("placeholder.exitApplication")}
@@ -212,8 +175,17 @@ export const PersonalSettingsContent = ({
             )}
             <div className="pb-8 pl-1">
               <div className="pb-3 font-medium">{t("placeholder.messageToast")}</div>
-              <Spin spinning={businessSettingUpdating || recvMessageOptUpdating}>
+              <Spin spinning={businessSettingUpdating}>
                 <div>
+                  <Checkbox
+                    className="mr-4"
+                    checked={selfInfo.allowBeep === BusinessAllowType.Allow}
+                    onChange={(e) =>
+                      businessSettingsUpdate(e.target.checked, "allowBeep")
+                    }
+                  >
+                    {t("placeholder.messageAllowBeep")}
+                  </Checkbox>
                   <Checkbox
                     checked={
                       selfInfo.globalRecvMsgOpt === MessageReceiveOptType.NotNotify
@@ -227,23 +199,6 @@ export const PersonalSettingsContent = ({
                 </div>
               </Spin>
             </div>
-            <div className="pb-8 pl-1">
-              <div className="pb-3 font-medium">
-                {t("placeholder.addFriendsSetting")}
-              </div>
-              <div>
-                <Spin spinning={businessSettingUpdating}>
-                  <Checkbox
-                    checked={selfInfo.allowAddFriend === BusinessAllowType.NotAllow}
-                    onChange={(e) =>
-                      businessSettingsUpdate(e.target.checked, "allowAddFriend")
-                    }
-                  >
-                    {t("placeholder.refuseAddFriend")}
-                  </Checkbox>
-                </Spin>
-              </div>
-            </div>
           </div>
         </div>
         <Divider className="m-0 border-4 border-[var(--gap-text)]" />
@@ -253,23 +208,6 @@ export const PersonalSettingsContent = ({
         >
           <div className="text-base font-medium">{t("placeholder.blackList")}</div>
           <RightOutlined rev={undefined} />
-        </div>
-        <Divider className="m-0 border-4 border-[var(--gap-text)]" />
-        <div
-          className="flex cursor-pointer items-center justify-between px-6 py-4"
-          onClick={toChangePassword}
-        >
-          <div className="text-base font-medium">{t("placeholder.changePassword")}</div>
-          <RightOutlined rev={undefined} />
-        </div>
-        <Divider className="m-0 border-4 border-[var(--gap-text)]" />
-        <div className="cursor-pointer px-6 py-4">
-          <div
-            className="text-base font-medium text-[var(--warn-text)]"
-            onClick={tryClearChatLogs}
-          >
-            {t("toast.clearChatHistory")}
-          </div>
         </div>
       </div>
     </div>

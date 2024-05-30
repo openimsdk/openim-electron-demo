@@ -1,5 +1,5 @@
 .conversation-item {
-  @apply relative my-1 flex items-center rounded-md p-3 hover:bg-[var(--primary-active)];
+  @apply relative my-1 flex items-center rounded-md p-2 hover:bg-[var(--primary-active)];
 
   &-pined {
     &::after {
@@ -11,8 +11,9 @@
       border-color: var(--primary) var(--primary) transparent transparent;
     }
   }
-}
 
-.content-wrap {
-  max-width: calc(100% - 110px);
+  :global(.emojione) {
+    width: 16px;
+    height: 16px;
+  }
 }

@@ -1,7 +1,8 @@
 import { CloseOutlined } from "@ant-design/icons";
 import { Button, Input, Modal, Upload } from "antd";
 import i18n, { t } from "i18next";
-import { GroupType } from "open-im-sdk-wasm";
+import { GroupType, SessionType } from "open-im-sdk-wasm";
+import { CardElem } from "open-im-sdk-wasm/lib/types/entity";
 import {
   forwardRef,
   ForwardRefRenderFunction,
@@ -14,21 +15,20 @@ import { v4 as uuidV4 } from "uuid";
 
 import { message } from "@/AntdGlobalComp";
 import OIMAvatar from "@/components/OIMAvatar";
+import { useConversationToggle } from "@/hooks/useConversationToggle";
 import { OverlayVisibleHandle, useOverlayVisible } from "@/hooks/useOverlayVisible";
 import { IMSDK } from "@/layout/MainContentWrap";
-import { useSendMessage } from "@/pages/chat/queryChat/ChatFooter/useSendMessage";
-import { ExMessageItem } from "@/store";
-import { feedbackToast, getFileType } from "@/utils/common";
-import emitter from "@/utils/events";
+import { feedbackToast } from "@/utils/common";
 
 import ChooseBox, { ChooseBoxHandle } from "./ChooseBox";
 import { CheckListItem } from "./ChooseBox/CheckItem";
 
-export type ChooseModalType =
-  | "CRATE_GROUP"
-  | "INVITE_TO_GROUP"
-  | "KICK_FORM_GROUP"
-  | "FORWARD_MESSAGE";
+export type ChooseModalType = "CRATE_GROUP" | "INVITE_TO_GROUP" | "KICK_FORM_GROUP";
+
+export interface SelectUserExtraData {
+  notConversation: boolean;
+  list: CheckListItem[];
+}
 
 export interface ChooseModalState {
   type: ChooseModalType;
@@ -43,18 +43,15 @@ const titleMap = {
   CRATE_GROUP: t("placeholder.createGroup"),
   INVITE_TO_GROUP: t("placeholder.invitation"),
   KICK_FORM_GROUP: t("placeholder.kickMember"),
-  FORWARD_MESSAGE: t("placeholder.mergeForward"),
 };
 
 i18n.on("languageChanged", () => {
   titleMap.CRATE_GROUP = t("placeholder.createGroup");
   titleMap.INVITE_TO_GROUP = t("placeholder.invitation");
   titleMap.KICK_FORM_GROUP = t("placeholder.kickMember");
-  titleMap.FORWARD_MESSAGE = t("placeholder.mergeForward");
 });
 
-const showConversationTypes = ["FORWARD_MESSAGE"];
-const onlyMemberTypes = ["KICK_FORM_GROUP"];
+const onlyMemberTypes = ["KICK_FORM_GROUP", "TRANSFER_IN_GROUP"];
 
 const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalProps> = (
   { state: { type, extraData } },
@@ -67,7 +64,7 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
     groupAvatar: "",
   });
 
-  const { sendMessage } = useSendMessage();
+  const { toSpecifiedConversation } = useConversationToggle();
   const { isOverlayOpen, closeOverlay } = useOverlayVisible(ref);
 
   useEffect(() => {
@@ -77,19 +74,35 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
         100,
       );
     }
+    if (isOverlayOpen && extraData) {
+      setTimeout(
+        () =>
+          chooseBoxRef.current?.updatePrevCheckList(
+            (extraData as SelectUserExtraData).list,
+          ),
+        100,
+      );
+    }
   }, [isOverlayOpen]);
 
   const confirmChoose = async () => {
     const choosedList = chooseBoxRef.current?.getCheckedList() ?? [];
-    if (!choosedList?.length) return;
+    if (!choosedList?.length) return message.warning(t("toast.selectLeastOne"));
+
+    if (!groupBaseInfo.groupName && type === "CRATE_GROUP")
+      return message.warning(t("toast.inputGroupName"));
 
     setLoading(true);
     try {
-      const funcName =
-        type === "FORWARD_MESSAGE" ? "createForwardMessage" : "createCardMessage";
-
       switch (type) {
         case "CRATE_GROUP":
+          if (choosedList.length === 1) {
+            toSpecifiedConversation({
+              sourceID: choosedList[0].userID!,
+              sessionType: SessionType.Single,
+            });
+            break;
+          }
           await IMSDK.createGroup({
             groupInfo: {
               groupType: GroupType.WorkingGroup,
@@ -113,16 +126,6 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
             userIDList: choosedList.map((item) => item.userID!),
             reason: "",
           });
-          break;
-        case "FORWARD_MESSAGE":
-          choosedList.map((item) => {
-            sendMessage({
-              message: extraData as ExMessageItem,
-              recvID: item.userID ?? "",
-              groupID: item.groupID ?? "",
-            });
-          });
-          message.success(t("toast.sendSuccess"));
           break;
         default:
           break;
@@ -148,7 +151,7 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
         data: { url },
       } = await IMSDK.uploadFile({
         name: file.name,
-        contentType: getFileType(file.name),
+        contentType: file.type,
         uuid: uuidV4(),
         file,
       });
@@ -159,7 +162,6 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
   };
 
   const isCheckInGroup = type === "INVITE_TO_GROUP";
-  const notConversation = !showConversationTypes.includes(type);
 
   return (
     <Modal
@@ -171,9 +173,11 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
       width={680}
       onCancel={closeOverlay}
       destroyOnClose
-      maskStyle={{
-        opacity: 0,
-        transition: "none",
+      styles={{
+        mask: {
+          opacity: 0,
+          transition: "none",
+        },
       }}
       afterClose={resetState}
       className="no-padding-modal max-w-[80vw]"
@@ -196,6 +200,7 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
               </div>
               <Input
                 placeholder={t("placeholder.pleaseEnter")}
+                spellCheck={false}
                 value={groupBaseInfo.groupName}
                 onChange={(e) =>
                   setGroupBaseInfo((state) => ({ ...state, groupName: e.target.value }))
@@ -223,11 +228,7 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
               <div className="min-w-[60px] font-medium">
                 {t("placeholder.groupMember")}
               </div>
-              <ChooseBox
-                className="!m-0 !h-[40vh] flex-1"
-                ref={chooseBoxRef}
-                notConversation={notConversation}
-              />
+              <ChooseBox className="!m-0 !h-[40vh] flex-1" ref={chooseBoxRef} />
             </div>
           </div>
         ) : (
@@ -235,7 +236,6 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
             className="!h-[60vh]"
             ref={chooseBoxRef}
             isCheckInGroup={isCheckInGroup}
-            notConversation={notConversation}
             showGroupMember={onlyMemberTypes.includes(type)}
             checkMemberRole={type === "KICK_FORM_GROUP"}
           />

@@ -53,16 +53,15 @@ OpenIM Electron Demo 是一个基于`openim-sdk-wasm`、`openim-server`和`Elect
 
 ### Web 应用程序
 
-1. 使用 `package.json` 替换 `package_build_web.json` 文件的内容，删除 Electron 运行所需的依赖项。同时，修改构建脚本。
-2. 运行以下命令来构建 Web 应用程序：
+1. 运行以下命令来构建 Web 应用程序：
    ```bash
    npm run build
    ```
-3. 构建结果将位于 `dist` 文件夹中。
+2. 构建结果将位于 `dist` 文件夹中。
 
 ### Electron 应用程序
 
-1. 使用 `package.json` 替换 `package_build.json` 文件的内容，只保留 Electron 运行所需的依赖项。这将显著减小包的大小。同时，修改打包脚本。
+1. 使用 `package.json` 替换 `package_electron.json` 文件的内容，只保留 Electron 运行所需的依赖项。这将显著减小包的大小。同时，修改打包脚本。
 2. 运行以下命令之一来构建 Electron 应用程序：
    - macOS:
      ```bash

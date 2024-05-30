@@ -1,24 +1,22 @@
 import { createHashRouter } from "react-router-dom";
 
+import { MainContentLayout } from "@/layout/MainContentLayout";
 import { MainContentWrap } from "@/layout/MainContentWrap";
 import { EmptyChat } from "@/pages/chat/EmptyChat";
 import { QueryChat } from "@/pages/chat/queryChat";
 
-import contactRoutes from "./contactRoutes";
+import contactRoutes from "./ContactRoutes";
+import GlobalErrorElement from "./GlobalErrorElement";
 
 const router = createHashRouter([
   {
     path: "/",
     element: <MainContentWrap />,
+    errorElement: <GlobalErrorElement />,
     children: [
       {
         path: "/",
-        async lazy() {
-          const { MainContentLayout } = await import("@/layout/MainContentLayout");
-          return {
-            Component: MainContentLayout,
-          };
-        },
+        element: <MainContentLayout />,
         children: [
           {
             path: "/chat",
