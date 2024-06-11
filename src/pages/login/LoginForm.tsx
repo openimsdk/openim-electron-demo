@@ -45,6 +45,7 @@ const LoginForm = ({ loginMethod, setFormType, updateLoginMethod }: LoginFormPro
     if (params.email) {
       setEmail(params.email);
     }
+    params.password = md5(params.password);
     login(params, {
       onSuccess: (data) => {
         const { chatToken, imToken, userID } = data.data;
@@ -67,8 +68,8 @@ const LoginForm = ({ loginMethod, setFormType, updateLoginMethod }: LoginFormPro
         className={styles["login-method-tab"]}
         activeKey={loginMethod}
         items={[
-          { key: "phone", label: "手机号" },
-          { key: "email", label: "邮箱" },
+          { key: "phone", label: t("placeholder.phoneNumber") },
+          { key: "email", label: t("placeholder.email") },
         ]}
         onChange={onLoginMethodChange}
       />
