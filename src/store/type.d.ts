@@ -9,7 +9,7 @@ import {
   GroupMemberItem,
   MessageItem,
   SelfUserInfo,
-} from "open-im-sdk-wasm/lib/types/entity";
+} from "@openim/wasm-client-sdk/lib/types/entity";
 
 import { BusinessUserInfo } from "@/api/login";
 
@@ -18,14 +18,20 @@ import { ExMessageItem } from "./message";
 export type IMConnectState = "success" | "loading" | "failed";
 
 export interface UserStore {
-  syncing: IMConnectState;
+  syncState: IMConnectState;
+  progress: number;
+  reinstall: boolean;
+  isLogining: boolean;
+  connectState: IMConnectState;
   selfInfo: BusinessUserInfo;
-  appConfig: AppConfig;
   appSettings: AppSettings;
-  updateSyncState: (syncing: IMConnectState) => void;
+  updateSyncState: (syncState: IMConnectState) => void;
+  updateProgressState: (progress: number) => void;
+  updateReinstallState: (reinstall: boolean) => void;
+  updateIsLogining: (isLogining: boolean) => void;
+  updateConnectState: (connectState: IMConnectState) => void;
   updateSelfInfo: (info: Partial<BusinessUserInfo>) => void;
   getSelfInfoByReq: () => void;
-  getAppConfigByReq: () => Promise<void>;
   updateAppSettings: (settings: Partial<AppSettings>) => void;
   userLogout: (force?: boolean) => Promise<void>;
 }

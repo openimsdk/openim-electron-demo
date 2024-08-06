@@ -6,8 +6,7 @@ import md5 from "md5";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { BusinessAllowType, useRegister, useSendSms, useVerifyCode } from "@/api/login";
-import { useUserStore } from "@/store";
+import { useRegister, useSendSms, useVerifyCode } from "@/api/login";
 import { setAreaCode, setEmail, setIMProfile, setPhoneNumber } from "@/utils/storage";
 
 import { areaCode } from "./areaCode";
@@ -23,7 +22,6 @@ type FormFields = {
   phoneNumber?: string;
   areaCode: string;
   verifyCode: string;
-  invitationCode: string;
   nickname: string;
   password: string;
   password2: string;
@@ -36,11 +34,6 @@ const RegisterForm = ({ loginMethod, setFormType }: RegisterFormProps) => {
   const { mutate: sendSms } = useSendSms();
   const { mutate: verifySmsCode } = useVerifyCode();
   const { mutate: register } = useRegister();
-
-  const needInvitationCode = useUserStore(
-    (state) =>
-      Number(state.appConfig.needInvitationCodeRegister) === BusinessAllowType.Allow,
-  );
 
   // 0login 1resetPassword 2register
   const [registerForm, setRegisterForm] = useState(0);
@@ -181,7 +174,6 @@ const RegisterForm = ({ loginMethod, setFormType }: RegisterFormProps) => {
         email: form.getFieldValue("email") as string,
         phoneNumber: form.getFieldValue("phoneNumber") as string,
         areaCode: form.getFieldValue("areaCode") as string,
-        invitationCode: form.getFieldValue("invitationCode") as string,
         usedFor: 1,
       },
       {
@@ -207,20 +199,13 @@ const RegisterForm = ({ loginMethod, setFormType }: RegisterFormProps) => {
     ? (form.getFieldValue("email") as string)
     : `${form.getFieldValue("areaCode")} ${form.getFieldValue("phoneNumber")}`;
 
-  const notNeedInvitationRegister = !needInvitationCode && registerForm === 0;
-
   return (
     <div className="flex flex-col justify-between">
       <div className="cursor-pointer text-sm text-gray-400" onClick={back}>
         <LeftOutlined rev={undefined} />
         <span className="ml-1">{t("placeholder.getBack")}</span>
       </div>
-      <div
-        className={clsx(
-          "mt-4 text-2xl font-medium",
-          notNeedInvitationRegister && "mt-12",
-        )}
-      >
+      <div className={clsx("mt-4 text-2xl font-medium")}>
         {registerForm === 0 && <span>{t("placeholder.register")}</span>}
         {registerForm === 1 && <span>{t(verifyTitile)}</span>}
         {registerForm === 2 && <span>{t("placeholder.setInfo")}</span>}
@@ -260,25 +245,6 @@ const RegisterForm = ({ loginMethod, setFormType }: RegisterFormProps) => {
             <Input allowClear placeholder={t("toast.inputEmail")} />
           </Form.Item>
         )}
-
-        {registerForm === 0 ? (
-          needInvitationCode ? (
-            <Form.Item
-              className="mb-24"
-              label={t("placeholder.invitationCode")}
-              name="invitationCode"
-            >
-              <Input
-                allowClear
-                spellCheck={false}
-                placeholder={t("toast.inputInvitationCode")}
-                className="w-full"
-              />
-            </Form.Item>
-          ) : (
-            <div className="h-12"></div>
-          )
-        ) : null}
 
         <Form.Item label="" hidden={registerForm !== 1} className="mb-14 mt-8">
           <div className="flex flex-row items-center justify-center">

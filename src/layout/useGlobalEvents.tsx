@@ -13,9 +13,8 @@ import {
   WSEvent,
   WsResponse,
 } from "@openim/wasm-client-sdk/lib/types/entity";
-import { useLatest } from "ahooks";
 import { t } from "i18next";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { getApiUrl, getWsUrl } from "@/config";
@@ -32,21 +31,18 @@ import { IMSDK } from "./MainContentWrap";
 
 export function useGlobalEvent() {
   const navigate = useNavigate();
-  const [connectState, setConnectState] = useState({
-    isSyncing: false,
-    isLogining: false,
-  });
-  const latestConnectState = useLatest(connectState);
   // user
+  const syncState = useUserStore((state) => state.syncState);
   const updateSyncState = useUserStore((state) => state.updateSyncState);
+  const updateProgressState = useUserStore((state) => state.updateProgressState);
+  const updateReinstallState = useUserStore((state) => state.updateReinstallState);
+  const updateIsLogining = useUserStore((state) => state.updateIsLogining);
+  const updateConnectState = useUserStore((state) => state.updateConnectState);
   const updateSelfInfo = useUserStore((state) => state.updateSelfInfo);
   const userLogout = useUserStore((state) => state.userLogout);
   // conversation
   const updateConversationList = useConversationStore(
     (state) => state.updateConversationList,
-  );
-  const updateCurrentConversation = useConversationStore(
-    (state) => state.updateCurrentConversation,
   );
   const updateUnReadCount = useConversationStore((state) => state.updateUnReadCount);
   const updateCurrentGroupInfo = useConversationStore(
@@ -61,7 +57,15 @@ export function useGlobalEvent() {
   const tryUpdateCurrentMemberInGroup = useConversationStore(
     (state) => state.tryUpdateCurrentMemberInGroup,
   );
+  const getConversationListByReq = useConversationStore(
+    (state) => state.getConversationListByReq,
+  );
+  const getUnReadCountByReq = useConversationStore(
+    (state) => state.getUnReadCountByReq,
+  );
   // contact
+  const getFriendListByReq = useContactStore((state) => state.getFriendListByReq);
+  const getGroupListByReq = useContactStore((state) => state.getGroupListByReq);
   const updateFriend = useContactStore((state) => state.updateFriend);
   const pushNewFriend = useContactStore((state) => state.pushNewFriend);
   const updateBlack = useContactStore((state) => state.updateBlack);
@@ -101,7 +105,7 @@ export function useGlobalEvent() {
   };
 
   const tryLogin = async () => {
-    setConnectState((state) => ({ ...state, isLogining: true }));
+    updateIsLogining(true);
     const IMToken = (await getIMToken()) as string;
     const IMUserID = (await getIMUserID()) as string;
     try {
@@ -120,7 +124,7 @@ export function useGlobalEvent() {
         navigate("/login");
       }
     }
-    setConnectState((state) => ({ ...state, isLogining: false }));
+    updateIsLogining(false);
   };
 
   const setIMListener = () => {
@@ -131,8 +135,10 @@ export function useGlobalEvent() {
     IMSDK.on(CbEvents.OnConnectSuccess, connectSuccessHandler);
     IMSDK.on(CbEvents.OnKickedOffline, kickHandler);
     IMSDK.on(CbEvents.OnUserTokenExpired, expiredHandler);
+    IMSDK.on(CbEvents.OnUserTokenInvalid, expiredHandler);
     // sync
     IMSDK.on(CbEvents.OnSyncServerStart, syncStartHandler);
+    IMSDK.on(CbEvents.OnSyncServerProgress, syncProgressHandler);
     IMSDK.on(CbEvents.OnSyncServerFinish, syncFinishHandler);
     IMSDK.on(CbEvents.OnSyncServerFailed, syncFailedHandler);
     // message
@@ -169,9 +175,10 @@ export function useGlobalEvent() {
     updateSelfInfo(data);
   };
   const connectingHandler = () => {
-    console.log("connecting...");
+    updateConnectState("loading");
   };
   const connectFailedHandler = ({ errCode, errMsg }: WSEvent) => {
+    updateConnectState("failed");
     console.error("connectFailedHandler", errCode, errMsg);
 
     if (errCode === 705) {
@@ -179,6 +186,7 @@ export function useGlobalEvent() {
     }
   };
   const connectSuccessHandler = () => {
+    updateConnectState("success");
     console.log("connect success...");
   };
   const kickHandler = () => tryOut(t("toast.accountKicked"));
@@ -194,25 +202,31 @@ export function useGlobalEvent() {
     });
 
   // sync
-  const syncStartHandler = () => {
+  const syncStartHandler = ({ data }: WSEvent<boolean>) => {
     updateSyncState("loading");
-    setConnectState((state) => ({ ...state, isSyncing: true }));
+    updateReinstallState(data);
+  };
+
+  const syncProgressHandler = ({ data }: WSEvent<number>) => {
+    updateProgressState(data);
   };
   const syncFinishHandler = () => {
     updateSyncState("success");
-    setConnectState((state) => ({ ...state, isSyncing: false }));
+    getFriendListByReq();
+    getGroupListByReq();
+    getConversationListByReq(false);
+    getUnReadCountByReq();
   };
   const syncFailedHandler = () => {
     updateSyncState("failed");
     feedbackToast({ msg: t("toast.syncFailed"), error: t("toast.syncFailed") });
-    setConnectState((state) => ({ ...state, isSyncing: false }));
   };
 
   // message
   const notPushType = [MessageType.TypingMessage, MessageType.RevokeMessage];
 
   const newMessageHandler = ({ data }: WSEvent<MessageItem[]>) => {
-    if (latestConnectState.current.isSyncing) {
+    if (syncState === "loading") {
       return;
     }
     data.map((message) => {
@@ -368,8 +382,10 @@ export function useGlobalEvent() {
     IMSDK.off(CbEvents.OnConnectSuccess, connectSuccessHandler);
     IMSDK.off(CbEvents.OnKickedOffline, kickHandler);
     IMSDK.off(CbEvents.OnUserTokenExpired, expiredHandler);
+    IMSDK.off(CbEvents.OnUserTokenInvalid, expiredHandler);
     // sync
     IMSDK.off(CbEvents.OnSyncServerStart, syncStartHandler);
+    IMSDK.off(CbEvents.OnSyncServerProgress, syncProgressHandler);
     IMSDK.off(CbEvents.OnSyncServerFinish, syncFinishHandler);
     IMSDK.off(CbEvents.OnSyncServerFailed, syncFailedHandler);
     // message
@@ -401,6 +417,4 @@ export function useGlobalEvent() {
     IMSDK.off(CbEvents.OnGroupApplicationAccepted, groupApplicationProcessedHandler);
     IMSDK.off(CbEvents.OnGroupApplicationRejected, groupApplicationProcessedHandler);
   };
-
-  return [connectState];
 }

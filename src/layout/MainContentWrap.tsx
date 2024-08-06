@@ -15,7 +15,6 @@ export const IMSDK = getSDK({
 
 export const MainContentWrap = () => {
   const updateAppSettings = useUserStore((state) => state.updateAppSettings);
-  const getAppConfigByReq = useUserStore((state) => state.getAppConfigByReq);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -55,7 +54,6 @@ export const MainContentWrap = () => {
     };
 
     initSettingStore();
-    getAppConfigByReq();
   }, []);
 
   return <Outlet />;

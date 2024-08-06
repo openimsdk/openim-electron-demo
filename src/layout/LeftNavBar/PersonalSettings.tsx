@@ -107,7 +107,7 @@ export const PersonalSettingsContent = ({
     if (key === "globalRecvMsgOpt") {
       updateInfo[key] = vaule
         ? MessageReceiveOptType.NotNotify
-        : MessageReceiveOptType.Nomal;
+        : MessageReceiveOptType.Normal;
     }
 
     updateBusinessSetting(updateInfo, {

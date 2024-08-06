@@ -5,18 +5,18 @@ import { IMSDK } from "@/layout/MainContentWrap";
 import { useConversationStore, useUserStore } from "@/store";
 
 export default function useConversationState() {
-  const syncing = useUserStore((state) => state.syncing);
-  const latestSyncing = useLatest(syncing);
+  const syncState = useUserStore((state) => state.syncState);
+  const latestSyncState = useLatest(syncState);
   const currentConversation = useConversationStore(
     (state) => state.currentConversation,
   );
   const latestCurrentConversation = useLatest(currentConversation);
 
   useUpdateEffect(() => {
-    if (syncing !== "loading") {
+    if (syncState !== "loading") {
       checkConversationState();
     }
-  }, [syncing]);
+  }, [syncState]);
 
   useUpdateEffect(() => {
     throttleCheckConversationState();
@@ -38,7 +38,7 @@ export default function useConversationState() {
   const checkConversationState = () => {
     if (
       !latestCurrentConversation.current ||
-      latestSyncing.current === "loading" ||
+      latestSyncState.current === "loading" ||
       document.visibilityState === "hidden"
     )
       return;

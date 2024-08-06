@@ -278,9 +278,7 @@ export const formatMessageByType = (message?: MessageItem): string => {
 export const initStore = () => {
   const { getSelfInfoByReq } = useUserStore.getState();
   const {
-    getFriendListByReq,
     getBlackListByReq,
-    getGroupListByReq,
     getRecvFriendApplicationListByReq,
     getRecvGroupApplicationListByReq,
     getSendFriendApplicationListByReq,
@@ -292,9 +290,7 @@ export const initStore = () => {
   getUnReadCountByReq();
   getConversationListByReq();
   getSelfInfoByReq();
-  getFriendListByReq();
   getBlackListByReq();
-  getGroupListByReq();
   getRecvFriendApplicationListByReq();
   getRecvGroupApplicationListByReq();
   getSendFriendApplicationListByReq();

@@ -56,10 +56,6 @@ const UserCardModal: ForwardRefRenderFunction<
   const [isFetching, setIsFetching] = useState(false);
   const [isSendRequest, setIsSendRequest] = useState(false);
   const [userFields, setUserFields] = useState<FieldRow[]>([]);
-  const allowSendMsgNotFriend = useUserStore(
-    (state) =>
-      Number(state.appConfig.allowSendMsgNotFriend) === BusinessAllowType.Allow,
-  );
 
   const selfInfo = useUserStore((state) => state.selfInfo);
   const isFriendUser = useContactStore(
@@ -174,7 +170,6 @@ const UserCardModal: ForwardRefRenderFunction<
   };
 
   const showAddFriend = !isFriendUser && !isSelf && !notAdd;
-  const showSendMessage = !isSelf && (isFriendUser || allowSendMsgNotFriend);
 
   return (
     <DraggableModalWrap
@@ -259,7 +254,7 @@ const UserCardModal: ForwardRefRenderFunction<
                   {t("placeholder.editInfo")}
                 </Button>
               )}
-              {showSendMessage && (
+              {!isSelf && (
                 <Button
                   type="primary"
                   className="flex-1"

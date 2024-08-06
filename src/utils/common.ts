@@ -39,7 +39,8 @@ export const bytesToSize = (bytes: number) => {
     sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
     i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return `${(bytes / Math.pow(k, i)).toPrecision(3)} ${sizes[i]}`;
+  const size = bytes / Math.pow(k, i);
+  return `${size % 1 === 0 ? size : size.toFixed(2)} ${sizes[i]}`;
 };
 
 export const secondsToTime = (seconds: number) => {

@@ -1,12 +1,7 @@
 import { t } from "i18next";
 import { create } from "zustand";
 
-import {
-  BusinessAllowType,
-  BusinessUserInfo,
-  getAppConfig,
-  getBusinessUserInfo,
-} from "@/api/login";
+import { BusinessUserInfo, getBusinessUserInfo } from "@/api/login";
 import { IMSDK } from "@/layout/MainContentWrap";
 import router from "@/routes";
 import { feedbackToast } from "@/utils/common";
@@ -17,15 +12,31 @@ import { useConversationStore } from "./conversation";
 import { AppConfig, AppSettings, IMConnectState, UserStore } from "./type";
 
 export const useUserStore = create<UserStore>()((set, get) => ({
-  syncing: "success",
+  syncState: "success",
+  progress: 0,
+  reinstall: true,
+  isLogining: false,
+  connectState: "success",
   selfInfo: {} as BusinessUserInfo,
   appConfig: {} as AppConfig,
   appSettings: {
     locale: getLocale(),
     closeAction: "miniSize",
   },
-  updateSyncState: (syncing: IMConnectState) => {
-    set({ syncing });
+  updateSyncState: (syncState: IMConnectState) => {
+    set({ syncState });
+  },
+  updateProgressState: (progress: number) => {
+    set({ progress });
+  },
+  updateReinstallState: (reinstall: boolean) => {
+    set({ reinstall });
+  },
+  updateIsLogining: (isLogining: boolean) => {
+    set({ isLogining });
+  },
+  updateConnectState: (connectState: IMConnectState) => {
+    set({ connectState });
   },
   getSelfInfoByReq: () => {
     IMSDK.getSelfUserInfo()
@@ -42,22 +53,6 @@ export const useUserStore = create<UserStore>()((set, get) => ({
   },
   updateSelfInfo: (info: Partial<BusinessUserInfo>) => {
     set((state) => ({ selfInfo: { ...state.selfInfo, ...info } }));
-  },
-  getAppConfigByReq: async () => {
-    let config = {} as AppConfig;
-    try {
-      const { data } = await getAppConfig();
-      config = data.config ?? {};
-      if (!config.allowSendMsgNotFriend) {
-        config.allowSendMsgNotFriend = BusinessAllowType.Allow;
-      }
-      if (!config.needInvitationCodeRegister) {
-        config.needInvitationCodeRegister = BusinessAllowType.Allow;
-      }
-    } catch (error) {
-      console.error("get app config err");
-    }
-    set((state) => ({ appConfig: { ...state.appConfig, ...config } }));
   },
   updateAppSettings: (settings: Partial<AppSettings>) => {
     if (settings.locale) {

@@ -191,13 +191,12 @@ const CommonLeft: FC<ICommonLeftProps> = (
       .filter((item) => Boolean(item.userID))
       .map((item) => item.userID!);
     try {
-      const { data } = await IMSDK.getSpecifiedGroupMembersInfo({
+      const { data } = await IMSDK.getUsersInGroup({
         groupID: currentGroupID,
         userIDList,
       });
-      const inGroupUserIDList = data.map((item) => item.userID);
       tmpList.map((item) => {
-        item.disabled = inGroupUserIDList.includes(item.userID!);
+        item.disabled = data.includes(item.userID!);
       });
     } catch (error) {
       console.error(error);

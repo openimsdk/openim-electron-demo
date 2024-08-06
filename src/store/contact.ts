@@ -3,6 +3,7 @@ import {
   BlackUserItem,
   FriendApplicationItem,
   FriendUserItem,
+  FullUserItem,
   GroupApplicationItem,
   GroupItem,
 } from "@openim/wasm-client-sdk/lib/types/entity";
@@ -26,9 +27,21 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
   unHandleGroupApplicationCount: 0,
   getFriendListByReq: async () => {
     try {
-      const { data } = await IMSDK.getFriendList();
+      let offset = 0;
+      let tmpList = [] as FullUserItem[];
+      let initialFetch = true;
+      // eslint-disable-next-line
+      while (true) {
+        const count = initialFetch ? 10000 : 1000;
+        const { data } = await IMSDK.getFriendListPage({ offset, count });
+        tmpList = [...tmpList, ...data];
+        offset += count;
+        if (data.length < count) break;
+        initialFetch = false;
+      }
+      // const { data } = await IMSDK.getFriendList();
       set(() => ({
-        friendList: data.map((item) => item.friendInfo!),
+        friendList: tmpList.map((item) => item.friendInfo!),
       }));
     } catch (error) {
       feedbackToast({ error, msg: t("toast.getFriendListFailed") });
@@ -79,8 +92,18 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
   },
   getGroupListByReq: async () => {
     try {
-      const { data } = await IMSDK.getJoinedGroupList();
-      set(() => ({ groupList: data }));
+      let offset = 0;
+      let tmpList = [] as GroupItem[];
+      // eslint-disable-next-line
+      while (true) {
+        const { data } = await IMSDK.getJoinedGroupListPage({ offset, count: 1000 });
+        tmpList = [...tmpList, ...data];
+        offset += 1000;
+        if (data.length < 1000) break;
+      }
+
+      // const { data } = await IMSDK.getJoinedGroupList();
+      set(() => ({ groupList: tmpList }));
     } catch (error) {
       feedbackToast({ error, msg: t("toast.getGroupListFailed") });
     }
