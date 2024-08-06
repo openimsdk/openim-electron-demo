@@ -1,8 +1,8 @@
+import { MessageItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import { Popover, PopoverProps, Upload } from "antd";
 import { TooltipPlacement } from "antd/es/tooltip";
 import clsx from "clsx";
 import i18n, { t } from "i18next";
-import { MessageItem } from "open-im-sdk-wasm/lib/types/entity";
 import { UploadRequestOption } from "rc-upload/lib/interface";
 import { memo, ReactNode, useCallback, useState } from "react";
 import React from "react";

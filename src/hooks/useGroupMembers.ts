@@ -1,6 +1,6 @@
+import { CbEvents } from "@openim/wasm-client-sdk";
+import { GroupMemberItem, WSEvent } from "@openim/wasm-client-sdk/lib/types/entity";
 import { useLatest } from "ahooks";
-import { CbEvents } from "open-im-sdk-wasm";
-import { GroupMemberItem, WSEvent } from "open-im-sdk-wasm/lib/types/entity";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { IMSDK } from "@/layout/MainContentWrap";

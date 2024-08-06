@@ -1,4 +1,4 @@
-import { FriendUserItem } from "open-im-sdk-wasm/lib/types/entity";
+import { FriendUserItem } from "@openim/wasm-client-sdk/lib/types/entity";
 
 const workerFunction = () => {
   const PinYin = {

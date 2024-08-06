@@ -1,5 +1,5 @@
+import { MessageItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import { useLatest, useRequest } from "ahooks";
-import { MessageItem } from "open-im-sdk-wasm/lib/types/entity";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 

@@ -1,7 +1,7 @@
 import { CloseOutlined, RightOutlined } from "@ant-design/icons";
+import { MessageReceiveOptType } from "@openim/wasm-client-sdk";
 import { Checkbox, Divider, Modal, Spin } from "antd";
 import { t } from "i18next";
-import { MessageReceiveOptType } from "open-im-sdk-wasm";
 import { forwardRef, ForwardRefRenderFunction, memo, useRef } from "react";
 import { useMutation } from "react-query";
 

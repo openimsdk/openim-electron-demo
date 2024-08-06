@@ -1,4 +1,4 @@
-import { Platform } from "open-im-sdk-wasm";
+import { Platform } from "@openim/wasm-client-sdk";
 
 export type DataPath = "public";
 

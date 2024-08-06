@@ -1,4 +1,4 @@
-import { GroupApplicationItem } from "open-im-sdk-wasm/lib/types/entity";
+import { GroupApplicationItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Virtuoso } from "react-virtuoso";

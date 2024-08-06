@@ -1,6 +1,6 @@
+import { SessionType } from "@openim/wasm-client-sdk";
+import { PublicUserItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import { t } from "i18next";
-import { SessionType } from "open-im-sdk-wasm";
-import { PublicUserItem } from "open-im-sdk-wasm/lib/types/entity";
 import { memo } from "react";
 import { v4 as uuidV4 } from "uuid";
 

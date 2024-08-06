@@ -1,6 +1,6 @@
 import { ExclamationCircleFilled, LoadingOutlined } from "@ant-design/icons";
+import { MessageStatus, MessageType } from "@openim/wasm-client-sdk";
 import { Spin } from "antd";
-import { MessageStatus, MessageType } from "open-im-sdk-wasm";
 import { FC, useEffect, useState } from "react";
 
 import { IMessageItemProps } from ".";

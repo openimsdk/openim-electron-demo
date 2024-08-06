@@ -1,6 +1,6 @@
-import { MessageStatus } from "open-im-sdk-wasm";
-import { MessageItem } from "open-im-sdk-wasm/lib/types/entity";
-import { SendMsgParams } from "open-im-sdk-wasm/lib/types/params";
+import { MessageStatus } from "@openim/wasm-client-sdk";
+import { MessageItem } from "@openim/wasm-client-sdk/lib/types/entity";
+import { SendMsgParams } from "@openim/wasm-client-sdk/lib/types/params";
 import { useCallback } from "react";
 
 import { IMSDK } from "@/layout/MainContentWrap";

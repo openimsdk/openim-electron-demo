@@ -1,7 +1,7 @@
 import { CloseOutlined } from "@ant-design/icons";
+import { BlackUserItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import { Button, Empty, Modal } from "antd";
 import { t } from "i18next";
-import { BlackUserItem } from "open-im-sdk-wasm/lib/types/entity";
 import { forwardRef, ForwardRefRenderFunction, memo, useState } from "react";
 
 import OIMAvatar from "@/components/OIMAvatar";

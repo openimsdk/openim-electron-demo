@@ -1,10 +1,14 @@
 import { LeftOutlined } from "@ant-design/icons";
+import {
+  GroupJoinSource,
+  GroupVerificationType,
+  SessionType,
+} from "@openim/wasm-client-sdk";
+import { GroupItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import { useRequest } from "ahooks";
 import { Button, Input } from "antd";
 import dayjs from "dayjs";
 import { t } from "i18next";
-import { GroupJoinSource, GroupVerificationType, SessionType } from "open-im-sdk-wasm";
-import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
 import { forwardRef, ForwardRefRenderFunction, memo, useEffect, useState } from "react";
 
 import clock from "@/assets/images/common/clock.png";

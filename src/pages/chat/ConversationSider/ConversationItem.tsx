@@ -1,11 +1,11 @@
-import { Badge } from "antd";
-import clsx from "clsx";
-import { t } from "i18next";
 import type {
   ConversationItem,
   ConversationItem as ConversationItemType,
   MessageItem,
-} from "open-im-sdk-wasm/lib/types/entity";
+} from "@openim/wasm-client-sdk/lib/types/entity";
+import { Badge } from "antd";
+import clsx from "clsx";
+import { t } from "i18next";
 import { memo, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 

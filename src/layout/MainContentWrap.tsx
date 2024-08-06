@@ -1,4 +1,4 @@
-import { getSDK } from "open-im-sdk-wasm";
+import { getSDK } from "@openim/wasm-client-sdk";
 import { useEffect } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 

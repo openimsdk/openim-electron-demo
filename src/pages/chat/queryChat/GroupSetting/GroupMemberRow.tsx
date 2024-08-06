@@ -1,6 +1,6 @@
+import { GroupItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import clsx from "clsx";
 import { t } from "i18next";
-import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
 import { memo, useEffect } from "react";
 
 import invite from "@/assets/images/chatSetting/invite.png";

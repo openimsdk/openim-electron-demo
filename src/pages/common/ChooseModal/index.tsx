@@ -1,8 +1,8 @@
 import { CloseOutlined } from "@ant-design/icons";
+import { GroupType, SessionType } from "@openim/wasm-client-sdk";
+import { CardElem } from "@openim/wasm-client-sdk/lib/types/entity";
 import { Button, Input, Modal, Upload } from "antd";
 import i18n, { t } from "i18next";
-import { GroupType, SessionType } from "open-im-sdk-wasm";
-import { CardElem } from "open-im-sdk-wasm/lib/types/entity";
 import {
   forwardRef,
   ForwardRefRenderFunction,

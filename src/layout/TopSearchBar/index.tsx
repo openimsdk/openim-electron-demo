@@ -1,12 +1,12 @@
-import { Popover } from "antd";
-import i18n, { t } from "i18next";
-import { CbEvents, MessageType } from "open-im-sdk-wasm";
+import { CbEvents, MessageType } from "@openim/wasm-client-sdk";
 import {
   GroupItem,
   MessageItem,
   RtcInvite,
   WSEvent,
-} from "open-im-sdk-wasm/lib/types/entity";
+} from "@openim/wasm-client-sdk/lib/types/entity";
+import { Popover } from "antd";
+import i18n, { t } from "i18next";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getBusinessUserInfo } from "@/api/login";

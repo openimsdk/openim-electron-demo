@@ -1,5 +1,5 @@
-import type { SessionType } from "open-im-sdk-wasm";
-import { ConversationItem } from "open-im-sdk-wasm/lib/types/entity";
+import type { SessionType } from "@openim/wasm-client-sdk";
+import { ConversationItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 

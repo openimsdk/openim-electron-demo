@@ -20,8 +20,8 @@ import {
   ConversationItem,
   MessageItem,
   PublicUserItem,
-} from "open-im-sdk-wasm/lib/types/entity";
-import { MessageType, SessionType } from "open-im-sdk-wasm";
+} from "@openim/wasm-client-sdk/lib/types/entity";
+import { MessageType, SessionType } from "@openim/wasm-client-sdk";
 import { isThisYear } from "date-fns";
 dayjs.extend(calendar);
 dayjs.extend(relativeTime);

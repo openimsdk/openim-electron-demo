@@ -1,7 +1,7 @@
+import { GroupMemberRole } from "@openim/wasm-client-sdk";
+import { GroupMemberItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import { Empty, Spin } from "antd";
 import { t } from "i18next";
-import { GroupMemberRole } from "open-im-sdk-wasm";
-import { GroupMemberItem } from "open-im-sdk-wasm/lib/types/entity";
 import { forwardRef, memo, useEffect } from "react";
 import { Virtuoso } from "react-virtuoso";
 

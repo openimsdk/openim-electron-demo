@@ -1,5 +1,5 @@
+import { MessageItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import clsx from "clsx";
-import { MessageItem } from "open-im-sdk-wasm/lib/types/entity";
 import { FC, memo } from "react";
 
 import { notificationMessageFormat } from "@/utils/imCommon";

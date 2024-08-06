@@ -3,11 +3,15 @@ import {
   useLocalParticipant,
   useRoomContext,
 } from "@livekit/components-react";
+import { CbEvents, MessageType } from "@openim/wasm-client-sdk";
+import {
+  MessageItem,
+  RtcInvite,
+  WSEvent,
+} from "@openim/wasm-client-sdk/lib/types/entity";
 import clsx from "clsx";
 import { t } from "i18next";
 import { RemoteParticipant, RoomEvent, Track } from "livekit-client";
-import { CbEvents, MessageType } from "open-im-sdk-wasm";
-import { MessageItem, RtcInvite, WSEvent } from "open-im-sdk-wasm/lib/types/entity";
 import { useEffect, useRef } from "react";
 
 import { getRtcConnectData } from "@/api/imApi";

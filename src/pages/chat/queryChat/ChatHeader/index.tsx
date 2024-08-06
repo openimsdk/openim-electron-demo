@@ -1,7 +1,7 @@
+import { SessionType } from "@openim/wasm-client-sdk";
 import { Layout, Tooltip } from "antd";
 import clsx from "clsx";
 import i18n, { t } from "i18next";
-import { SessionType } from "open-im-sdk-wasm";
 import { memo, useEffect, useRef } from "react";
 
 import group_member from "@/assets/images/chatHeader/group_member.png";

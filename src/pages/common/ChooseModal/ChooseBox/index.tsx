@@ -1,10 +1,10 @@
 import { SearchOutlined } from "@ant-design/icons";
+import { GroupMemberItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import { useLatest } from "ahooks";
 import { Breadcrumb, Input, Spin } from "antd";
 import { BreadcrumbItemType } from "antd/es/breadcrumb/Breadcrumb";
 import clsx from "clsx";
 import i18n, { t } from "i18next";
-import { GroupMemberItem } from "open-im-sdk-wasm/lib/types/entity";
 import {
   FC,
   forwardRef,

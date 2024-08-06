@@ -1,6 +1,6 @@
+import { SessionType } from "@openim/wasm-client-sdk";
 import { useUnmount } from "ahooks";
 import { Layout } from "antd";
-import { SessionType } from "open-im-sdk-wasm";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import { useConversationStore } from "@/store";

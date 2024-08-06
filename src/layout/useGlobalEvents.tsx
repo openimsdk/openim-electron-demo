@@ -1,7 +1,5 @@
-import { useLatest } from "ahooks";
-import { t } from "i18next";
-import { CbEvents } from "open-im-sdk-wasm";
-import { LogLevel, MessageType, SessionType } from "open-im-sdk-wasm";
+import { CbEvents } from "@openim/wasm-client-sdk";
+import { LogLevel, MessageType, SessionType } from "@openim/wasm-client-sdk";
 import {
   BlackUserItem,
   ConversationItem,
@@ -14,7 +12,9 @@ import {
   SelfUserInfo,
   WSEvent,
   WsResponse,
-} from "open-im-sdk-wasm/lib/types/entity";
+} from "@openim/wasm-client-sdk/lib/types/entity";
+import { useLatest } from "ahooks";
+import { t } from "i18next";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 

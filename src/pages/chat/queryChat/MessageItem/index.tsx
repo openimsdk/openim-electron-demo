@@ -1,6 +1,6 @@
+import { MessageType } from "@openim/wasm-client-sdk";
+import type { MessageItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import clsx from "clsx";
-import { MessageType } from "open-im-sdk-wasm";
-import type { MessageItem } from "open-im-sdk-wasm/lib/types/entity";
 import { FC, memo, useCallback } from "react";
 
 import OIMAvatar from "@/components/OIMAvatar";

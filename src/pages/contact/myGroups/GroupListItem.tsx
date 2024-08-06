@@ -1,4 +1,4 @@
-import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
+import { GroupItem } from "@openim/wasm-client-sdk/lib/types/entity";
 
 import OIMAvatar from "@/components/OIMAvatar";
 

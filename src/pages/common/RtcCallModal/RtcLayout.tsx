@@ -6,6 +6,7 @@ import {
   useTracks,
   VideoTrack,
 } from "@livekit/components-react";
+import { PublicUserItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import { Spin } from "antd";
 import clsx from "clsx";
 import {
@@ -15,7 +16,6 @@ import {
   ParticipantEvent,
   Track,
 } from "livekit-client";
-import { PublicUserItem } from "open-im-sdk-wasm/lib/types/entity";
 import { useEffect, useState } from "react";
 
 import OIMAvatar from "@/components/OIMAvatar";

@@ -1,5 +1,5 @@
+import { Platform } from "@openim/wasm-client-sdk";
 import { useKeyPress } from "ahooks";
-import { Platform } from "open-im-sdk-wasm";
 
 import win_close from "@/assets/images/topSearchBar/win_close.png";
 import win_max from "@/assets/images/topSearchBar/win_max.png";

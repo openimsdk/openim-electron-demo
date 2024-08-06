@@ -1,6 +1,6 @@
+import { FriendUserItem, SelfUserInfo } from "@openim/wasm-client-sdk/lib/types/entity";
 import { Tooltip } from "antd";
 import { t } from "i18next";
-import { FriendUserItem, SelfUserInfo } from "open-im-sdk-wasm/lib/types/entity";
 import { memo } from "react";
 
 import { modal } from "@/AntdGlobalComp";

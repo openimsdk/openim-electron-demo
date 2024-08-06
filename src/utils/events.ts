@@ -1,7 +1,7 @@
 import { ChooseModalState } from "@/pages/common/ChooseModal";
 import { InviteData } from "@/pages/common/RtcCallModal/data";
 import mitt from "mitt";
-import { GroupItem, MessageItem } from "open-im-sdk-wasm/lib/types/entity";
+import { GroupItem, MessageItem } from "@openim/wasm-client-sdk/lib/types/entity";
 
 type EmitterEvents = {
   OPEN_USER_CARD: OpenUserCardParams;

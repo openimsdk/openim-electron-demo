@@ -1,5 +1,5 @@
+import { GroupItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import { Select } from "antd";
-import { GroupItem } from "open-im-sdk-wasm/lib/types/entity";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Virtuoso } from "react-virtuoso";

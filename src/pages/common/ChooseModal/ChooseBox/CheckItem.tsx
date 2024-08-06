@@ -1,12 +1,12 @@
 import { CloseOutlined, RightOutlined } from "@ant-design/icons";
-import { Checkbox } from "antd";
-import clsx from "clsx";
-import { SessionType } from "open-im-sdk-wasm";
+import { SessionType } from "@openim/wasm-client-sdk";
 import {
   ConversationItem,
   FriendUserItem,
   GroupItem,
-} from "open-im-sdk-wasm/lib/types/entity";
+} from "@openim/wasm-client-sdk/lib/types/entity";
+import { Checkbox } from "antd";
+import clsx from "clsx";
 import { FC, memo } from "react";
 
 import OIMAvatar from "@/components/OIMAvatar";

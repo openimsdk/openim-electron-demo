@@ -1,4 +1,4 @@
-import { MessageItem } from "open-im-sdk-wasm/lib/types/entity";
+import { MessageItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import { v4 as uuidV4 } from "uuid";
 
 import { IMSDK } from "@/layout/MainContentWrap";

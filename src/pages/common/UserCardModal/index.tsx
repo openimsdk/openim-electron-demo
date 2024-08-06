@@ -1,9 +1,9 @@
+import { CbEvents } from "@openim/wasm-client-sdk";
+import { SessionType } from "@openim/wasm-client-sdk";
+import { FriendUserItem, WSEvent } from "@openim/wasm-client-sdk/lib/types/entity";
 import { Button, Divider, Spin } from "antd";
 import dayjs from "dayjs";
 import { t } from "i18next";
-import { CbEvents } from "open-im-sdk-wasm";
-import { SessionType } from "open-im-sdk-wasm";
-import { FriendUserItem, WSEvent } from "open-im-sdk-wasm/lib/types/entity";
 import {
   FC,
   forwardRef,

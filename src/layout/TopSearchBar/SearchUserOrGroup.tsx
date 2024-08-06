@@ -1,7 +1,7 @@
 import { CloseOutlined } from "@ant-design/icons";
+import { GroupItem, WSEvent } from "@openim/wasm-client-sdk/lib/types/entity";
 import { Button, Input, InputRef } from "antd";
 import { t } from "i18next";
-import { GroupItem, WSEvent } from "open-im-sdk-wasm/lib/types/entity";
 import {
   forwardRef,
   ForwardRefRenderFunction,

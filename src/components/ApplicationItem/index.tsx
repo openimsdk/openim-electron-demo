@@ -1,10 +1,10 @@
-import { Button, Spin } from "antd";
-import { t } from "i18next";
-import { ApplicationHandleResult } from "open-im-sdk-wasm";
+import { ApplicationHandleResult } from "@openim/wasm-client-sdk";
 import {
   FriendApplicationItem,
   GroupApplicationItem,
-} from "open-im-sdk-wasm/lib/types/entity";
+} from "@openim/wasm-client-sdk/lib/types/entity";
+import { Button, Spin } from "antd";
+import { t } from "i18next";
 import { memo, useCallback, useState } from "react";
 
 import arrow from "@/assets/images/contact/arrowTopRight.png";
