@@ -149,7 +149,7 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ visible, close }) => {
                 >
                   <Input
                     addonBefore="wss://"
-                    placeholder="Such as：web.rentsoft.cn/msg_gateway"
+                    placeholder="Such as：xxx.com/msg_gateway"
                   />
                 </Form.Item>
                 <Form.Item
@@ -157,20 +157,14 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ visible, close }) => {
                   name="IMApiUrl"
                   rules={[{ required: true, message: "Please input your IMApiUrl!" }]}
                 >
-                  <Input
-                    addonBefore="https://"
-                    placeholder="Such as：web.rentsoft.cn/api"
-                  />
+                  <Input addonBefore="https://" placeholder="Such as：xxx.com/api" />
                 </Form.Item>
                 <Form.Item
                   label="ChatUrl"
                   name="ChatUrl"
                   rules={[{ required: true, message: "Please input your ChatUrl!" }]}
                 >
-                  <Input
-                    addonBefore="https://"
-                    placeholder="Such as：web.rentsoft.cn/chat"
-                  />
+                  <Input addonBefore="https://" placeholder="Such as：xxx.com/chat" />
                 </Form.Item>
                 <Form.Item wrapperCol={{ offset: 10, span: 14 }}>
                   <Button type="primary" htmlType="submit">
