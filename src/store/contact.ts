@@ -3,7 +3,6 @@ import {
   BlackUserItem,
   FriendApplicationItem,
   FriendUserItem,
-  FullUserItem,
   GroupApplicationItem,
   GroupItem,
 } from "@openim/wasm-client-sdk/lib/types/entity";
@@ -28,7 +27,7 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
   getFriendListByReq: async () => {
     try {
       let offset = 0;
-      let tmpList = [] as FullUserItem[];
+      let tmpList = [] as FriendUserItem[];
       let initialFetch = true;
       // eslint-disable-next-line
       while (true) {
@@ -41,7 +40,7 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
       }
       // const { data } = await IMSDK.getFriendList();
       set(() => ({
-        friendList: tmpList.map((item) => item.friendInfo!),
+        friendList: [...tmpList],
       }));
     } catch (error) {
       feedbackToast({ error, msg: t("toast.getFriendListFailed") });

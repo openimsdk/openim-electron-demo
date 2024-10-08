@@ -108,11 +108,12 @@ const UserCardModal: ForwardRefRenderFunction<
       return selfInfo;
     }
     let userInfo: CardInfo | null = null;
-    const { data } = await IMSDK.getUsersInfoWithCache({
-      userIDList: [userID!],
-      groupID: groupID,
-    });
-    userInfo = { ...(data[0]?.friendInfo ?? data[0]?.publicInfo) };
+    const friendInfo = useContactStore
+      .getState()
+      .friendList.find((item) => item.userID === userID);
+    if (friendInfo) {
+      userInfo = { ...friendInfo };
+    }
 
     try {
       const {

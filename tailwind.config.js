@@ -26,6 +26,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require("@tailwindcss/line-clamp")],
   darkMode: "class",
 };

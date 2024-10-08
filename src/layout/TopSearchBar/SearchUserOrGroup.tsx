@@ -16,6 +16,7 @@ import { searchBusinessUserInfo } from "@/api/login";
 import DraggableModalWrap from "@/components/DraggableModalWrap";
 import { OverlayVisibleHandle, useOverlayVisible } from "@/hooks/useOverlayVisible";
 import { CardInfo } from "@/pages/common/UserCardModal";
+import { useContactStore } from "@/store";
 import { feedbackToast } from "@/utils/common";
 
 import { IMSDK } from "../MainContentWrap";
@@ -71,13 +72,12 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
           message.warning(t("empty.noSearchResults"));
           return;
         }
-        const { data } = await IMSDK.getUsersInfoWithCache({
-          userIDList: [users[0].userID],
-        });
-        const friendInfo = data[0].friendInfo;
+        const friendInfo = useContactStore
+          .getState()
+          .friendList.find((friend) => friend.userID === users[0].userID);
 
         openUserCardWithData({
-          ...friendInfo,
+          ...(friendInfo ?? {}),
           ...users[0],
         });
       } catch (error) {

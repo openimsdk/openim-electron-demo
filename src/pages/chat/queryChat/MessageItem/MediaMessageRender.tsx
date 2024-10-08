@@ -16,14 +16,14 @@ const MediaMessageRender: FC<IMessageItemProps> = ({ message }) => {
 
   const isVideoMessage = message.contentType === MessageType.VideoMessage;
   const imageHeight = isVideoMessage
-    ? message.videoElem.snapshotHeight
-    : message.pictureElem.sourcePicture.height;
+    ? message.videoElem!.snapshotHeight
+    : message.pictureElem!.sourcePicture.height;
   const imageWidth = isVideoMessage
-    ? message.videoElem.snapshotWidth
-    : message.pictureElem.sourcePicture.width;
+    ? message.videoElem!.snapshotWidth
+    : message.pictureElem!.sourcePicture.width;
   const snapshotMaxHeight = isVideoMessage
     ? 320
-    : message.pictureElem.snapshotPicture.height;
+    : message.pictureElem!.snapshotPicture.height;
   const minHeight = min(200, imageWidth) * (imageHeight / imageWidth) + 2;
   const adaptedHight = min(minHeight, snapshotMaxHeight) + 10;
   const adaptedWidth = min(imageWidth, 200) + 10;
@@ -31,8 +31,8 @@ const MediaMessageRender: FC<IMessageItemProps> = ({ message }) => {
   const isSucceed = message.status === MessageStatus.Succeed;
 
   const sourceUrl = isVideoMessage
-    ? message.videoElem.snapshotUrl
-    : message.pictureElem.snapshotPicture.url;
+    ? message.videoElem!.snapshotUrl
+    : message.pictureElem!.snapshotPicture.url;
 
   const isSending = message.status === MessageStatus.Sending;
   const minStyle = { minHeight: `${adaptedHight}px`, minWidth: `${adaptedWidth}px` };
@@ -42,7 +42,7 @@ const MediaMessageRender: FC<IMessageItemProps> = ({ message }) => {
       <div
         className="relative max-w-[200px]"
         style={minStyle}
-        onClick={() => isVideoMessage && showVideoPlayer(message.videoElem.videoUrl)}
+        onClick={() => isVideoMessage && showVideoPlayer(message.videoElem!.videoUrl)}
       >
         <Image
           rootClassName="message-image cursor-pointer"
@@ -57,7 +57,7 @@ const MediaMessageRender: FC<IMessageItemProps> = ({ message }) => {
         />
         {isVideoMessage && (
           <div className="absolute bottom-3 right-4 text-white">
-            {secondsToMS(message.videoElem.duration)}
+            {secondsToMS(message.videoElem!.duration)}
           </div>
         )}
         {isVideoMessage && isSucceed && (

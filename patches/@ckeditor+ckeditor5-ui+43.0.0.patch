@@ -1,0 +1,42 @@
+diff --git a/node_modules/@ckeditor/ckeditor5-ui/src/editorui/poweredby.js b/node_modules/@ckeditor/ckeditor5-ui/src/editorui/poweredby.js
+index 191aba1..324f6d2 100644
+--- a/node_modules/@ckeditor/ckeditor5-ui/src/editorui/poweredby.js
++++ b/node_modules/@ckeditor/ckeditor5-ui/src/editorui/poweredby.js
+@@ -112,12 +112,9 @@ export default class PoweredBy extends /* #__PURE__ */ DomEmitterMixin() {
+             if (!this._balloonView) {
+                 this._createBalloonView();
+             }
+-            this._balloonView.pin(attachOptions);
++            // this._balloonView.pin(attachOptions);
+         }
+     }
+-    /**
+-     * Hides the "powered by" balloon if already visible.
+-     */
+     _hideBalloon() {
+         if (this._balloonView) {
+             this._balloonView.unpin();
+diff --git a/node_modules/@ckeditor/ckeditor5-ui/src/icon/iconview.js b/node_modules/@ckeditor/ckeditor5-ui/src/icon/iconview.js
+index dd6d2ed..7af8e61 100644
+--- a/node_modules/@ckeditor/ckeditor5-ui/src/icon/iconview.js
++++ b/node_modules/@ckeditor/ckeditor5-ui/src/icon/iconview.js
+@@ -42,17 +42,14 @@ class IconView extends View {
+             }
+         });
+     }
+-    /**
+-     * @inheritDoc
+-     */
+     render() {
+         super.render();
+-        this._updateXMLContent();
++        // this._updateXMLContent();
+         this._colorFillPaths();
+         // This is a hack for lack of innerHTML binding.
+         // See: https://github.com/ckeditor/ckeditor5-ui/issues/99.
+         this.on('change:content', () => {
+-            this._updateXMLContent();
++            // this._updateXMLContent();
+             this._colorFillPaths();
+         });
+         this.on('change:fillColor', () => {

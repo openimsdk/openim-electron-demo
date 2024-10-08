@@ -231,7 +231,7 @@ export function useGlobalEvent() {
     }
     data.map((message) => {
       if (message.contentType === MessageType.CustomMessage) {
-        const customData = JSON.parse(message.customElem.data);
+        const customData = JSON.parse(message.customElem!.data);
         if (
           CustomType.CallingInvite <= customData.customType &&
           customData.customType <= CustomType.CallingHungup

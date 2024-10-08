@@ -17,8 +17,6 @@ import message_icon_active from "@/assets/images/nav/nav_bar_message_active.png"
 import change_avatar from "@/assets/images/profile/change_avatar.png";
 import OIMAvatar from "@/components/OIMAvatar";
 import { useContactStore, useConversationStore, useUserStore } from "@/store";
-import { ChildWindowOptions } from "@/types/common";
-import { openAbout, openPersonalSettings } from "@/utils/childWindows";
 import { feedbackToast } from "@/utils/common";
 import emitter from "@/utils/events";
 

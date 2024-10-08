@@ -3,20 +3,12 @@ import calendar from "dayjs/plugin/calendar";
 import relativeTime from "dayjs/plugin/relativeTime";
 import updateLocale from "dayjs/plugin/updateLocale";
 import { t } from "i18next";
-import default_group from "@/assets/images/contact/my_groups.png";
-import { v4 as uuidv4 } from "uuid";
 
-import {
-  CustomMessageType,
-  GroupSessionTypes,
-  SystemMessageTypes,
-} from "@/constants/im";
+import { GroupSessionTypes } from "@/constants/im";
 import { useConversationStore, useUserStore } from "@/store";
 import { useContactStore } from "@/store/contact";
 
-import { generateAvatar, secondsToTime } from "./common";
 import {
-  AtTextElem,
   ConversationItem,
   MessageItem,
   PublicUserItem,
@@ -72,7 +64,7 @@ export const notificationMessageFormat = (msg: MessageItem) => {
       case MessageType.FriendAdded:
         return t("messageDescription.alreadyFriendMessage");
       case MessageType.GroupCreated:
-        const groupCreatedDetail = JSON.parse(msg.notificationElem.detail);
+        const groupCreatedDetail = JSON.parse(msg.notificationElem!.detail);
         const groupCreatedUser = groupCreatedDetail.opUser;
         return t("messageDescription.createGroupMessage", {
           creator: linkWrap({
@@ -81,7 +73,7 @@ export const notificationMessageFormat = (msg: MessageItem) => {
           }),
         });
       case MessageType.MemberQuit:
-        const quitDetails = JSON.parse(msg.notificationElem.detail);
+        const quitDetails = JSON.parse(msg.notificationElem!.detail);
         const quitUser = quitDetails.quitUser;
         return t("messageDescription.quitGroupMessage", {
           name: linkWrap({
@@ -90,7 +82,7 @@ export const notificationMessageFormat = (msg: MessageItem) => {
           }),
         });
       case MessageType.MemberInvited:
-        const inviteDetails = JSON.parse(msg.notificationElem.detail);
+        const inviteDetails = JSON.parse(msg.notificationElem!.detail);
         const inviteOpUser = inviteDetails.opUser;
         const invitedUserList = inviteDetails.invitedUserList ?? [];
         let inviteStr = "";
@@ -116,7 +108,7 @@ export const notificationMessageFormat = (msg: MessageItem) => {
           }`,
         });
       case MessageType.MemberKicked:
-        const kickDetails = JSON.parse(msg.notificationElem.detail);
+        const kickDetails = JSON.parse(msg.notificationElem!.detail);
         const kickOpUser = kickDetails.opUser;
         const kickdUserList = kickDetails.kickedUserList ?? [];
         let kickStr = "";
@@ -136,7 +128,7 @@ export const notificationMessageFormat = (msg: MessageItem) => {
           kickedUser: `${kickStr}${kickdUserList.length > 3 ? "..." : ""}`,
         });
       case MessageType.MemberEnter:
-        const enterDetails = JSON.parse(msg.notificationElem.detail);
+        const enterDetails = JSON.parse(msg.notificationElem!.detail);
         const enterUser = enterDetails.entrantUser;
         return t("messageDescription.joinGroupMessage", {
           name: linkWrap({
@@ -145,7 +137,7 @@ export const notificationMessageFormat = (msg: MessageItem) => {
           }),
         });
       case MessageType.OANotification:
-        const customNoti = JSON.parse(msg.notificationElem.detail);
+        const customNoti = JSON.parse(msg.notificationElem!.detail);
         return customNoti.text;
       default:
         return "";
@@ -203,7 +195,7 @@ export const formatMessageByType = (message?: MessageItem): string => {
   try {
     switch (message.contentType) {
       case MessageType.TextMessage:
-        return message.textElem?.content;
+        return message.textElem?.content || "";
       case MessageType.PictureMessage:
         return t("messageDescription.imageMessage");
       case MessageType.VideoMessage:
@@ -211,19 +203,19 @@ export const formatMessageByType = (message?: MessageItem): string => {
       case MessageType.FriendAdded:
         return t("messageDescription.alreadyFriendMessage");
       case MessageType.MemberEnter:
-        const enterDetails = JSON.parse(message.notificationElem.detail);
+        const enterDetails = JSON.parse(message.notificationElem!.detail);
         const enterUser = enterDetails.entrantUser;
         return t("messageDescription.joinGroupMessage", {
           name: getName(enterUser),
         });
       case MessageType.GroupCreated:
-        const groupCreatedDetail = JSON.parse(message.notificationElem.detail);
+        const groupCreatedDetail = JSON.parse(message.notificationElem!.detail);
         const groupCreatedUser = groupCreatedDetail.opUser;
         return t("messageDescription.createGroupMessage", {
           creator: getName(groupCreatedUser),
         });
       case MessageType.MemberInvited:
-        const inviteDetails = JSON.parse(message.notificationElem.detail);
+        const inviteDetails = JSON.parse(message.notificationElem!.detail);
         const inviteOpUser = inviteDetails.opUser;
         const invitedUserList = inviteDetails.invitedUserList ?? [];
         let inviteStr = "";
@@ -242,7 +234,7 @@ export const formatMessageByType = (message?: MessageItem): string => {
           }`,
         });
       case MessageType.MemberKicked:
-        const kickDetails = JSON.parse(message.notificationElem.detail);
+        const kickDetails = JSON.parse(message.notificationElem!.detail);
         const kickOpUser = kickDetails.opUser;
         const kickdUserList = kickDetails.kickedUserList ?? [];
         let kickStr = "";
@@ -259,13 +251,13 @@ export const formatMessageByType = (message?: MessageItem): string => {
           }`,
         });
       case MessageType.MemberQuit:
-        const quitDetails = JSON.parse(message.notificationElem.detail);
+        const quitDetails = JSON.parse(message.notificationElem!.detail);
         const quitUser = quitDetails.quitUser;
         return t("messageDescription.quitGroupMessage", {
           name: getName(quitUser),
         });
       case MessageType.OANotification:
-        const customNoti = JSON.parse(message.notificationElem.detail);
+        const customNoti = JSON.parse(message.notificationElem!.detail);
         return customNoti.text;
       default:
         return "";

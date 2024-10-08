@@ -66,7 +66,7 @@ const TopSearchBar = () => {
       let rtcInvite = undefined as undefined | RtcInvite;
       data.map((message) => {
         if (message.contentType === MessageType.CustomMessage) {
-          const customData = JSON.parse(message.customElem.data);
+          const customData = JSON.parse(message.customElem!.data);
           if (customData.customType === CustomType.CallingInvite) {
             rtcInvite = customData.data;
           }

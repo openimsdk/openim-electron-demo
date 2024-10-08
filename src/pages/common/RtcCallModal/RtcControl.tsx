@@ -90,7 +90,7 @@ export const RtcControl = ({
     const newMessageHandler = ({ data }: WSEvent<MessageItem[]>) => {
       data.map((message) => {
         if (message.contentType === MessageType.CustomMessage) {
-          const customData = JSON.parse(message.customElem.data) as {
+          const customData = JSON.parse(message.customElem!.data) as {
             data: RtcInvite;
             customType: CustomType;
           };

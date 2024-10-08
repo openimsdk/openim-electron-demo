@@ -1,4 +1,5 @@
 import "./index.scss";
+import "ckeditor5/ckeditor5.css";
 
 import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 import { Essentials } from "@ckeditor/ckeditor5-essentials";
