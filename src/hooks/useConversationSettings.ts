@@ -18,7 +18,7 @@ export function useConversationSettings() {
       if (!currentConversation) return;
 
       try {
-        await IMSDK.pinConversation({
+        await IMSDK.setConversation({
           conversationID: currentConversation.conversationID,
           isPinned,
         });

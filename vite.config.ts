@@ -22,6 +22,13 @@ export default defineConfig(({ command }) => {
         "@": path.join(__dirname, "src"),
       },
     },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          silenceDeprecations: ["legacy-js-api"],
+        },
+      },
+    },
     plugins: [
       react(),
       electron({
