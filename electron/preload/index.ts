@@ -1,24 +1,29 @@
 import fs from "fs";
 import path from "path";
-import os from "os";
 import { DataPath, IElectronAPI } from "./../../src/types/globalExpose.d";
-import { contextBridge, ipcRenderer, shell } from "electron";
+import { contextBridge, ipcRenderer } from "electron";
 import { isProd } from "../utils";
+import "@openim/electron-client-sdk/lib/preload";
+import { Platform } from "@openim/wasm-client-sdk";
 
 const getPlatform = () => {
   if (process.platform === "darwin") {
-    return 4;
+    return Platform.MacOSX;
   }
   if (process.platform === "win32") {
-    return 3;
+    return Platform.Windows;
   }
-  return 7;
+  return Platform.Linux;
 };
 
 const getDataPath = (key: DataPath) => {
   switch (key) {
     case "public":
       return isProd ? ipcRenderer.sendSync("getDataPath", "public") : "";
+    case "sdkResources":
+      return isProd ? ipcRenderer.sendSync("getDataPath", "sdkResources") : "";
+    case "logsPath":
+      return isProd ? ipcRenderer.sendSync("getDataPath", "logsPath") : "";
     default:
       return "";
   }
@@ -46,6 +51,34 @@ const ipcSendSync = (channel: string, ...arg: any) => {
   return ipcRenderer.sendSync(channel, ...arg);
 };
 
+const getUniqueSavePath = (originalPath: string) => {
+  let counter = 0;
+  let savePath = originalPath;
+  let fileDir = path.dirname(originalPath);
+  let fileName = path.basename(originalPath);
+  let fileExt = path.extname(originalPath);
+  let baseName = path.basename(fileName, fileExt);
+
+  while (fs.existsSync(savePath)) {
+    counter++;
+    fileName = `${baseName}(${counter})${fileExt}`;
+    savePath = path.join(fileDir, fileName);
+  }
+
+  return savePath;
+};
+
+const getFileByPath = async (filePath: string) => {
+  try {
+    const filename = path.basename(filePath);
+    const data = await fs.promises.readFile(filePath);
+    return new File([data], filename);
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 const saveFileToDisk = async ({
   file,
   sync,
@@ -54,17 +87,18 @@ const saveFileToDisk = async ({
   sync?: boolean;
 }): Promise<string> => {
   const arrayBuffer = await file.arrayBuffer();
-  const saveDir = ipcRenderer.sendSync("getDataPath", "userData");
+  const saveDir = ipcRenderer.sendSync("getDataPath", "sdkResources");
   const savePath = path.join(saveDir, file.name);
+  const uniqueSavePath = getUniqueSavePath(savePath);
   if (!fs.existsSync(saveDir)) {
     fs.mkdirSync(saveDir, { recursive: true });
   }
   if (sync) {
-    await fs.promises.writeFile(savePath, Buffer.from(arrayBuffer));
+    await fs.promises.writeFile(uniqueSavePath, Buffer.from(arrayBuffer));
   } else {
-    fs.promises.writeFile(savePath, Buffer.from(arrayBuffer));
+    fs.promises.writeFile(uniqueSavePath, Buffer.from(arrayBuffer));
   }
-  return savePath;
+  return uniqueSavePath;
 };
 
 const Api: IElectronAPI = {
@@ -77,6 +111,7 @@ const Api: IElectronAPI = {
   unsubscribeAll,
   ipcInvoke,
   ipcSendSync,
+  getFileByPath,
   saveFileToDisk,
 };
 

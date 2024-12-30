@@ -19,6 +19,9 @@ export const initI18n = () => {
     "zh-CN": {
       translation: translation_zh,
     },
+    zh: {
+      translation: translation_zh,
+    },
   };
 
   i18n.init(

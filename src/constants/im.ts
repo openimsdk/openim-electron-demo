@@ -25,23 +25,6 @@ export const SystemMessageTypes = [
   ...GroupSystemMessageTypes,
 ];
 
-export const CustomMessageType = {
-  MassMsg: 903,
-};
-
-export const canSearchMessageTypes = [
-  MessageType.TextMessage,
-  MessageType.AtTextMessage,
-  MessageType.FileMessage,
-  MessageType.QuoteMessage,
-  MessageType.PictureMessage,
-  MessageType.VideoMessage,
-  MessageType.CardMessage,
-  MessageType.LocationMessage,
-  MessageType.VoiceMessage,
-  MessageType.CustomMessage,
-];
-
 export enum CustomType {
   CallingInvite = 200,
   CallingAccept = 201,

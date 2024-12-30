@@ -1,3 +1,15 @@
+.image-inline {
+  margin: 2px;
+  img {
+    aspect-ratio: auto !important;
+    max-width: 30vw !important;
+    max-height: 15vh !important;
+    width: auto !important;
+    object-fit: contain;
+    cursor: pointer;
+  }
+}
+
 .ck-content {
   padding: 0 18px !important;
   border: none !important;
@@ -57,6 +69,18 @@
 
 .ck-image-upload-complete-icon:after {
   display: none !important;
+}
+
+.ck-balloon-panel_visible {
+  border-radius: 10px !important;
+  border: none !important;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12),
+    0 9px 28px 8px rgba(0, 0, 0, 0.05) !important;
+  overflow: hidden !important;
+}
+
+.ck-list__item .ck-on {
+  background-color: #f0f0f0 !important;
 }
 
 .ck .ck-widget {

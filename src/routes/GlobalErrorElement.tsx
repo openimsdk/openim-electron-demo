@@ -5,7 +5,7 @@ import { useRouteError } from "react-router-dom";
 const GlobalErrorElement = () => {
   const error = useRouteError();
 
-  const tryLogReport = () => {
+  const reload = () => {
     window.location.reload();
   };
 
@@ -18,7 +18,7 @@ const GlobalErrorElement = () => {
         status="404"
         subTitle={t("toast.somethingError")}
         extra={
-          <Button type="primary" onClick={tryLogReport}>
+          <Button type="primary" onClick={reload}>
             {t("placeholder.recover")}
           </Button>
         }

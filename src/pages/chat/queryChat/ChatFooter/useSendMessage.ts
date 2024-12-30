@@ -1,11 +1,11 @@
 import { MessageStatus } from "@openim/wasm-client-sdk";
-import { MessageItem } from "@openim/wasm-client-sdk/lib/types/entity";
+import { MessageItem, WsResponse } from "@openim/wasm-client-sdk/lib/types/entity";
 import { SendMsgParams } from "@openim/wasm-client-sdk/lib/types/params";
 import { useCallback } from "react";
 
 import { IMSDK } from "@/layout/MainContentWrap";
 import { useConversationStore } from "@/store";
-import emitter from "@/utils/events";
+import { emit } from "@/utils/events";
 
 import { pushNewMessage, updateOneMessage } from "../useHistoryMessageList";
 
@@ -27,7 +27,7 @@ export function useSendMessage() {
 
       if (needPush) {
         pushNewMessage(message);
-        emitter.emit("CHAT_LIST_SCROLL_TO_BOTTOM", true);
+        emit("CHAT_LIST_SCROLL_TO_BOTTOM");
       }
 
       const options = {

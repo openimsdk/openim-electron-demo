@@ -1,29 +1,33 @@
 import { SearchOutlined } from "@ant-design/icons";
+import { SessionType } from "@openim/wasm-client-sdk";
 import { GroupMemberItem } from "@openim/wasm-client-sdk/lib/types/entity";
-import { useLatest } from "ahooks";
+import { useDebounceFn, useLatest } from "ahooks";
 import { Breadcrumb, Input, Spin } from "antd";
 import { BreadcrumbItemType } from "antd/es/breadcrumb/Breadcrumb";
 import clsx from "clsx";
 import i18n, { t } from "i18next";
 import {
-  FC,
+  ChangeEvent,
   forwardRef,
   ForwardRefRenderFunction,
   memo,
   useCallback,
   useEffect,
   useImperativeHandle,
+  useRef,
   useState,
 } from "react";
 import { Virtuoso } from "react-virtuoso";
 
 import friend from "@/assets/images/chooseModal/friend.png";
 import group from "@/assets/images/chooseModal/group.png";
+import recently from "@/assets/images/chooseModal/recently.png";
 import { useCurrentMemberRole } from "@/hooks/useCurrentMemberRole";
-import useGroupMembers from "@/hooks/useGroupMembers";
+import useGroupMembers, { REACH_SEARCH_FLAG } from "@/hooks/useGroupMembers";
 import { IMSDK } from "@/layout/MainContentWrap";
 import { useConversationStore } from "@/store";
 import { useContactStore } from "@/store/contact";
+import { feedbackToast } from "@/utils/common";
 
 import CheckItem, { CheckListItem } from "./CheckItem";
 import MenuItem from "./MenuItem";
@@ -31,19 +35,25 @@ import MenuItem from "./MenuItem";
 const menuList = [
   {
     idx: 0,
+    title: t("placeholder.latestChat"),
+    icon: recently,
+  },
+  {
+    idx: 1,
     title: t("placeholder.myFriend"),
     icon: friend,
   },
   {
-    idx: 1,
+    idx: 2,
     title: t("placeholder.myGroup"),
     icon: group,
   },
 ];
 
 i18n.on("languageChanged", () => {
-  menuList[0].title = t("placeholder.myFriend");
-  menuList[1].title = t("placeholder.myGroup");
+  menuList[0].title = t("placeholder.latestChat");
+  menuList[1].title = t("placeholder.myFriend");
+  menuList[2].title = t("placeholder.myGroup");
 });
 
 export type ChooseMenuItem = (typeof menuList)[0];
@@ -51,7 +61,9 @@ export type ChooseMenuItem = (typeof menuList)[0];
 interface IChooseBoxProps {
   className?: string;
   isCheckInGroup?: boolean;
+  notConversation?: boolean;
   showGroupMember?: boolean;
+  chooseOneOnly?: boolean;
   checkMemberRole?: boolean;
 }
 
@@ -65,27 +77,54 @@ const ChooseBox: ForwardRefRenderFunction<ChooseBoxHandle, IChooseBoxProps> = (
   props,
   ref,
 ) => {
-  const { className, checkMemberRole, isCheckInGroup, showGroupMember } = props;
+  const {
+    className,
+    isCheckInGroup,
+    notConversation,
+    showGroupMember,
+    chooseOneOnly,
+    checkMemberRole,
+  } = props;
 
   const [checkedList, setCheckedList] = useState<CheckListItem[]>([]);
   const latestCheckedList = useLatest(checkedList);
 
-  const checkClick = useCallback((data: CheckListItem) => {
-    const idx = latestCheckedList.current.findIndex(
-      (item) =>
-        (item.userID && item.userID === data.userID) ||
-        (item.groupID && item.groupID === data.groupID && !showGroupMember),
-    );
-    if (idx > -1) {
-      setCheckedList((state) => {
-        const newState = [...state];
-        newState.splice(idx, 1);
-        return newState;
-      });
-    } else {
-      setCheckedList((state) => [...state, data]);
-    }
-  }, []);
+  const [searchState, setSearchState] = useState({
+    keywords: "",
+    searching: false,
+    canSearch: showGroupMember,
+  });
+
+  const memberListRef = useRef<MemberListHandle>(null);
+  const commLeftRef = useRef<CommonLeftHandle>(null);
+
+  const checkClick = useCallback(
+    (data: CheckListItem) => {
+      const idx = latestCheckedList.current.findIndex(
+        (item) =>
+          (item.userID && item.userID === data.userID) ||
+          (item.groupID && item.groupID === data.groupID && !showGroupMember),
+      );
+      if (idx > -1) {
+        setCheckedList((state) => {
+          const newState = [...state];
+          newState.splice(idx, 1);
+          return newState;
+        });
+      } else {
+        if (chooseOneOnly && latestCheckedList.current.length > 0) {
+          feedbackToast({
+            msg: t("toast.beyondSelectionLimit"),
+            error: t("toast.beyondSelectionLimit"),
+          });
+          return;
+        }
+
+        setCheckedList((state) => [...state, data]);
+      }
+    },
+    [chooseOneOnly],
+  );
 
   const isChecked = useCallback(
     (data: CheckListItem) =>
@@ -105,6 +144,24 @@ const ChooseBox: ForwardRefRenderFunction<ChooseBoxHandle, IChooseBoxProps> = (
     setCheckedList([...data]);
   };
 
+  const { run: onEnterSearch } = useDebounceFn(
+    () => {
+      if (!searchState.keywords) return;
+      setSearchState((state) => ({ ...state, searching: true }));
+
+      if (showGroupMember) {
+        memberListRef.current?.searchMember(searchState.keywords);
+      } else {
+        commLeftRef.current?.getFilterCheckList(searchState.keywords);
+      }
+    },
+    { wait: 150 },
+  );
+
+  const updateIsCanSearch = useCallback((canSearch: boolean) => {
+    setSearchState((state) => ({ ...state, canSearch }));
+  }, []);
+
   useImperativeHandle(ref, () => ({
     getCheckedList: () => checkedList,
     resetState,
@@ -121,24 +178,40 @@ const ChooseBox: ForwardRefRenderFunction<ChooseBoxHandle, IChooseBoxProps> = (
       <div className="flex flex-1 flex-col border-r border-[var(--gap-text)]">
         <div className="p-5.5 pb-3">
           <Input
+            value={searchState.keywords}
             allowClear
             spellCheck={false}
+            disabled={!searchState.canSearch}
+            onChange={(e) => {
+              setSearchState((state) => ({
+                searching: e.target.value ? state.searching : false,
+                keywords: e.target.value,
+                canSearch: state.canSearch,
+              }));
+              onEnterSearch();
+            }}
             prefix={
               <SearchOutlined rev={undefined} className="text-[var(--sub-text)]" />
             }
           />
         </div>
         {showGroupMember ? (
-          <MemoMemberList
+          <ForwardMemberList
+            ref={memberListRef}
             isChecked={isChecked}
-            checkMemberRole={checkMemberRole}
             checkClick={checkClick}
+            checkMemberRole={checkMemberRole}
+            isSearching={searchState.searching}
           />
         ) : (
-          <MemoCommonLeft
+          <ForwardCommonLeft
+            ref={commLeftRef}
+            notConversation={notConversation!}
             isCheckInGroup={isCheckInGroup!}
+            isSearching={searchState.searching}
             isChecked={isChecked}
             checkClick={checkClick}
+            updateIsCanSearch={updateIsCanSearch}
           />
         )}
       </div>
@@ -164,21 +237,37 @@ const ChooseBox: ForwardRefRenderFunction<ChooseBoxHandle, IChooseBoxProps> = (
 export default memo(forwardRef(ChooseBox));
 
 interface ICommonLeftProps {
+  notConversation: boolean;
   isCheckInGroup: boolean;
+  isSearching: boolean;
   checkClick: (data: CheckListItem) => void;
   isChecked: (data: CheckListItem) => boolean;
+  updateIsCanSearch: (canSearch: boolean) => void;
 }
 
-const CommonLeft: FC<ICommonLeftProps> = (
-  { isCheckInGroup, checkClick, isChecked },
+interface CommonLeftHandle {
+  getFilterCheckList: (keyword: string) => void;
+}
+
+const CommonLeft: ForwardRefRenderFunction<CommonLeftHandle, ICommonLeftProps> = (
+  {
+    notConversation,
+    isCheckInGroup,
+    isSearching,
+    checkClick,
+    isChecked,
+    updateIsCanSearch,
+  },
   ref,
 ) => {
   const [breadcrumb, setBreadcrumb] = useState<BreadcrumbItemType[]>([]);
   const [checkList, setCheckList] = useState<CheckListItem[]>([]);
+  const [searchList, setSearchList] = useState<CheckListItem[]>([]);
 
   const breadcrumbClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault();
     setBreadcrumb([]);
+    updateIsCanSearch(false);
   };
 
   const checkInGroup = async (list: CheckListItem[]) => {
@@ -211,10 +300,23 @@ const CommonLeft: FC<ICommonLeftProps> = (
     };
     switch (idx) {
       case 0:
+        setCheckList(
+          await checkInGroup(
+            useConversationStore
+              .getState()
+              .conversationList.filter(
+                (conversation) =>
+                  conversation.conversationType !== SessionType.Notification,
+              ),
+          ),
+        );
+        pushItem.title = t("placeholder.latestChat");
+        break;
+      case 1:
         setCheckList(await checkInGroup(useContactStore.getState().friendList));
         pushItem.title = t("placeholder.myFriend");
         break;
-      case 1:
+      case 2:
         setCheckList(await checkInGroup(useContactStore.getState().groupList));
         pushItem.title = t("placeholder.myGroup");
         break;
@@ -222,13 +324,42 @@ const CommonLeft: FC<ICommonLeftProps> = (
         break;
     }
     setBreadcrumb((state) => [...state, pushItem]);
+    updateIsCanSearch(true);
   }, []);
+
+  const getFilterCheckList = (keyword: string) => {
+    if (!keyword) {
+      setSearchList([]);
+      return;
+    }
+
+    const upperCaseKeyword = keyword.toUpperCase();
+    const filterList = checkList.filter((item) => {
+      if (item.conversationID) {
+        return item.showName?.toUpperCase().includes(upperCaseKeyword);
+      }
+      if (item.groupID) {
+        return (
+          item.groupName?.toUpperCase().includes(upperCaseKeyword) ||
+          item.groupID?.toUpperCase().includes(upperCaseKeyword)
+        );
+      }
+      return (
+        item.nickname?.toUpperCase().includes(upperCaseKeyword) ||
+        item.userID?.toUpperCase().includes(upperCaseKeyword) ||
+        item.remark?.toUpperCase().includes(upperCaseKeyword)
+      );
+    });
+    setSearchList(filterList);
+  };
+
+  useImperativeHandle(ref, () => ({ getFilterCheckList }), [JSON.stringify(checkList)]);
 
   if (breadcrumb.length < 1) {
     return (
       <div className="flex-1 overflow-auto">
         {menuList.map((menu) => {
-          if (menu.idx !== 0) {
+          if (notConversation && menu.idx !== 1) {
             return null;
           }
           return <MenuItem menu={menu} key={menu.idx} menuClick={menuClick} />;
@@ -236,6 +367,8 @@ const CommonLeft: FC<ICommonLeftProps> = (
       </div>
     );
   }
+
+  const dataSource = isSearching ? searchList : checkList;
 
   return (
     <div className="flex flex-1 flex-col">
@@ -255,7 +388,7 @@ const CommonLeft: FC<ICommonLeftProps> = (
       <div className="mb-3 flex-1 overflow-y-auto">
         <Virtuoso
           className="h-full"
-          data={checkList}
+          data={dataSource}
           itemContent={(_, item) => (
             <CheckItem
               showCheck
@@ -271,20 +404,25 @@ const CommonLeft: FC<ICommonLeftProps> = (
   );
 };
 
-const MemoCommonLeft = memo(CommonLeft);
+const ForwardCommonLeft = memo(forwardRef(CommonLeft));
 
 interface IGroupMemberListProps {
+  isSearching?: boolean;
   checkMemberRole?: boolean;
   checkClick: (data: CheckListItem) => void;
   isChecked: (data: CheckListItem) => boolean;
 }
 
-const GroupMemberList: FC<IGroupMemberListProps> = (
-  { checkMemberRole, checkClick, isChecked },
-  ref,
-) => {
+interface MemberListHandle {
+  searchMember: (keywords: string) => void;
+}
+
+const GroupMemberList: ForwardRefRenderFunction<
+  MemberListHandle,
+  IGroupMemberListProps
+> = ({ isSearching, checkMemberRole, checkClick, isChecked }, ref) => {
   const { currentRolevel, currentMemberInGroup } = useCurrentMemberRole();
-  const { fetchState, getMemberData, resetState } = useGroupMembers({
+  const { fetchState, searchMember, getMemberData, resetState } = useGroupMembers({
     notRefresh: true,
   });
 
@@ -301,34 +439,50 @@ const GroupMemberList: FC<IGroupMemberListProps> = (
     if (fetchState.loading || !fetchState.hasMore) {
       return;
     }
-    getMemberData();
+    if (!isSearching) {
+      getMemberData();
+    } else {
+      searchMember(REACH_SEARCH_FLAG);
+    }
   };
 
   const isDisabled = (member: GroupMemberItem) => {
+    if (member.userID === currentMemberInGroup?.userID) return true;
     if (!checkMemberRole) return false;
     return member.roleLevel >= currentRolevel;
   };
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      searchMember,
+    }),
+    [],
+  );
+
+  const dataSource = isSearching
+    ? fetchState.searchMemberList
+    : fetchState.groupMemberList;
+
   return (
-    <Virtuoso
-      className="h-full overflow-x-hidden"
-      data={fetchState.groupMemberList}
-      endReached={endReached}
-      components={{
-        Header: () => (fetchState.loading ? <Spin /> : null),
-      }}
-      itemContent={(_, member) => (
-        <CheckItem
-          showCheck
-          isChecked={isChecked(member)}
-          disabled={isDisabled(member)}
-          data={member}
-          key={member.userID}
-          itemClick={checkClick}
-        />
-      )}
-    />
+    <Spin wrapperClassName="h-full" spinning={fetchState.loading}>
+      <Virtuoso
+        className="h-full overflow-x-hidden"
+        data={dataSource}
+        fixedItemHeight={62}
+        endReached={endReached}
+        itemContent={(_, member) => (
+          <CheckItem
+            showCheck
+            isChecked={isChecked(member)}
+            disabled={isDisabled(member)}
+            data={member}
+            itemClick={checkClick}
+          />
+        )}
+      />
+    </Spin>
   );
 };
 
-const MemoMemberList = memo(GroupMemberList);
+const ForwardMemberList = memo(forwardRef(GroupMemberList));

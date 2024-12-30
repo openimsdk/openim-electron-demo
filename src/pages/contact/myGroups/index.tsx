@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Virtuoso } from "react-virtuoso";
 
 import { useContactStore, useUserStore } from "@/store";
-import emitter from "@/utils/events";
+import { emit } from "@/utils/events";
 
 import GroupListItem from "./GroupListItem";
 
@@ -35,7 +35,7 @@ export const MyGroups = () => {
   });
 
   const showGroupCard = useCallback((group: GroupItem) => {
-    emitter.emit("OPEN_GROUP_CARD", group);
+    emit("OPEN_GROUP_CARD", group);
   }, []);
 
   return (

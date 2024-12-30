@@ -1,6 +1,6 @@
 import { Platform } from "@openim/wasm-client-sdk";
 
-export type DataPath = "public";
+export type DataPath = "public" | "emojiData" | "sdkResources" | "logsPath";
 
 export interface IElectronAPI {
   getDataPath: (key: DataPath) => string;
@@ -12,17 +12,16 @@ export interface IElectronAPI {
   unsubscribeAll: (channel: string) => void;
   ipcInvoke: <T = unknown>(channel: string, ...arg: any) => Promise<T>;
   ipcSendSync: <T = unknown>(channel: string, ...arg: any) => T;
-  saveFileToDisk: (params: {
-    file: File;
-    type: "fileCache" | "sentFileCache";
-    sync?: boolean;
-  }) => Promise<string>;
+  saveFileToDisk: (params: { file: File; sync?: boolean }) => Promise<string>;
+  getFileByPath: (filePath: string) => Promise<File | null>;
 }
 
 declare global {
   interface Window {
     electronAPI?: IElectronAPI;
-    userClick: (userID?: string, isSelf?: boolean) => void;
+    userClick: (userID?: string, groupID?: string) => void;
+    editRevoke: (clientMsgID: string) => void;
+    screenshotPreview: (results: string) => void;
   }
 }
 

@@ -5,6 +5,7 @@ import { t } from "i18next";
 import { forwardRef, ForwardRefRenderFunction, memo, useRef } from "react";
 import { useMutation } from "react-query";
 
+import { modal } from "@/AntdGlobalComp";
 import { errorHandle } from "@/api/errorHandle";
 import {
   BusinessAllowType,
@@ -14,16 +15,17 @@ import {
 import i18n from "@/i18n";
 import { useUserStore } from "@/store";
 import { LocaleString } from "@/store/type";
+import { feedbackToast } from "@/utils/common";
 
 import { OverlayVisibleHandle, useOverlayVisible } from "../../hooks/useOverlayVisible";
+import { IMSDK } from "../MainContentWrap";
 import BlackList from "./BlackList";
+import ChangePassword from "./ChangePassword";
 
 const PersonalSettings: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
   _,
   ref,
 ) => {
-  const backListRef = useRef<OverlayVisibleHandle>(null);
-
   const { isOverlayOpen, closeOverlay } = useOverlayVisible(ref);
 
   return (
@@ -45,11 +47,7 @@ const PersonalSettings: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> 
       className="no-padding-modal max-w-[70vw]"
       maskTransitionName=""
     >
-      <PersonalSettingsContent
-        closeOverlay={closeOverlay}
-        openBackListOverlay={() => backListRef.current?.openOverlay()}
-      />
-      <BlackList ref={backListRef} />
+      <PersonalSettingsContent closeOverlay={closeOverlay} />
     </Modal>
   );
 };
@@ -58,16 +56,17 @@ export default memo(forwardRef(PersonalSettings));
 
 export const PersonalSettingsContent = ({
   closeOverlay,
-  openBackListOverlay,
 }: {
   closeOverlay?: () => void;
-  openBackListOverlay?: () => void;
 }) => {
   const selfInfo = useUserStore((state) => state.selfInfo);
   const localeStr = useUserStore((state) => state.appSettings.locale);
   const closeAction = useUserStore((state) => state.appSettings.closeAction);
   const updateAppSettings = useUserStore((state) => state.updateAppSettings);
   const updateSelfInfo = useUserStore((state) => state.updateSelfInfo);
+
+  const backListRef = useRef<OverlayVisibleHandle>(null);
+  const changePasswordRef = useRef<OverlayVisibleHandle>(null);
 
   const { isLoading: businessSettingUpdating, mutate: updateBusinessSetting } =
     useMutation(updateBusinessUserInfo, {
@@ -95,8 +94,26 @@ export const PersonalSettingsContent = ({
     }
   };
 
+  const tryClearChatLogs = () => {
+    modal.confirm({
+      title: t("toast.clearChatHistory"),
+      content: t("toast.confirmClearChatHistory"),
+      onOk: async () => {
+        try {
+          await IMSDK.deleteAllMsgFromLocalAndSvr();
+        } catch (error) {
+          feedbackToast({ error });
+        }
+      },
+    });
+  };
+
   const toBlackList = () => {
-    openBackListOverlay?.();
+    backListRef.current?.openOverlay();
+  };
+
+  const toChangePassword = () => {
+    changePasswordRef.current?.openOverlay();
   };
 
   const businessSettingsUpdate = (vaule: boolean, key: keyof BusinessUserInfo) => {
@@ -108,6 +125,10 @@ export const PersonalSettingsContent = ({
       updateInfo[key] = vaule
         ? MessageReceiveOptType.NotNotify
         : MessageReceiveOptType.Normal;
+      // IMSDK.setGlobalRecvMessageOpt(MessageReceiveOptType.Normal);
+    }
+    if (key === "allowAddFriend") {
+      updateInfo[key] = !vaule ? BusinessAllowType.Allow : BusinessAllowType.NotAllow;
     }
 
     updateBusinessSetting(updateInfo, {
@@ -118,8 +139,10 @@ export const PersonalSettingsContent = ({
   };
 
   return (
-    <div className="flex max-h-[80vh] flex-col bg-[var(--chat-bubble)]">
-      <div className="flex items-center justify-between bg-[var(--gap-text)] p-5">
+    <div className="flex flex-col bg-[var(--chat-bubble)]">
+      <BlackList ref={backListRef} />
+      <ChangePassword ref={changePasswordRef} />
+      <div className="app-drag flex items-center justify-between bg-[var(--gap-text)] p-5">
         <span className="text-base font-medium">{t("placeholder.accountSetting")}</span>
         <CloseOutlined
           className="app-no-drag cursor-pointer text-[#8e9aaf]"
@@ -199,6 +222,23 @@ export const PersonalSettingsContent = ({
                 </div>
               </Spin>
             </div>
+            <div className="pb-8 pl-1">
+              <div className="pb-3 font-medium">
+                {t("placeholder.addFriendsSetting")}
+              </div>
+              <div>
+                <Spin spinning={businessSettingUpdating}>
+                  <Checkbox
+                    checked={selfInfo.allowAddFriend === BusinessAllowType.NotAllow}
+                    onChange={(e) =>
+                      businessSettingsUpdate(e.target.checked, "allowAddFriend")
+                    }
+                  >
+                    {t("placeholder.refuseAddFriend")}
+                  </Checkbox>
+                </Spin>
+              </div>
+            </div>
           </div>
         </div>
         <Divider className="m-0 border-4 border-[var(--gap-text)]" />
@@ -208,6 +248,23 @@ export const PersonalSettingsContent = ({
         >
           <div className="text-base font-medium">{t("placeholder.blackList")}</div>
           <RightOutlined rev={undefined} />
+        </div>
+        <Divider className="m-0 border-4 border-[var(--gap-text)]" />
+        <div
+          className="flex cursor-pointer items-center justify-between px-6 py-4"
+          onClick={toChangePassword}
+        >
+          <div className="text-base font-medium">{t("placeholder.changePassword")}</div>
+          <RightOutlined rev={undefined} />
+        </div>
+        <Divider className="m-0 border-4 border-[var(--gap-text)]" />
+        <div className="cursor-pointer px-6 py-4">
+          <div
+            className="text-base font-medium text-[var(--warn-text)]"
+            onClick={tryClearChatLogs}
+          >
+            {t("toast.clearChatHistory")}
+          </div>
         </div>
       </div>
     </div>

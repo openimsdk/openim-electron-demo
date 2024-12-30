@@ -1,6 +1,13 @@
 import "xgplayer/dist/index.min.css";
 
-import { memo, useEffect } from "react";
+import {
+  forwardRef,
+  ForwardRefRenderFunction,
+  memo,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from "react";
 import { SimplePlayer } from "xgplayer";
 import { I18N } from "xgplayer";
 import ZH from "xgplayer/es/lang/zh-cn";
@@ -15,17 +22,19 @@ import Time from "xgplayer/es/plugins/time";
 
 I18N.use(ZH);
 
-const VideoPlayer = ({
-  url,
-  autoplay,
-  poster,
-}: {
-  url: string;
-  autoplay?: boolean;
-  poster?: string;
-}) => {
+const VideoPlayer: ForwardRefRenderFunction<
+  {
+    pausePlay: () => void;
+  },
+  {
+    url: string;
+    autoplay?: boolean;
+    poster?: string;
+  }
+> = ({ url, autoplay, poster }, ref) => {
+  const player = useRef<SimplePlayer>();
   useEffect(() => {
-    new SimplePlayer({
+    player.current = new SimplePlayer({
       id: "video_player",
       url,
       autoplay,
@@ -34,7 +43,21 @@ const VideoPlayer = ({
     });
   }, [url]);
 
+  const pausePlay = () => {
+    if (!player.current?.paused) {
+      player.current?.pause();
+    }
+  };
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      pausePlay,
+    }),
+    [],
+  );
+
   return <div id="video_player" />;
 };
 
-export default memo(VideoPlayer);
+export default memo(forwardRef(VideoPlayer));

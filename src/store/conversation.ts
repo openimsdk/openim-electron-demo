@@ -2,6 +2,7 @@ import {
   ConversationItem,
   GroupItem,
   GroupMemberItem,
+  MessageItem,
 } from "@openim/wasm-client-sdk/lib/types/entity";
 import { t } from "i18next";
 import { create } from "zustand";
@@ -16,12 +17,15 @@ import { useUserStore } from "./user";
 const CONVERSATION_SPLIT_COUNT = 500;
 
 export const useConversationStore = create<ConversationStore>()((set, get) => ({
+  conversationIniting: true,
   conversationList: [],
   currentConversation: undefined,
   unReadCount: 0,
   currentGroupInfo: undefined,
   currentMemberInGroup: undefined,
-  getConversationListByReq: async (isOffset?: boolean) => {
+  getConversationListByReq: async (isOffset?: boolean, forceLoading?: boolean) => {
+    if (!forceLoading && !isOffset) set(() => ({ conversationIniting: true }));
+
     let tmpConversationList = [] as ConversationItem[];
     try {
       const { data } = await IMSDK.getConversationListSplit({
@@ -31,6 +35,7 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
       tmpConversationList = data;
     } catch (error) {
       feedbackToast({ error, msg: t("toast.getConversationFailed") });
+      if (!isOffset) set(() => ({ conversationIniting: false }));
       return true;
     }
     set((state) => ({
@@ -39,6 +44,7 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
         ...tmpConversationList,
       ],
     }));
+    if (!forceLoading && !isOffset) set(() => ({ conversationIniting: false }));
     return tmpConversationList.length === CONVERSATION_SPLIT_COUNT;
   },
   updateConversationList: (
@@ -52,7 +58,10 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
 
     if (type === "filter") {
       set((state) => ({
-        conversationList: conversationSort([...list, ...state.conversationList]),
+        conversationList: conversationSort(
+          [...list, ...state.conversationList],
+          state.conversationList,
+        ),
       }));
       return;
     }
@@ -75,7 +84,10 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
     tmpConversationList.splice(idx, 1);
     set(() => ({ conversationList: [...tmpConversationList] }));
   },
-  updateCurrentConversation: (conversation?: ConversationItem) => {
+  updateCurrentConversation: async (
+    conversation?: ConversationItem,
+    isJump?: boolean,
+  ) => {
     if (!conversation) {
       set(() => ({
         currentConversation: undefined,
@@ -91,9 +103,17 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
       conversation.conversationID !== prevConversation?.conversationID;
     if (toggleNewConversation && isGroupSession(conversation.conversationType)) {
       get().getCurrentGroupInfoByReq(conversation.groupID);
-      get().getCurrentMemberInGroupByReq(conversation.groupID);
+      await get().getCurrentMemberInGroupByReq(conversation.groupID);
     }
     set(() => ({ currentConversation: { ...conversation } }));
+  },
+  updateCurrentConversationFields: (fields: Partial<ConversationItem>) => {
+    set((state) => ({
+      currentConversation: {
+        ...state.currentConversation!,
+        ...fields,
+      },
+    }));
   },
   getUnReadCountByReq: async () => {
     try {
@@ -132,10 +152,14 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
       });
       memberInfo = data[0];
     } catch (error) {
+      set(() => ({ currentMemberInGroup: undefined }));
       feedbackToast({ error, msg: t("toast.getGroupMemberFailed") });
       return;
     }
-    set(() => ({ currentMemberInGroup: { ...memberInfo } }));
+    set(() => ({ currentMemberInGroup: memberInfo ? { ...memberInfo } : undefined }));
+  },
+  setCurrentMemberInGroup: (memberInfo?: GroupMemberItem) => {
+    set(() => ({ currentMemberInGroup: memberInfo }));
   },
   tryUpdateCurrentMemberInGroup: (member: GroupMemberItem) => {
     const currentMemberInGroup = get().currentMemberInGroup;

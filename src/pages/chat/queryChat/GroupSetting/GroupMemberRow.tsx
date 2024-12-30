@@ -7,7 +7,7 @@ import invite from "@/assets/images/chatSetting/invite.png";
 import kick from "@/assets/images/chatSetting/kick.png";
 import OIMAvatar from "@/components/OIMAvatar";
 import useGroupMembers from "@/hooks/useGroupMembers";
-import emitter from "@/utils/events";
+import { emit } from "@/utils/events";
 
 import styles from "./group-setting.module.scss";
 
@@ -35,7 +35,7 @@ const GroupMemberRow = ({
 
   const inviteMember = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation();
-    emitter.emit("OPEN_CHOOSE_MODAL", {
+    emit("OPEN_CHOOSE_MODAL", {
       type: "INVITE_TO_GROUP",
       extraData: currentGroupInfo.groupID,
     });
@@ -43,7 +43,7 @@ const GroupMemberRow = ({
 
   const kickMember = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation();
-    emitter.emit("OPEN_CHOOSE_MODAL", {
+    emit("OPEN_CHOOSE_MODAL", {
       type: "KICK_FORM_GROUP",
       extraData: currentGroupInfo.groupID,
     });
@@ -61,7 +61,7 @@ const GroupMemberRow = ({
             key={member.userID}
             title={member.nickname}
             className={styles["member-item"]}
-            onClick={() => window.userClick(member.userID)}
+            onClick={() => window.userClick(member.userID, member.groupID)}
           >
             <OIMAvatar src={member.faceURL} text={member.nickname} size={36} />
             <div className="mt-2 min-h-[16px] max-w-full truncate text-xs">

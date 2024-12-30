@@ -1,16 +1,14 @@
 import type { MessageReceiveOptType } from "@openim/wasm-client-sdk";
-import { useMutation, useQuery } from "react-query";
+import { useMutation } from "react-query";
 import { v4 as uuidv4 } from "uuid";
 
-import { getChatUrl } from "@/config";
 import { useUserStore } from "@/store";
-import { AppConfig } from "@/store/type";
 import createAxiosInstance from "@/utils/request";
 import { getChatToken } from "@/utils/storage";
 
 import { errorHandle } from "./errorHandle";
 
-const request = createAxiosInstance(getChatUrl());
+const request = createAxiosInstance(import.meta.env.VITE_CHAT_URL as string);
 
 const platform = window.electronAPI?.getPlatform() ?? 5;
 
@@ -238,14 +236,3 @@ export const updateBusinessUserInfo = async (
     },
   );
 };
-
-export const getAppConfig = () =>
-  request.post<{ config: AppConfig }>(
-    "/client_config/get",
-    {},
-    {
-      headers: {
-        operationID: uuidv4(),
-      },
-    },
-  );

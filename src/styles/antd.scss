@@ -14,7 +14,8 @@
   color: var(--sub-text) !important;
 }
 
-.ant-app {
+.ant-app,
+.lk-room-container {
   height: var(--full-height);
   & > .ant-spin-nested-loading {
     height: var(--full-height);
@@ -41,6 +42,12 @@
 .message-image {
   .ant-image-mask {
     border-radius: 6px;
+  }
+}
+
+.quote-image {
+  .ant-image-mask {
+    opacity: 0 !important;
   }
 }
 
@@ -148,6 +155,35 @@
   }
 }
 
+.global-search-modal {
+  .ant-modal-content {
+    border-radius: 16px;
+  }
+
+  .message-drawer-tab {
+    .ant-tabs-nav {
+      padding: 0 32px;
+      margin-bottom: 0;
+      border-bottom: 1px solid var(--gap-text);
+    }
+  }
+
+  .ant-tabs-content-holder {
+    .ant-tabs-content {
+      padding: 0 12px;
+      overflow-y: hidden;
+    }
+  }
+}
+
+.rtc-single-modal {
+  .ant-modal-content {
+    padding: 0;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+}
+
 .bold-label-form {
   .ant-form-item-label {
     label {
@@ -176,6 +212,10 @@
   }
 }
 
+.ant-switch {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
 .ant-breadcrumb-link {
   line-height: 22px;
 }
@@ -199,6 +239,16 @@
   width: 100%;
 }
 
+.h-full > .ant-spin-container {
+  height: 100%;
+}
+
+.drop-file-moal {
+  .ant-modal-confirm-content {
+    max-width: 100% !important;
+  }
+}
+
 .ant-skeleton-with-avatar
   .ant-skeleton-content
   .ant-skeleton-title
@@ -212,4 +262,20 @@
 
 .ant-skeleton .ant-skeleton-header .ant-skeleton-avatar {
   border-radius: 6px;
+}
+
+.send-action-dropdown {
+  .ant-dropdown-menu-item {
+    padding: 4px 6px !important;
+    width: 120px !important;
+
+    span {
+      font-size: 12px;
+      color: var(--sub-text);
+    }
+
+    .anticon-check {
+      color: var(--primary);
+    }
+  }
 }

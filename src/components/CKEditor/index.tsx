@@ -6,6 +6,7 @@ import { Essentials } from "@ckeditor/ckeditor5-essentials";
 import { ImageInline, ImageInsert } from "@ckeditor/ckeditor5-image";
 import { Paragraph } from "@ckeditor/ckeditor5-paragraph";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
+import { useLatest } from "ahooks";
 import {
   forwardRef,
   ForwardRefRenderFunction,
@@ -24,8 +25,10 @@ export type CKEditorRef = {
 interface CKEditorProps {
   value: string;
   placeholder?: string;
+  enterWithShift?: boolean;
   onChange?: (value: string) => void;
   onEnter?: () => void;
+  onContextMenu?: () => void;
 }
 
 export interface EmojiData {
@@ -39,10 +42,11 @@ const keyCodes = {
 };
 
 const Index: ForwardRefRenderFunction<CKEditorRef, CKEditorProps> = (
-  { value, placeholder, onChange, onEnter },
+  { value, placeholder, enterWithShift, onChange, onEnter, onContextMenu },
   ref,
 ) => {
   const ckEditor = useRef<ClassicEditor | null>(null);
+  const latestEnterWithShift = useLatest(enterWithShift);
 
   const focus = (moveToEnd = false) => {
     const editor = ckEditor.current;
@@ -70,11 +74,15 @@ const Index: ForwardRefRenderFunction<CKEditorRef, CKEditorProps> = (
         emojiData as Record<string, any>,
       );
 
+      const focusFlag = !editor.data.get().trim();
+
       const insertPosition = editor.model.document.selection.getFirstPosition();
+      console.log(insertPosition);
+
       if (!insertPosition) return;
 
       writer.insert(emojiElement, insertPosition);
-      setTimeout(focus);
+      setTimeout(() => focus(focusFlag));
     });
   };
 
@@ -82,14 +90,14 @@ const Index: ForwardRefRenderFunction<CKEditorRef, CKEditorProps> = (
     editor.editing.view.document.on(
       "keydown",
       (evt, data) => {
-        if (data.keyCode === 13) {
+        if (data.keyCode === 13 && latestEnterWithShift.current === data.shiftKey) {
           data.preventDefault();
           evt.stop();
           onEnter?.();
           return;
         }
 
-        if (data.keyCode === 13 && data.shiftKey) {
+        if (data.keyCode === 13 && latestEnterWithShift.current) {
           data.preventDefault();
           evt.stop();
 
@@ -108,12 +116,19 @@ const Index: ForwardRefRenderFunction<CKEditorRef, CKEditorProps> = (
           const hasSelectContent = !editor.model.getSelectedContent(selection).isEmpty;
           const hasEditorContent = Boolean(editor.getData());
 
-          if (!hasEditorContent || hasSelectContent) return;
+          if (!hasEditorContent) {
+            return;
+          }
+
+          if (hasSelectContent) return;
 
           if (
             selection.focus?.nodeBefore &&
-            // @ts-ignore
-            selection.focus?.nodeBefore.name === "emoji"
+            (selection.focus?.nodeBefore.hasAttribute("mention") ||
+              // @ts-ignore
+              selection.focus?.nodeBefore.name === "imageInline" ||
+              // @ts-ignore
+              selection.focus?.nodeBefore.name === "emoji")
           ) {
             editor.model.change((writer) => {
               if (selection.focus?.nodeBefore) {
@@ -127,6 +142,14 @@ const Index: ForwardRefRenderFunction<CKEditorRef, CKEditorProps> = (
       },
       { priority: "high" },
     );
+
+    if (onContextMenu) {
+      const editorElement = editor.ui.view.editable.element;
+      editorElement?.addEventListener("contextmenu", (event) => {
+        onContextMenu();
+        event.preventDefault();
+      });
+    }
   };
 
   useImperativeHandle(

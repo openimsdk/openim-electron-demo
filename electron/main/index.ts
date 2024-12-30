@@ -1,16 +1,15 @@
 import { app } from "electron";
+import { join } from "node:path";
 import { createMainWindow } from "./windowManage";
 import { createTray } from "./trayManage";
 import { setIpcMainListener } from "./ipcHandlerManage";
-import {
-  performAppStartup,
-  setAppGlobalData,
-  setAppListener,
-  setSingleInstance,
-} from "./appManage";
+import { setAppGlobalData, setAppListener, setSingleInstance } from "./appManage";
 import createAppMenu from "./menuManage";
 import { isLinux } from "../utils";
+import { getLogger } from "../utils/log";
 import { initI18n } from "../i18n";
+
+export const logger = getLogger(join(app.getPath("userData"), `/OpenIMData/logs`));
 
 const init = () => {
   initI18n();
@@ -20,7 +19,6 @@ const init = () => {
 };
 
 setAppGlobalData();
-performAppStartup();
 setIpcMainListener();
 setSingleInstance();
 setAppListener(init);

@@ -1,7 +1,7 @@
-import { App as AntdApp, ConfigProvider } from "antd";
+import { App as AntdApp, ConfigProvider, theme } from "antd";
 import enUS from "antd/locale/en_US";
 import zhCN from "antd/locale/zh_CN";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { RouterProvider } from "react-router-dom";
@@ -22,7 +22,7 @@ function App() {
 
   return (
     <ConfigProvider
-      button={{ autoInsertSpace: false }}
+      autoInsertSpaceInButton={false}
       locale={locale === "zh-CN" ? zhCN : enUS}
       theme={{
         token: { colorPrimary: "#0089FF" },

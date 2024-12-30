@@ -1,5 +1,9 @@
-import { CbEvents } from "@openim/wasm-client-sdk";
-import { LogLevel, MessageType, SessionType } from "@openim/wasm-client-sdk";
+import { CbEvents, LogLevel } from "@openim/wasm-client-sdk";
+import {
+  MessageReceiveOptType,
+  MessageType,
+  SessionType,
+} from "@openim/wasm-client-sdk";
 import {
   BlackUserItem,
   ConversationItem,
@@ -9,30 +13,37 @@ import {
   GroupItem,
   GroupMemberItem,
   MessageItem,
+  RevokedInfo,
   SelfUserInfo,
   WSEvent,
   WsResponse,
 } from "@openim/wasm-client-sdk/lib/types/entity";
 import { t } from "i18next";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { getApiUrl, getWsUrl } from "@/config";
+import { BusinessAllowType } from "@/api/login";
+import messageRing from "@/assets/audio/newMsg.mp3";
 import { CustomType } from "@/constants";
-import { pushNewMessage } from "@/pages/chat/queryChat/useHistoryMessageList";
+import {
+  pushNewMessage,
+  updateMessageNicknameAndFaceUrl,
+  updateOneMessage,
+} from "@/pages/chat/queryChat/useHistoryMessageList";
 import { useConversationStore, useUserStore } from "@/store";
 import { useContactStore } from "@/store/contact";
 import { feedbackToast } from "@/utils/common";
-import emitter from "@/utils/events";
-import { initStore } from "@/utils/imCommon";
+import { emit } from "@/utils/events";
+import { createNotification, initStore, isGroupSession } from "@/utils/imCommon";
 import { clearIMProfile, getIMToken, getIMUserID } from "@/utils/storage";
 
 import { IMSDK } from "./MainContentWrap";
 
 export function useGlobalEvent() {
   const navigate = useNavigate();
+  const resume = useRef(false);
+
   // user
-  const syncState = useUserStore((state) => state.syncState);
   const updateSyncState = useUserStore((state) => state.updateSyncState);
   const updateProgressState = useUserStore((state) => state.updateProgressState);
   const updateReinstallState = useUserStore((state) => state.updateReinstallState);
@@ -44,12 +55,18 @@ export function useGlobalEvent() {
   const updateConversationList = useConversationStore(
     (state) => state.updateConversationList,
   );
+  const updateCurrentConversation = useConversationStore(
+    (state) => state.updateCurrentConversation,
+  );
   const updateUnReadCount = useConversationStore((state) => state.updateUnReadCount);
   const updateCurrentGroupInfo = useConversationStore(
     (state) => state.updateCurrentGroupInfo,
   );
   const getCurrentGroupInfoByReq = useConversationStore(
     (state) => state.getCurrentGroupInfoByReq,
+  );
+  const setCurrentMemberInGroup = useConversationStore(
+    (state) => state.setCurrentMemberInGroup,
   );
   const getCurrentMemberInGroupByReq = useConversationStore(
     (state) => state.getCurrentMemberInGroupByReq,
@@ -85,9 +102,21 @@ export function useGlobalEvent() {
     (state) => state.updateSendGroupApplication,
   );
 
+  let cacheConversationList = [] as ConversationItem[];
+  let audioEl: HTMLAudioElement | null = null;
+
   useEffect(() => {
     loginCheck();
+    cacheConversationList = [];
     setIMListener();
+    setIpcListener();
+
+    window.addEventListener("online", () => {
+      IMSDK.networkStatusChanged();
+    });
+    window.addEventListener("offline", () => {
+      IMSDK.networkStatusChanged();
+    });
     return () => {
       disposeIMListener();
     };
@@ -109,14 +138,33 @@ export function useGlobalEvent() {
     const IMToken = (await getIMToken()) as string;
     const IMUserID = (await getIMUserID()) as string;
     try {
-      await IMSDK.login({
-        userID: IMUserID,
-        token: IMToken,
-        platformID: window.electronAPI?.getPlatform() ?? 5,
-        apiAddr: getApiUrl(),
-        wsAddr: getWsUrl(),
-        logLevel: LogLevel.Debug,
-      });
+      const apiAddr = import.meta.env.VITE_API_URL;
+      const wsAddr = import.meta.env.VITE_WS_URL;
+      if (window.electronAPI) {
+        await IMSDK.initSDK({
+          platformID: window.electronAPI?.getPlatform() ?? 5,
+          apiAddr,
+          wsAddr,
+          dataDir: window.electronAPI.getDataPath("sdkResources") || "./",
+          logFilePath: window.electronAPI.getDataPath("logsPath") || "./",
+          logLevel: LogLevel.Debug,
+          isLogStandardOutput: false,
+          systemType: "electron",
+        });
+        await IMSDK.login({
+          userID: IMUserID,
+          token: IMToken,
+        });
+      } else {
+        await IMSDK.login({
+          userID: IMUserID,
+          token: IMToken,
+          platformID: 5,
+          apiAddr,
+          wsAddr,
+          logLevel: LogLevel.Debug,
+        });
+      }
       initStore();
     } catch (error) {
       console.error(error);
@@ -143,6 +191,7 @@ export function useGlobalEvent() {
     IMSDK.on(CbEvents.OnSyncServerFailed, syncFailedHandler);
     // message
     IMSDK.on(CbEvents.OnRecvNewMessages, newMessageHandler);
+    IMSDK.on(CbEvents.OnNewRecvMessageRevoked, revokedMessageHandler);
     // conversation
     IMSDK.on(CbEvents.OnConversationChanged, conversationChnageHandler);
     IMSDK.on(CbEvents.OnNewConversation, newConversationHandler);
@@ -172,10 +221,16 @@ export function useGlobalEvent() {
   };
 
   const selfUpdateHandler = ({ data }: WSEvent<SelfUserInfo>) => {
+    updateMessageNicknameAndFaceUrl({
+      sendID: data.userID,
+      senderNickname: data.nickname,
+      senderFaceUrl: data.faceURL,
+    });
     updateSelfInfo(data);
   };
   const connectingHandler = () => {
     updateConnectState("loading");
+    console.log("connecting...");
   };
   const connectFailedHandler = ({ errCode, errMsg }: WSEvent) => {
     updateConnectState("failed");
@@ -206,7 +261,6 @@ export function useGlobalEvent() {
     updateSyncState("loading");
     updateReinstallState(data);
   };
-
   const syncProgressHandler = ({ data }: WSEvent<number>) => {
     updateProgressState(data);
   };
@@ -214,7 +268,7 @@ export function useGlobalEvent() {
     updateSyncState("success");
     getFriendListByReq();
     getGroupListByReq();
-    getConversationListByReq(false);
+    getConversationListByReq(false, true);
     getUnReadCountByReq();
   };
   const syncFailedHandler = () => {
@@ -223,30 +277,116 @@ export function useGlobalEvent() {
   };
 
   // message
-  const notPushType = [MessageType.TypingMessage, MessageType.RevokeMessage];
-
   const newMessageHandler = ({ data }: WSEvent<MessageItem[]>) => {
-    if (syncState === "loading") {
+    if (useUserStore.getState().syncState === "loading" || resume.current) {
       return;
     }
-    data.map((message) => {
-      if (message.contentType === MessageType.CustomMessage) {
-        const customData = JSON.parse(message.customElem!.data);
-        if (
-          CustomType.CallingInvite <= customData.customType &&
-          customData.customType <= CustomType.CallingHungup
-        ) {
-          return;
-        }
+    data.map((message) => handleNewMessage(message));
+  };
+
+  const revokedMessageHandler = ({ data }: WSEvent<RevokedInfo>) => {
+    updateOneMessage({
+      clientMsgID: data.clientMsgID,
+      contentType: MessageType.RevokeMessage,
+      notificationElem: {
+        detail: JSON.stringify(data),
+      },
+    } as MessageItem);
+  };
+
+  const newMessageNotify = async (newServerMsg: MessageItem) => {
+    if (useUserStore.getState().syncState === "loading") {
+      return;
+    }
+
+    const selfInfo = useUserStore.getState().selfInfo;
+
+    if (
+      selfInfo.allowBeep === BusinessAllowType.NotAllow ||
+      selfInfo.globalRecvMsgOpt !== MessageReceiveOptType.Normal
+    ) {
+      return;
+    }
+
+    let cveItem = [
+      ...useConversationStore.getState().conversationList,
+      ...cacheConversationList,
+    ].find((conversation) => {
+      if (isGroupSession(newServerMsg.sessionType)) {
+        return newServerMsg.groupID === conversation.groupID;
       }
-      if (
-        !notPushType.includes(message.contentType) &&
-        inCurrentConversation(message)
-      ) {
-        pushNewMessage(message);
-        emitter.emit("CHAT_LIST_SCROLL_TO_BOTTOM", false);
-      }
+      return newServerMsg.sendID === conversation.userID;
     });
+
+    if (!cveItem) {
+      try {
+        const { data } = await IMSDK.getOneConversation({
+          sessionType: newServerMsg.sessionType,
+          sourceID: newServerMsg.groupID || newServerMsg.sendID,
+        });
+        cveItem = data;
+        cacheConversationList = [...cacheConversationList, { ...cveItem }];
+      } catch (e) {
+        return;
+      }
+    }
+
+    if (cveItem.recvMsgOpt !== MessageReceiveOptType.Normal) {
+      return;
+    }
+
+    createNotification({
+      message: newServerMsg,
+      conversation: cveItem,
+      callback: async (conversation) => {
+        if (
+          useConversationStore.getState().currentConversation?.conversationID ===
+          conversation.conversationID
+        )
+          return;
+        await updateCurrentConversation({ ...conversation, unreadCount: 1 });
+        navigate(`/chat/${conversation.conversationID}`);
+      },
+    });
+
+    if (!audioEl) {
+      audioEl = document.createElement("audio");
+    }
+    audioEl.src = messageRing;
+    audioEl.play();
+  };
+
+  const notPushType = [MessageType.TypingMessage, MessageType.RevokeMessage];
+
+  const handleNewMessage = (newServerMsg: MessageItem) => {
+    if (newServerMsg.contentType === MessageType.CustomMessage) {
+      const customData = JSON.parse(newServerMsg.customElem!.data);
+      if (
+        CustomType.CallingInvite <= customData.customType &&
+        customData.customType <= CustomType.CallingHungup
+      ) {
+        return;
+      }
+    }
+
+    const needNotification =
+      !notPushType.includes(newServerMsg.contentType) &&
+      newServerMsg.sendID !== useUserStore.getState().selfInfo.userID;
+
+    if (needNotification) {
+      if (
+        document.visibilityState === "hidden" ||
+        !inCurrentConversation(newServerMsg)
+      ) {
+        newMessageNotify(newServerMsg);
+      }
+    }
+
+    if (!inCurrentConversation(newServerMsg)) return;
+
+    if (!notPushType.includes(newServerMsg.contentType)) {
+      pushNewMessage(newServerMsg);
+    }
   };
 
   const inCurrentConversation = (newServerMsg: MessageItem) => {
@@ -283,11 +423,19 @@ export function useGlobalEvent() {
     updateConversationList(data, "push");
   };
   const totalUnreadChangeHandler = ({ data }: WSEvent<number>) => {
+    if (data === useConversationStore.getState().unReadCount) return;
     updateUnReadCount(data);
   };
 
   // friend
   const friednInfoChangeHandler = ({ data }: WSEvent<FriendUserItem>) => {
+    if (data.userID === useConversationStore.getState().currentConversation?.userID) {
+      updateMessageNicknameAndFaceUrl({
+        sendID: data.userID,
+        senderNickname: data.remark || data.nickname,
+        senderFaceUrl: data.faceURL,
+      });
+    }
     updateFriend(data);
   };
   const friednAddedHandler = ({ data }: WSEvent<FriendUserItem>) => {
@@ -302,6 +450,13 @@ export function useGlobalEvent() {
     pushNewBlack(data);
   };
   const blackDeletedHandler = ({ data }: WSEvent<BlackUserItem>) => {
+    IMSDK.getSpecifiedFriendsInfo({
+      friendUserIDList: [data.userID],
+    }).then(({ data }) => {
+      if (data.length) {
+        pushNewFriend(data[0]);
+      }
+    });
     updateBlack(data, true);
   };
 
@@ -309,14 +464,14 @@ export function useGlobalEvent() {
   const joinedGroupAddedHandler = ({ data }: WSEvent<GroupItem>) => {
     if (data.groupID === useConversationStore.getState().currentConversation?.groupID) {
       updateCurrentGroupInfo(data);
-      // getCurrentMemberInGroupByReq(group.groupID);
+      getCurrentMemberInGroupByReq(data.groupID);
     }
     pushNewGroup(data);
   };
   const joinedGroupDeletedHandler = ({ data }: WSEvent<GroupItem>) => {
     if (data.groupID === useConversationStore.getState().currentConversation?.groupID) {
       getCurrentGroupInfoByReq(data.groupID);
-      getCurrentMemberInGroupByReq(data.groupID);
+      setCurrentMemberInGroup();
     }
     updateGroup(data, true);
   };
@@ -349,6 +504,11 @@ export function useGlobalEvent() {
   };
   const groupMemberInfoChangedHandler = ({ data }: WSEvent<GroupMemberItem>) => {
     if (data.groupID === useConversationStore.getState().currentConversation?.groupID) {
+      updateMessageNicknameAndFaceUrl({
+        sendID: data.userID,
+        senderNickname: data.nickname,
+        senderFaceUrl: data.faceURL,
+      });
       tryUpdateCurrentMemberInGroup(data);
     }
   };
@@ -416,5 +576,17 @@ export function useGlobalEvent() {
     IMSDK.off(CbEvents.OnGroupApplicationAdded, groupApplicationProcessedHandler);
     IMSDK.off(CbEvents.OnGroupApplicationAccepted, groupApplicationProcessedHandler);
     IMSDK.off(CbEvents.OnGroupApplicationRejected, groupApplicationProcessedHandler);
+  };
+
+  const setIpcListener = () => {
+    window.electronAPI?.subscribe("appResume", () => {
+      if (resume.current) {
+        return;
+      }
+      resume.current = true;
+      setTimeout(() => {
+        resume.current = false;
+      }, 5000);
+    });
   };
 }

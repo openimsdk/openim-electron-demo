@@ -2,7 +2,7 @@ import "dayjs/locale/zh-cn";
 
 import dayjs from "dayjs";
 import i18n from "i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
+// import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
 
 import { getLocale } from "@/utils/storage";
@@ -17,11 +17,14 @@ const resources = {
   "zh-CN": {
     translation: translation_zh,
   },
+  zh: {
+    translation: translation_zh,
+  },
 };
 
 i18n
   .use(initReactI18next)
-  .use(LanguageDetector)
+  // .use(LanguageDetector)
   .init({
     resources,
     lng: getLocale(),

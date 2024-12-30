@@ -1,21 +1,30 @@
-import { MessageType } from "@openim/wasm-client-sdk";
-import type { MessageItem } from "@openim/wasm-client-sdk/lib/types/entity";
+import {
+  MessageItem as MessageItemType,
+  MessageType,
+  SessionType,
+} from "@openim/wasm-client-sdk";
+import { Popover } from "antd";
 import clsx from "clsx";
-import { FC, memo, useCallback } from "react";
+import { FC, memo, useCallback, useRef, useState } from "react";
 
 import OIMAvatar from "@/components/OIMAvatar";
-import { useUserStore } from "@/store";
 import { formatMessageTime } from "@/utils/imCommon";
 
+import CardMessageRenderer from "./CardMessageRenderer";
 import CatchMessageRender from "./CatchMsgRenderer";
+import FaceMessageRender from "./FaceMessageRender";
+import FileMessageRenderer from "./FileMessageRenderer";
+import LocationMessageRenderer from "./LocationMessageRenderer";
 import MediaMessageRender from "./MediaMessageRender";
 import styles from "./message-item.module.scss";
 import MessageItemErrorBoundary from "./MessageItemErrorBoundary";
+import MessageMenuContent from "./MessageMenuContent";
 import MessageSuffix from "./MessageSuffix";
 import TextMessageRender from "./TextMessageRender";
+import VoiceMessageRender from "./VoiceMessageRender";
 
 export interface IMessageItemProps {
-  message: MessageItem;
+  message: MessageItemType;
   isSender: boolean;
   disabled?: boolean;
   conversationID?: string;
@@ -24,8 +33,14 @@ export interface IMessageItemProps {
 
 const components: Record<number, FC<IMessageItemProps>> = {
   [MessageType.TextMessage]: TextMessageRender,
+  [MessageType.AtTextMessage]: TextMessageRender,
+  [MessageType.VoiceMessage]: VoiceMessageRender,
   [MessageType.PictureMessage]: MediaMessageRender,
   [MessageType.VideoMessage]: MediaMessageRender,
+  [MessageType.FaceMessage]: FaceMessageRender,
+  [MessageType.CardMessage]: CardMessageRenderer,
+  [MessageType.FileMessage]: FileMessageRenderer,
+  [MessageType.LocationMessage]: LocationMessageRenderer,
 };
 
 const MessageItem: FC<IMessageItemProps> = ({
@@ -34,21 +49,21 @@ const MessageItem: FC<IMessageItemProps> = ({
   isSender,
   conversationID,
 }) => {
+  const messageWrapRef = useRef<HTMLDivElement>(null);
+  const [showMessageMenu, setShowMessageMenu] = useState(false);
   const MessageRenderComponent = components[message.contentType] || CatchMessageRender;
 
-  // locale re render
-  useUserStore((state) => state.appSettings.locale);
-
-  const tryShowUserCard = useCallback(() => {
-    if (disabled) return;
-    window.userClick(message.sendID);
+  const closeMessageMenu = useCallback(() => {
+    setShowMessageMenu(false);
   }, []);
+
+  const canShowMessageMenu = !disabled;
 
   return (
     <>
       <div
         id={`chat_${message.clientMsgID}`}
-        className="relative flex select-text px-5 py-3"
+        className={clsx("relative flex select-text px-5 py-3")}
       >
         <div
           className={clsx(
@@ -60,10 +75,9 @@ const MessageItem: FC<IMessageItemProps> = ({
             size={36}
             src={message.senderFaceUrl}
             text={message.senderNickname}
-            onClick={tryShowUserCard}
           />
 
-          <div className={styles["message-wrap"]}>
+          <div className={styles["message-wrap"]} ref={messageWrapRef}>
             <div className={styles["message-profile"]}>
               <div
                 title={message.senderNickname}
@@ -79,20 +93,35 @@ const MessageItem: FC<IMessageItemProps> = ({
               </div>
             </div>
 
-            <MessageItemErrorBoundary message={message}>
-              <MessageRenderComponent
+            <Popover
+              className={styles["menu-wrap"]}
+              content={
+                <MessageMenuContent
+                  message={message}
+                  conversationID={conversationID!}
+                  closeMenu={closeMessageMenu}
+                />
+              }
+              title={null}
+              trigger="contextMenu"
+              open={canShowMessageMenu ? showMessageMenu : false}
+              onOpenChange={(vis) => setShowMessageMenu(vis)}
+            >
+              <MessageItemErrorBoundary message={message}>
+                <MessageRenderComponent
+                  message={message}
+                  isSender={isSender}
+                  disabled={disabled}
+                />
+              </MessageItemErrorBoundary>
+
+              <MessageSuffix
                 message={message}
                 isSender={isSender}
-                disabled={disabled}
+                disabled={false}
+                conversationID={conversationID}
               />
-            </MessageItemErrorBoundary>
-
-            <MessageSuffix
-              message={message}
-              isSender={isSender}
-              disabled={false}
-              conversationID={conversationID}
-            />
+            </Popover>
           </div>
         </div>
       </div>

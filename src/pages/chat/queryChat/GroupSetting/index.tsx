@@ -1,10 +1,10 @@
 import { Drawer } from "antd";
 import { t } from "i18next";
-import { forwardRef, ForwardRefRenderFunction, memo, useState } from "react";
+import { forwardRef, ForwardRefRenderFunction, memo, useRef, useState } from "react";
 
 import { OverlayVisibleHandle, useOverlayVisible } from "@/hooks/useOverlayVisible";
 
-import GroupMemberList from "./GroupMemberList";
+import GroupMemberList, { GroupMemberListHandle } from "./GroupMemberList";
 import GroupMemberListHeader from "./GroupMemberListHeader";
 import GroupSettings from "./GroupSettings";
 
@@ -12,12 +12,23 @@ const GroupSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
   _,
   ref,
 ) => {
+  const memberListRef = useRef<GroupMemberListHandle>(null);
+  const [isSearching, setIsSearching] = useState(false);
   const [isPreviewMembers, setIsPreviewMembers] = useState(false);
 
   const { isOverlayOpen, closeOverlay } = useOverlayVisible(ref);
 
+  const searchMember = (keyword: string) => {
+    memberListRef.current?.searchMember(keyword);
+  };
+
+  const updateSearching = (val: boolean) => {
+    setIsSearching(val);
+  };
+
   const closePreviewMembers = () => {
     setIsPreviewMembers(false);
+    setIsSearching(false);
   };
 
   return (
@@ -26,7 +37,11 @@ const GroupSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
         !isPreviewMembers ? (
           t("placeholder.setting")
         ) : (
-          <GroupMemberListHeader back2Settings={closePreviewMembers} />
+          <GroupMemberListHeader
+            back2Settings={closePreviewMembers}
+            searchMemebers={searchMember}
+            updateSearching={updateSearching}
+          />
         )
       }
       destroyOnClose
@@ -52,7 +67,7 @@ const GroupSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
           updateTravel={() => setIsPreviewMembers(true)}
         />
       ) : (
-        <GroupMemberList />
+        <GroupMemberList ref={memberListRef} isSearching={isSearching} />
       )}
     </Drawer>
   );

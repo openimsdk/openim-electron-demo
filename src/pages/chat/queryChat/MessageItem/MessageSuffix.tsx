@@ -21,11 +21,13 @@ const MessageSuffix: FC<IMessageItemProps> = ({ message }) => {
     };
   }, [message.status]);
 
+  const isFileTypeMessage = fileTypes.includes(message.contentType);
+
   return (
     <div className={styles.suffix}>
       {showSending &&
         message.status === MessageStatus.Sending &&
-        message.contentType === MessageType.TextMessage && (
+        !isFileTypeMessage && (
           <Spin
             className="flex"
             indicator={
@@ -34,10 +36,19 @@ const MessageSuffix: FC<IMessageItemProps> = ({ message }) => {
           />
         )}
       {message.status === MessageStatus.Failed && (
-        <ExclamationCircleFilled className="text-base text-[var(--warn-text)]" />
+        <ExclamationCircleFilled
+          className="text-base text-[var(--warn-text)]"
+          rev={undefined}
+        />
       )}
     </div>
   );
 };
 
 export default MessageSuffix;
+
+const fileTypes = [
+  MessageType.PictureMessage,
+  MessageType.VideoMessage,
+  MessageType.FileMessage,
+];

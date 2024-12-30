@@ -1,0 +1,35 @@
+.global-search-modal {
+  :global {
+    .ant-modal-content {
+      height: 80vh;
+      padding-bottom: 24px;
+      border-radius: 24px;
+    }
+    .ant-modal-body {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+  .search-tab {
+    flex: 1;
+    overflow: hidden;
+    :global {
+      .ant-tabs-nav {
+        margin-bottom: 0;
+      }
+      .ant-tabs-nav-wrap {
+        padding: 0 24px;
+      }
+      .ant-tabs-content,
+      .ant-tabs-tabpane {
+        height: 100%;
+      }
+    }
+  }
+  .virtuoso-wrapper {
+    & > div {
+      padding-top: 12px;
+    }
+  }
+}

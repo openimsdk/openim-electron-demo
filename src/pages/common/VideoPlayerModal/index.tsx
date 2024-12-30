@@ -28,11 +28,9 @@ export const useVideoPlayer = () => {
       centered: true,
       maskTransitionName: "",
       className: "no-padding-modal",
-      styles: {
-        mask: {
-          opacity: 0,
-          transition: "none",
-        },
+      maskStyle: {
+        opacity: 0,
+        transition: "none",
       },
       content: (
         <div id="video_player_modal">

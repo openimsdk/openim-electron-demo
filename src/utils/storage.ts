@@ -1,8 +1,9 @@
+import { CustomEmojiItem } from "@/pages/chat/queryChat/MessageItem/FaceMessageRender";
 import { LocaleString } from "@/store/type";
 import * as localForage from "localforage";
 
 localForage.config({
-  name: "OpenIM-Config",
+  name: "OpenCorp-Config",
 });
 
 type SendAction = "enter" | "enterwithshift";
@@ -32,7 +33,16 @@ export const setIMProfile = ({
   setTMUserID(userID);
 };
 
+export const setAccessedFriendApplication = async (list: string[]) =>
+  localForage.setItem(`${await getIMUserID()}_accessedFriendApplications`, list);
+export const setAccessedGroupApplication = async (list: string[]) =>
+  localForage.setItem(`${await getIMUserID()}_accessedGroupApplications`, list);
+export const setUserCustomEmojis = async (list: CustomEmojiItem[]) =>
+  localForage.setItem(`${await getIMUserID()}_customEmojis`, list);
+
 export const setLocale = (locale: string) => localStorage.setItem("IM_LOCALE", locale);
+export const setSendAction = (action: string) =>
+  localStorage.setItem("IM_SEND_ACTION", action);
 
 export const clearIMProfile = () => {
   localForage.removeItem("IM_TOKEN");
@@ -48,8 +58,21 @@ export const getLoginMethod = () =>
 export const getIMToken = async () => await localForage.getItem("IM_TOKEN");
 export const getChatToken = async () => await localForage.getItem("IM_CHAT_TOKEN");
 export const getIMUserID = async () => await localForage.getItem("IM_USERID");
+export const getAccessedFriendApplication = async () =>
+  (await localForage.getItem<string[]>(
+    `${await getIMUserID()}_accessedFriendApplications`,
+  )) ?? [];
+export const getAccessedGroupApplication = async () =>
+  (await localForage.getItem<string[]>(
+    `${await getIMUserID()}_accessedGroupApplications`,
+  )) ?? [];
+export const getUserCustomEmojis = async (): Promise<CustomEmojiItem[]> =>
+  (await localForage.getItem(`${await getIMUserID()}_customEmojis`)) ?? [];
 
 export const getLocale = (): LocaleString =>
   window.electronAPI?.ipcSendSync("getKeyStoreSync", { key: "language" }) ||
   (localStorage.getItem("IM_LOCALE") as LocaleString) ||
-  "zh-CN";
+  window.navigator.language ||
+  "en-US";
+export const getSendAction = () =>
+  (localStorage.getItem("IM_SEND_ACTION") as SendAction) || "enter";

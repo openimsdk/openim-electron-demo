@@ -10,6 +10,7 @@ import FlexibleSider from "@/components/FlexibleSider";
 import { useConversationStore, useUserStore } from "@/store";
 
 import ConversationItemComp from "./ConversationItem";
+import ConversationSkeleton from "./ConversationSkeleton";
 import styles from "./index.module.scss";
 
 const ConnectBar = () => {
@@ -56,15 +57,21 @@ const ConnectBar = () => {
 const ConversationSider = () => {
   const { conversationID } = useParams();
   const conversationList = useConversationStore((state) => state.conversationList);
+  const conversationIniting = useConversationStore(
+    (state) => state.conversationIniting,
+  );
   const getConversationListByReq = useConversationStore(
     (state) => state.getConversationListByReq,
   );
   const virtuoso = useRef<VirtuosoHandle>(null);
   const hasmore = useRef(true);
+  const loading = useRef(false);
 
   const endReached = async () => {
-    if (!hasmore.current) return;
+    if (!hasmore.current || loading.current) return;
+    loading.current = true;
     hasmore.current = await getConversationListByReq(true);
+    loading.current = false;
   };
 
   return (
@@ -80,12 +87,16 @@ const ConversationSider = () => {
           ref={virtuoso}
           endReached={endReached}
           computeItemKey={(_, item) => item.conversationID}
-          itemContent={(_, conversation) => (
-            <ConversationItemComp
-              isActive={conversationID === conversation.conversationID}
-              conversation={conversation}
-            />
-          )}
+          itemContent={(_, conversation) =>
+            conversationIniting ? (
+              <ConversationSkeleton />
+            ) : (
+              <ConversationItemComp
+                isActive={conversationID === conversation.conversationID}
+                conversation={conversation}
+              />
+            )
+          }
         />
       </FlexibleSider>
     </div>

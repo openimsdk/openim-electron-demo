@@ -1,7 +1,7 @@
+@use "./styles/global.scss";
+@use "./styles/antd.scss";
+@use "./styles/svg.scss";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import "./styles/global.scss";
-@import "./styles/antd.scss";
-@import "./styles/svg.scss";

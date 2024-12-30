@@ -10,11 +10,14 @@ import { memo, useCallback, useState } from "react";
 import arrow from "@/assets/images/contact/arrowTopRight.png";
 import OIMAvatar from "@/components/OIMAvatar";
 import { IMSDK } from "@/layout/MainContentWrap";
-import emitter from "@/utils/events";
+import { emit } from "@/utils/events";
 
 type ApplicationItemSource = FriendApplicationItem & GroupApplicationItem;
 
-export type AccessFunction = (source: Partial<ApplicationItemSource>) => Promise<void>;
+export type AccessFunction = (
+  source: Partial<ApplicationItemSource>,
+  isRecv: boolean,
+) => Promise<void>;
 
 const ApplicationItem = ({
   currentUserID,
@@ -36,7 +39,7 @@ const ApplicationItem = ({
     if (isGroup) {
       return t("application.applyToJoin");
     }
-    return t(isRecv ? "application.applyToFriend" : "application.applyToAdd");
+    return isRecv ? t("application.applyToFriend") : t("application.applyToAdd");
   };
 
   const getTitle = () => {
@@ -65,14 +68,14 @@ const ApplicationItem = ({
 
   const loadingWrap = async (isAgree: boolean) => {
     setLoading(true);
-    await (isAgree ? onAccept(source) : onReject(source));
+    await (isAgree ? onAccept(source, isRecv) : onReject(source, isRecv));
     setLoading(false);
   };
 
   const tryShowCard = useCallback(async () => {
     if (isGroup) {
       const { data } = await IMSDK.getSpecifiedGroupsInfo([source.groupID!]);
-      emitter.emit("OPEN_GROUP_CARD", data[0]);
+      emit("OPEN_GROUP_CARD", data[0]);
       return;
     }
     window.userClick(isRecv ? source.fromUserID : source.toUserID);
@@ -85,7 +88,7 @@ const ApplicationItem = ({
           <OIMAvatar
             src={getAvatarUrl()}
             text={getTitle()}
-            isgroup={isGroup}
+            isgroup={isGroup && !isRecv}
             onClick={tryShowCard}
           />
           <div className="ml-3">

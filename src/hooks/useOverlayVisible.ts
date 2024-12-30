@@ -1,4 +1,4 @@
-import { ForwardedRef, useImperativeHandle, useState } from "react";
+import { ForwardedRef, useCallback, useImperativeHandle, useState } from "react";
 
 export interface OverlayVisibleHandle {
   isOverlayOpen: boolean;
@@ -9,12 +9,12 @@ export interface OverlayVisibleHandle {
 export function useOverlayVisible(ref: ForwardedRef<OverlayVisibleHandle>) {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
-  const openOverlay = () => {
+  const openOverlay = useCallback(() => {
     setIsOverlayOpen(true);
-  };
-  const closeOverlay = () => {
+  }, []);
+  const closeOverlay = useCallback(() => {
     setIsOverlayOpen(false);
-  };
+  }, []);
 
   useImperativeHandle(ref, () => ({
     isOverlayOpen,

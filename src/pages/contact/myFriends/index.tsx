@@ -6,7 +6,7 @@ import { GroupedVirtuoso, GroupedVirtuosoHandle } from "react-virtuoso";
 
 import { useContactStore } from "@/store";
 import { formatContactsByWorker } from "@/utils/contactsFormat";
-import emitter from "@/utils/events";
+import { emit } from "@/utils/events";
 
 import AlphabetIndex from "./AlphabetIndex";
 import FriendListItem from "./FriendListItem";
@@ -44,7 +44,7 @@ export const MyFriends = () => {
   );
 
   const showUserCard = useCallback((userID: string) => {
-    emitter.emit("OPEN_USER_CARD", {
+    emit("OPEN_USER_CARD", {
       userID,
     });
   }, []);

@@ -1,10 +1,10 @@
-import { MessageItem } from "@openim/wasm-client-sdk/lib/types/entity";
+import { MessageItem } from "@openim/wasm-client-sdk";
 import { useLatest, useRequest } from "ahooks";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { IMSDK } from "@/layout/MainContentWrap";
-import emitter from "@/utils/events";
+import emitter, { emit, UpdateMessaggeBaseInfoParams } from "@/utils/events";
 
 const START_INDEX = 10000;
 const SPLIT_COUNT = 20;
@@ -13,7 +13,7 @@ export function useHistoryMessageList() {
   const { conversationID } = useParams();
   const [loadState, setLoadState] = useState({
     initLoading: true,
-    hasMore: true,
+    hasMoreOld: true,
     messageList: [] as MessageItem[],
     firstItemIndex: START_INDEX,
   });
@@ -21,12 +21,11 @@ export function useHistoryMessageList() {
   const minSeq = useRef(0);
 
   useEffect(() => {
-    getMoreMessages(false);
+    loadHistoryMessages();
     return () => {
-      cancelLoadMore();
       setLoadState(() => ({
         initLoading: true,
-        hasMore: true,
+        hasMoreOld: true,
         messageList: [] as MessageItem[],
         firstItemIndex: START_INDEX,
       }));
@@ -36,6 +35,13 @@ export function useHistoryMessageList() {
 
   useEffect(() => {
     const pushNewMessage = (message: MessageItem) => {
+      if (
+        latestLoadState.current.messageList.find(
+          (item) => item.clientMsgID === message.clientMsgID,
+        )
+      ) {
+        return;
+      }
       setLoadState((preState) => ({
         ...preState,
         messageList: [...preState.messageList, message],
@@ -45,9 +51,30 @@ export function useHistoryMessageList() {
       setLoadState((preState) => {
         const tmpList = [...preState.messageList];
         const idx = tmpList.findIndex((msg) => msg.clientMsgID === message.clientMsgID);
-        if (idx !== -1) {
-          tmpList[idx] = { ...tmpList[idx], ...message };
+        if (idx < 0) {
+          return preState;
         }
+
+        tmpList[idx] = { ...tmpList[idx], ...message };
+        return {
+          ...preState,
+          messageList: tmpList,
+        };
+      });
+    };
+    const updateMessageNicknameAndFaceUrl = ({
+      sendID,
+      senderNickname,
+      senderFaceUrl,
+    }: UpdateMessaggeBaseInfoParams) => {
+      setLoadState((preState) => {
+        const tmpList = [...preState.messageList].map((message) => {
+          if (message.sendID === sendID) {
+            message.senderFaceUrl = senderFaceUrl;
+            message.senderNickname = senderNickname;
+          }
+          return message;
+        });
         return {
           ...preState,
           messageList: tmpList,
@@ -62,6 +89,7 @@ export function useHistoryMessageList() {
           return preState;
         }
         tmpList.splice(idx, 1);
+
         return {
           ...preState,
           messageList: tmpList,
@@ -71,33 +99,32 @@ export function useHistoryMessageList() {
     const clearMessages = () => {
       setLoadState(() => ({
         initLoading: false,
-        hasMore: true,
+        hasMoreOld: true,
+        hasMoreNew: true,
         messageList: [] as MessageItem[],
         firstItemIndex: START_INDEX,
       }));
       minSeq.current = 0;
     };
-    const loadHistoryMessages = () => getMoreMessages(false);
     emitter.on("PUSH_NEW_MSG", pushNewMessage);
     emitter.on("UPDATE_ONE_MSG", updateOneMessage);
+    emitter.on("UPDATE_MSG_NICK_AND_FACEURL", updateMessageNicknameAndFaceUrl);
     emitter.on("DELETE_ONE_MSG", deleteOnewMessage);
     emitter.on("CLEAR_MSGS", clearMessages);
-    emitter.on("LOAD_HISTORY_MSGS", loadHistoryMessages);
     return () => {
       emitter.off("PUSH_NEW_MSG", pushNewMessage);
       emitter.off("UPDATE_ONE_MSG", updateOneMessage);
+      emitter.off("UPDATE_MSG_NICK_AND_FACEURL", updateMessageNicknameAndFaceUrl);
       emitter.off("DELETE_ONE_MSG", deleteOnewMessage);
       emitter.off("CLEAR_MSGS", clearMessages);
-      emitter.off("LOAD_HISTORY_MSGS", loadHistoryMessages);
     };
   }, []);
 
-  const {
-    loading,
-    runAsync: getMoreMessages,
-    cancel: cancelLoadMore,
-  } = useRequest(
+  const loadHistoryMessages = () => getMoreOldMessages(false);
+
+  const { loading: moreOldLoading, runAsync: getMoreOldMessages } = useRequest(
     async (loadMore = true) => {
+      const reqConversationID = conversationID;
       const { data } = await IMSDK.getAdvancedHistoryMessageList({
         lastMinSeq: minSeq.current,
         count: SPLIT_COUNT,
@@ -105,13 +132,18 @@ export function useHistoryMessageList() {
           ? latestLoadState.current.messageList[0]?.clientMsgID
           : "",
         conversationID: conversationID ?? "",
+        viewType: 0,
       });
-      setLoadState((preState) => ({
-        initLoading: false,
-        hasMore: data.messageList.length !== 0,
-        messageList: [...data.messageList, ...(loadMore ? preState.messageList : [])],
-        firstItemIndex: preState.firstItemIndex - data.messageList.length,
-      }));
+      if (conversationID !== reqConversationID) return;
+      setTimeout(() =>
+        setLoadState((preState) => ({
+          ...preState,
+          initLoading: false,
+          hasMoreOld: !data.isEnd,
+          messageList: [...data.messageList, ...(loadMore ? preState.messageList : [])],
+          firstItemIndex: preState.firstItemIndex - data.messageList.length,
+        })),
+      );
       minSeq.current = data.lastMinSeq;
     },
     {
@@ -124,16 +156,16 @@ export function useHistoryMessageList() {
     loadState,
     latestLoadState,
     conversationID,
-    loading,
-    getMoreMessages,
+    moreOldLoading,
+    getMoreOldMessages,
   };
 }
 
-export const pushNewMessage = (message: MessageItem) =>
-  emitter.emit("PUSH_NEW_MSG", message);
+export const pushNewMessage = (message: MessageItem) => emit("PUSH_NEW_MSG", message);
 export const updateOneMessage = (message: MessageItem) =>
-  emitter.emit("UPDATE_ONE_MSG", message);
+  emit("UPDATE_ONE_MSG", message);
+export const updateMessageNicknameAndFaceUrl = (params: UpdateMessaggeBaseInfoParams) =>
+  emit("UPDATE_MSG_NICK_AND_FACEURL", params);
 export const deleteOneMessage = (clientMsgID: string) =>
-  emitter.emit("DELETE_ONE_MSG", clientMsgID);
-export const clearMessages = () => emitter.emit("CLEAR_MSGS");
-export const loadHistoryMessages = () => emitter.emit("LOAD_HISTORY_MSGS");
+  emit("DELETE_ONE_MSG", clientMsgID);
+export const clearMessages = () => emit("CLEAR_MSGS");

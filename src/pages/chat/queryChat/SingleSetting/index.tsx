@@ -1,4 +1,5 @@
 import { RightOutlined } from "@ant-design/icons";
+import { MessageReceiveOptType } from "@openim/wasm-client-sdk";
 import { Button, Divider, Drawer } from "antd";
 import { t } from "i18next";
 import { forwardRef, ForwardRefRenderFunction, memo } from "react";
@@ -11,14 +12,20 @@ import { OverlayVisibleHandle, useOverlayVisible } from "@/hooks/useOverlayVisib
 import { IMSDK } from "@/layout/MainContentWrap";
 import { useContactStore } from "@/store/contact";
 import { feedbackToast } from "@/utils/common";
-import emitter from "@/utils/events";
+import { emit } from "@/utils/events";
+
+// export interface SingleSettingProps {}
 
 const SingleSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
   _,
   ref,
 ) => {
-  const { currentConversation, updateConversationPin, clearConversationMessages } =
-    useConversationSettings();
+  const {
+    currentConversation,
+    updateConversationPin,
+    updateConversationMessageRemind,
+    clearConversationMessages,
+  } = useConversationSettings();
 
   const isBlack = useContactStore((state) => state.blackList).some(
     (black) => currentConversation?.userID === black.userID,
@@ -76,7 +83,7 @@ const SingleSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
   };
 
   const openUserCard = () => {
-    emitter.emit("OPEN_USER_CARD", { userID: currentConversation?.userID });
+    emit("OPEN_USER_CARD", { userID: currentConversation?.userID });
   };
 
   return (
@@ -113,6 +120,14 @@ const SingleSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
         title={t("placeholder.sticky")}
         value={currentConversation?.isPinned}
         tryChange={updateConversationPin}
+      />
+      <SettingRow
+        className="pb-2"
+        title={t("placeholder.notNotify")}
+        value={currentConversation?.recvMsgOpt === MessageReceiveOptType.NotNotify}
+        tryChange={(checked) =>
+          updateConversationMessageRemind(checked, MessageReceiveOptType.NotNotify)
+        }
       />
       <SettingRow
         title={t("placeholder.moveBlacklist")}

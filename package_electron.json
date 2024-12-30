@@ -1,8 +1,8 @@
 {
-  "name": "OpenIM-Demo",
-  "version": "3.5.1",
+  "name": "OpenCorp-Base",
+  "version": "3.8.2",
   "main": "dist-electron/main/index.js",
-  "description": "OpenIM Electron Demo.",
+  "description": "OpenIM PC Client.",
   "author": "blooming",
   "private": true,
   "debug": {
@@ -12,7 +12,7 @@
   },
   "scripts": {
     "dev": "vite --host",
-    "build": "tsc && vite build && electron-builder",
+    "build": "vite build",
     "preview": "vite preview",
     "build:mac": "vite build  &&  electron-builder --macos --x64",
     "build:mac-arm": "vite build  &&  electron-builder --macos --arm64",
@@ -20,6 +20,7 @@
     "build:win-arm": "vite build  &&  electron-builder --win --arm64",
     "build:linux": "vite build  &&  electron-builder --linux --x64",
     "build:linux-arm": "vite build  &&  electron-builder --linux --arm64",
+    "build:all": "vite build  &&  electron-builder --macos --x64  &&  electron-builder --macos --arm64  &&  electron-builder --win --x64  &&  electron-builder --linux --x64  &&  electron-builder --linux --arm64",
     "pree2e": "vite build --mode=test",
     "e2e": "playwright test",
     "format": "prettier --write .",
@@ -35,8 +36,13 @@
     "*.{json,html,css,scss,xml,md}": ["prettier --write"]
   },
   "dependencies": {
+    "@openim/electron-client-sdk": "^1.0.7",
+    "@openim/wasm-client-sdk": "^3.8.0",
+    "electron-log": "^5.0.0",
+    "electron-screenshots": "^0.5.23",
     "electron-store": "^8.1.0",
+    "adm-zip": "^0.5.10",
     "i18next": "^22.5.0",
-    "i18next-fs-backend": "^2.2.0"
+    "sudo-prompt": "^9.2.1"
   }
 }

@@ -9,7 +9,7 @@ import { clearIMProfile, getLocale, setLocale } from "@/utils/storage";
 
 import { useContactStore } from "./contact";
 import { useConversationStore } from "./conversation";
-import { AppConfig, AppSettings, IMConnectState, UserStore } from "./type";
+import { AppSettings, IMConnectState, UserStore } from "./type";
 
 export const useUserStore = create<UserStore>()((set, get) => ({
   syncState: "success",
@@ -18,7 +18,6 @@ export const useUserStore = create<UserStore>()((set, get) => ({
   isLogining: false,
   connectState: "success",
   selfInfo: {} as BusinessUserInfo,
-  appConfig: {} as AppConfig,
   appSettings: {
     locale: getLocale(),
     closeAction: "miniSize",
@@ -60,13 +59,12 @@ export const useUserStore = create<UserStore>()((set, get) => ({
     }
     set((state) => ({ appSettings: { ...state.appSettings, ...settings } }));
   },
-  userLogout: async (force = false) => {
+  userLogout: async (force?: boolean) => {
     if (!force) await IMSDK.logout();
     clearIMProfile();
-    set({ selfInfo: {} as BusinessUserInfo });
+    set({ selfInfo: {} as BusinessUserInfo, progress: 0 });
     useContactStore.getState().clearContactStore();
     useConversationStore.getState().clearConversationStore();
-    window.electronAPI?.ipcInvoke("updateUnreadCount", 0);
     router.navigate("/login");
   },
 }));

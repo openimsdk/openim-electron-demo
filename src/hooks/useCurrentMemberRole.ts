@@ -1,34 +1,11 @@
 import { GroupMemberRole } from "@openim/wasm-client-sdk";
-import { useEffect, useState } from "react";
 
-import { IMSDK } from "@/layout/MainContentWrap";
 import { useConversationStore } from "@/store";
 
 export function useCurrentMemberRole() {
   const currentMemberInGroup = useConversationStore(
     (state) => state.currentMemberInGroup,
   );
-
-  const [isJoinGroup, setIsJoinGroup] = useState(true);
-
-  useEffect(() => {
-    const groupID = currentMemberInGroup?.groupID;
-    if (!groupID) {
-      setIsJoinGroup(false);
-      return;
-    }
-
-    async function checkGroupMembership() {
-      try {
-        const { data } = await IMSDK.isJoinGroup<boolean>(groupID as string);
-        setIsJoinGroup(data);
-      } catch (error) {
-        setIsJoinGroup(false);
-      }
-    }
-
-    checkGroupMembership();
-  }, [currentMemberInGroup?.groupID]);
 
   const isOwner = currentMemberInGroup?.roleLevel === GroupMemberRole.Owner;
   const isAdmin = currentMemberInGroup?.roleLevel === GroupMemberRole.Admin;
@@ -40,7 +17,7 @@ export function useCurrentMemberRole() {
     isOwner,
     isAdmin,
     isNomal,
-    isJoinGroup,
+    isJoinGroup: Boolean(currentMemberInGroup?.userID),
     currentRolevel,
     currentIsMuted,
     currentMemberInGroup,

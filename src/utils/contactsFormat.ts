@@ -524,12 +524,15 @@ const workerFunction = () => {
   self.onmessage = (e) => self.postMessage(formatContacts(e.data));
 };
 
+// 将函数转换为字符串，并创建一个Blob
 const blob = new Blob(["(" + workerFunction + ")()"], {
   type: "application/javascript",
 });
 
+// 创建一个指向该Blob的URL
 const workerUrl = URL.createObjectURL(blob);
 
+// 使用这个URL创建一个新的Web Worker
 const worker = new Worker(workerUrl);
 
 type ContactsData = {

@@ -33,6 +33,8 @@ export const feedbackToast = (config?: FeedbackToastParams) => {
   }
 };
 
+export const canSendImageTypeList = ["png", "jpg", "jpeg", "gif", "bmp", "webp"];
+
 export const bytesToSize = (bytes: number) => {
   if (bytes === 0) return "0 B";
   const k = 1024,
@@ -76,11 +78,11 @@ export const secondsToTime = (seconds: number) => {
 };
 
 export const secondsToMS = (duration: number) => {
-  let minutes = Math.floor(duration / 60).toString();
+  let minutes = Math.floor(duration / 60) % 60;
   let seconds = (duration % 60).toString();
-  minutes = minutes.length === 1 ? "0" + minutes : minutes;
+  minutes = minutes.toString().padStart(2, "0") as unknown as number;
   seconds = seconds.length === 1 ? "0" + seconds : seconds;
-  return minutes + ":" + seconds;
+  return `${minutes}:${seconds}`;
 };
 
 export const filterEmptyValue = (obj: Record<string, unknown>) => {
@@ -94,6 +96,17 @@ export const filterEmptyValue = (obj: Record<string, unknown>) => {
 export const checkIsSafari = () =>
   /^((?!chrome|android).)*safari/i.test(navigator.userAgent) &&
   /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+export const downloadFile = async (originUrl: string) => {
+  const linkNode = document.createElement("a");
+  linkNode.style.display = "none";
+  const idx = originUrl.lastIndexOf("/");
+  linkNode.download = originUrl.slice(idx + 1);
+  linkNode.href = originUrl;
+  document.body.appendChild(linkNode);
+  linkNode.click();
+  document.body.removeChild(linkNode);
+};
 
 export const base64toFile = (base64Str: string) => {
   var arr = base64Str.split(","),
@@ -111,7 +124,22 @@ export const base64toFile = (base64Str: string) => {
   });
 };
 
+export const fileToBase64 = (file: File): Promise<string> =>
+  new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = function (evt) {
+      const base64 = evt.target?.result;
+      resolve(base64 as string);
+    };
+    reader.readAsDataURL(file);
+  });
+
 export const formatBr = (str: string) => str.replace(/\n/g, "<br>");
+
+export const getFileType = (name: string) => {
+  const idx = name.lastIndexOf(".");
+  return name.slice(idx + 1);
+};
 
 export const generateAvatar = (str: string, size = 40) => {
   str = !str ? t("placeholder.unknown") : str.split("")[0];

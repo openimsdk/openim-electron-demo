@@ -1,5 +1,7 @@
+import { ApplicationHandleResult } from "@openim/wasm-client-sdk";
 import { FriendApplicationItem } from "@openim/wasm-client-sdk/lib/types/entity";
-import { useCallback } from "react";
+import { useDeepCompareEffect } from "ahooks";
+import { useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Virtuoso } from "react-virtuoso";
 
@@ -8,6 +10,8 @@ import { IMSDK } from "@/layout/MainContentWrap";
 import { useUserStore } from "@/store";
 import { useContactStore } from "@/store/contact";
 import { feedbackToast } from "@/utils/common";
+import { calcApplicationBadge } from "@/utils/imCommon";
+import { setAccessedFriendApplication } from "@/utils/storage";
 
 export const NewFriends = () => {
   const { t } = useTranslation();
@@ -19,32 +23,72 @@ export const NewFriends = () => {
   const sendFriendApplicationList = useContactStore(
     (state) => state.sendFriendApplicationList,
   );
+  const updateRecvFriendApplication = useContactStore(
+    (state) => state.updateRecvFriendApplication,
+  );
+  const updateSendFriendApplication = useContactStore(
+    (state) => state.updateSendFriendApplication,
+  );
 
   const friendApplicationList = sortArray(
     recvFriendApplicationList.concat(sendFriendApplicationList),
   );
 
-  const onAccept = useCallback(async (application: FriendApplicationItem) => {
-    try {
-      await IMSDK.acceptFriendApplication({
-        toUserID: application.fromUserID,
-        handleMsg: "",
-      });
-    } catch (error) {
-      feedbackToast({ error });
-    }
-  }, []);
+  useDeepCompareEffect(() => {
+    const accessedFriendApplications = [...recvFriendApplicationList]
+      .filter(
+        (application) =>
+          application.handleResult === ApplicationHandleResult.Unprocessed,
+      )
+      .map((application) => `${application.fromUserID}_${application.createTime}`);
+    setAccessedFriendApplication(accessedFriendApplications).then(calcApplicationBadge);
+  }, [recvFriendApplicationList]);
 
-  const onReject = useCallback(async (application: FriendApplicationItem) => {
-    try {
-      await IMSDK.refuseFriendApplication({
-        toUserID: application.fromUserID,
-        handleMsg: "",
-      });
-    } catch (error) {
-      feedbackToast({ error });
-    }
-  }, []);
+  const onAccept = useCallback(
+    async (application: FriendApplicationItem, isRecv: boolean) => {
+      try {
+        await IMSDK.acceptFriendApplication({
+          toUserID: application.fromUserID,
+          handleMsg: "",
+        });
+        const newApplication = {
+          ...application,
+          handleResult: ApplicationHandleResult.Agree,
+        };
+        if (isRecv) {
+          updateRecvFriendApplication(newApplication);
+        } else {
+          updateSendFriendApplication(newApplication);
+        }
+      } catch (error) {
+        feedbackToast({ error });
+      }
+    },
+    [],
+  );
+
+  const onReject = useCallback(
+    async (application: FriendApplicationItem, isRecv: boolean) => {
+      try {
+        await IMSDK.refuseFriendApplication({
+          toUserID: application.fromUserID,
+          handleMsg: "",
+        });
+        const newApplication = {
+          ...application,
+          handleResult: ApplicationHandleResult.Reject,
+        };
+        if (isRecv) {
+          updateRecvFriendApplication(newApplication);
+        } else {
+          updateSendFriendApplication(newApplication);
+        }
+      } catch (error) {
+        feedbackToast({ error });
+      }
+    },
+    [],
+  );
 
   return (
     <div className="flex h-full w-full flex-col bg-white">
@@ -72,14 +116,12 @@ export const NewFriends = () => {
 
 const sortArray = (list: FriendApplicationItem[]) => {
   list.sort((a, b) => {
-    if (a.handleResult === 0 && b.handleResult === 0) {
-      return b.createTime - a.createTime;
-    } else if (a.handleResult === 0) {
+    if (a.handleResult === 0 && b.handleResult !== 0) {
       return -1;
-    } else if (b.handleResult === 0) {
+    } else if (b.handleResult === 0 && a.handleResult !== 0) {
       return 1;
     }
-    return 0;
+    return b.createTime - a.createTime;
   });
   return list;
 };

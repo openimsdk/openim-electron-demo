@@ -1,8 +1,8 @@
-import { MessageItem } from "@openim/wasm-client-sdk/lib/types/entity";
+import { MessageItem } from "@openim/wasm-client-sdk";
 import { v4 as uuidV4 } from "uuid";
 
 import { IMSDK } from "@/layout/MainContentWrap";
-import { base64toFile } from "@/utils/common";
+import { base64toFile, canSendImageTypeList } from "@/utils/common";
 
 export interface FileWithPath extends File {
   path?: string;
@@ -19,6 +19,13 @@ export function useFileMessage() {
       height,
       url: URL.createObjectURL(file),
     };
+
+    if (window.electronAPI) {
+      const imageMessage = (await IMSDK.createImageMessageFromFullPath(file.path!))
+        .data;
+      imageMessage.pictureElem!.sourcePicture.url = baseInfo.url;
+      return imageMessage;
+    }
     const options = {
       sourcePicture: baseInfo,
       bigPicture: baseInfo,
@@ -32,6 +39,25 @@ export function useFileMessage() {
 
   const getVideoMessage = async (file: FileWithPath, snapShotFile: FileWithPath) => {
     const { width, height } = await getPicInfo(snapShotFile);
+
+    if (window.electronAPI) {
+      const snapshotPath =
+        (await window.electronAPI?.saveFileToDisk({
+          sync: true,
+          file: snapShotFile,
+        })) || `/${snapShotFile.name}`;
+
+      const videoMessage = (
+        await IMSDK.createVideoMessageFromFullPath({
+          videoPath: file.path!,
+          snapshotPath,
+          videoType: file.type,
+          duration: await getMediaDuration(URL.createObjectURL(file)),
+        })
+      ).data;
+      videoMessage.videoElem!.snapshotUrl = URL.createObjectURL(snapShotFile);
+      return videoMessage;
+    }
     const options = {
       videoFile: file,
       snapshotFile: snapShotFile,
@@ -52,15 +78,43 @@ export function useFileMessage() {
     return (await IMSDK.createVideoMessageByFile(options)).data;
   };
 
-  const createImageOrVideoMessage = async (
-    file: FileWithPath,
-  ): Promise<MessageItem> => {
-    const isImage = file.type.includes("image");
+  const getFileMessage = async (file: FileWithPath) => {
+    if (window.electronAPI) {
+      return (
+        await IMSDK.createFileMessageFromFullPath({
+          filePath: file.path!,
+          fileName: file.name,
+        })
+      ).data;
+    }
+    const options = {
+      file,
+      filePath: "",
+      fileName: file.name,
+      uuid: uuidV4(),
+      sourceUrl: "",
+      fileSize: file.size,
+      fileType: file.type,
+    };
+    return (await IMSDK.createFileMessageByFile(options)).data;
+  };
+
+  const createFileMessage = async (file: FileWithPath): Promise<MessageItem> => {
+    const isImage = canSendImageTypeList.includes(getFileType(file.name));
+    const isVideo = file.type.includes(window.electronAPI ? "video" : "mp4");
     if (isImage) {
       return await getImageMessage(file);
     }
-    const snapShotFile = await getVideoSnshotFile(file);
-    return await getVideoMessage(file, snapShotFile);
+    if (isVideo) {
+      const snapShotFile = await getVideoSnshotFile(file);
+      return await getVideoMessage(file, snapShotFile);
+    }
+    return await getFileMessage(file);
+  };
+
+  const getFileType = (name: string) => {
+    const idx = name.lastIndexOf(".");
+    return name.slice(idx + 1);
   };
 
   const getPicInfo = (file: File): Promise<HTMLImageElement> =>
@@ -113,7 +167,8 @@ export function useFileMessage() {
   return {
     getImageMessage,
     getVideoMessage,
+    getFileMessage,
+    createFileMessage,
     getVideoSnshotFile,
-    createImageOrVideoMessage,
   };
 }

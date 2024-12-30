@@ -1,10 +1,9 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { getChatUrl } from "@/config";
 import createAxiosInstance from "@/utils/request";
 import { getChatToken } from "@/utils/storage";
 
-const request = createAxiosInstance(getChatUrl());
+const request = createAxiosInstance(import.meta.env.VITE_CHAT_URL as string);
 
 export const getRtcConnectData = async (room: string, identity: string) => {
   const token = (await getChatToken()) as string;

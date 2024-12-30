@@ -1,0 +1,46 @@
+.notice-card {
+  @apply absolute -bottom-6 left-1/2 z-10 -translate-x-1/2 translate-y-full rounded-lg border border-[var(--gap-text)] bg-white px-4 py-3 leading-none;
+  width: 60%;
+  max-width: 380px;
+  box-shadow: 6px 6px 12px 1px rgba(81, 94, 112, 0.05);
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+.calling-card {
+  @apply absolute -bottom-6 right-3 z-10 translate-y-full rounded-lg bg-[#F2F8FF] px-3 py-3 leading-none;
+  width: 240px;
+  max-width: 240px;
+}
+
+.can-expanded-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  max-height: 0;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.dot-1,
+.dot-2,
+.dot-3 {
+  animation-name: blink;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-timing-function: ease-in-out;
+  display: inline-block;
+}
+
+.dot-2 {
+  animation-delay: 0.8s;
+}
+
+.dot-3 {
+  animation-delay: 1.4s;
+}

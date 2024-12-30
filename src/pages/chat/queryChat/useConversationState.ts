@@ -1,8 +1,9 @@
 import { useLatest, useThrottleFn, useUpdateEffect } from "ahooks";
 import { useEffect } from "react";
 
+import { useCurrentMemberRole } from "@/hooks/useCurrentMemberRole";
 import { IMSDK } from "@/layout/MainContentWrap";
-import { useConversationStore, useUserStore } from "@/store";
+import { useContactStore, useConversationStore, useUserStore } from "@/store";
 
 export default function useConversationState() {
   const syncState = useUserStore((state) => state.syncState);
@@ -11,6 +12,14 @@ export default function useConversationState() {
     (state) => state.currentConversation,
   );
   const latestCurrentConversation = useLatest(currentConversation);
+  const isBlackUser = useContactStore(
+    (state) =>
+      state.blackList.findIndex(
+        (user) => user.userID === currentConversation?.userID,
+      ) !== -1,
+  );
+
+  const { isJoinGroup, isNomal } = useCurrentMemberRole();
 
   useUpdateEffect(() => {
     if (syncState !== "loading") {
@@ -20,7 +29,7 @@ export default function useConversationState() {
 
   useUpdateEffect(() => {
     throttleCheckConversationState();
-  }, [currentConversation?.groupAtType, currentConversation?.unreadCount]);
+  }, [currentConversation?.unreadCount]);
 
   useEffect(() => {
     checkConversationState();
@@ -52,6 +61,24 @@ export default function useConversationState() {
 
   const { run: throttleCheckConversationState } = useThrottleFn(
     checkConversationState,
-    { wait: 2000 },
+    { wait: 2000, leading: false },
   );
+
+  const getIsCanSendMessage = () => {
+    if (currentConversation?.userID) {
+      return !isBlackUser;
+    }
+
+    if (!isJoinGroup) {
+      return false;
+    }
+
+    return true;
+  };
+
+  return {
+    getIsCanSendMessage,
+    isBlackUser,
+    currentConversation,
+  };
 }

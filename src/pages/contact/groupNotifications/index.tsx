@@ -1,4 +1,6 @@
+import { ApplicationHandleResult } from "@openim/wasm-client-sdk";
 import { GroupApplicationItem } from "@openim/wasm-client-sdk/lib/types/entity";
+import { useDeepCompareEffect } from "ahooks";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Virtuoso } from "react-virtuoso";
@@ -8,6 +10,8 @@ import { IMSDK } from "@/layout/MainContentWrap";
 import { useUserStore } from "@/store";
 import { useContactStore } from "@/store/contact";
 import { feedbackToast } from "@/utils/common";
+import { calcApplicationBadge } from "@/utils/imCommon";
+import { setAccessedGroupApplication } from "@/utils/storage";
 
 export const GroupNotifications = () => {
   const { t } = useTranslation();
@@ -19,34 +23,74 @@ export const GroupNotifications = () => {
   const sendGroupApplicationList = useContactStore(
     (state) => state.sendGroupApplicationList,
   );
+  const updateRecvGroupApplication = useContactStore(
+    (state) => state.updateRecvGroupApplication,
+  );
+  const updateSendGroupApplication = useContactStore(
+    (state) => state.updateSendGroupApplication,
+  );
 
   const groupApplicationList = sortArray(
     recvGroupApplicationList.concat(sendGroupApplicationList),
   );
 
-  const onAccept = useCallback(async (application: GroupApplicationItem) => {
-    try {
-      await IMSDK.acceptGroupApplication({
-        groupID: application.groupID,
-        fromUserID: application.userID,
-        handleMsg: "",
-      });
-    } catch (error) {
-      feedbackToast({ error });
-    }
-  }, []);
+  useDeepCompareEffect(() => {
+    const accessedGroupApplications = recvGroupApplicationList
+      .filter(
+        (application) =>
+          application.handleResult === ApplicationHandleResult.Unprocessed,
+      )
+      .map((application) => `${application.userID}_${application.reqTime}`);
+    setAccessedGroupApplication(accessedGroupApplications).then(calcApplicationBadge);
+  }, [recvGroupApplicationList]);
 
-  const onReject = useCallback(async (application: GroupApplicationItem) => {
-    try {
-      await IMSDK.refuseGroupApplication({
-        groupID: application.groupID,
-        fromUserID: application.userID,
-        handleMsg: "",
-      });
-    } catch (error) {
-      feedbackToast({ error });
-    }
-  }, []);
+  const onAccept = useCallback(
+    async (application: GroupApplicationItem, isRecv: boolean) => {
+      try {
+        await IMSDK.acceptGroupApplication({
+          groupID: application.groupID,
+          fromUserID: application.userID,
+          handleMsg: "",
+        });
+        const newApplication = {
+          ...application,
+          handleResult: ApplicationHandleResult.Agree,
+        };
+        if (isRecv) {
+          updateRecvGroupApplication(newApplication);
+        } else {
+          updateSendGroupApplication(newApplication);
+        }
+      } catch (error) {
+        feedbackToast({ error });
+      }
+    },
+    [],
+  );
+
+  const onReject = useCallback(
+    async (application: GroupApplicationItem, isRecv: boolean) => {
+      try {
+        await IMSDK.refuseGroupApplication({
+          groupID: application.groupID,
+          fromUserID: application.userID,
+          handleMsg: "",
+        });
+        const newApplication = {
+          ...application,
+          handleResult: ApplicationHandleResult.Reject,
+        };
+        if (isRecv) {
+          updateRecvGroupApplication(newApplication);
+        } else {
+          updateSendGroupApplication(newApplication);
+        }
+      } catch (error) {
+        feedbackToast({ error });
+      }
+    },
+    [],
+  );
 
   return (
     <div className="flex h-full w-full flex-col bg-white">
@@ -74,14 +118,12 @@ export const GroupNotifications = () => {
 
 const sortArray = (list: GroupApplicationItem[]) => {
   list.sort((a, b) => {
-    if (a.handleResult === 0 && b.handleResult === 0) {
-      return b.reqTime - a.reqTime;
-    } else if (a.handleResult === 0) {
+    if (a.handleResult === 0 && b.handleResult !== 0) {
       return -1;
-    } else if (b.handleResult === 0) {
+    } else if (b.handleResult === 0 && a.handleResult !== 0) {
       return 1;
     }
-    return 0;
+    return b.reqTime - a.reqTime;
   });
   return list;
 };

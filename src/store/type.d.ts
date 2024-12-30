@@ -8,12 +8,9 @@ import {
   GroupItem,
   GroupMemberItem,
   MessageItem,
-  SelfUserInfo,
 } from "@openim/wasm-client-sdk/lib/types/entity";
 
 import { BusinessUserInfo } from "@/api/login";
-
-import { ExMessageItem } from "./message";
 
 export type IMConnectState = "success" | "loading" | "failed";
 
@@ -36,13 +33,6 @@ export interface UserStore {
   userLogout: (force?: boolean) => Promise<void>;
 }
 
-export interface AppConfig {
-  discoverPageURL: string;
-  ordinaryUserAddFriend: number;
-  allowSendMsgNotFriend: number;
-  needInvitationCodeRegister: number;
-}
-
 export interface AppSettings {
   locale: LocaleString;
   closeAction: "miniSize" | "quit";
@@ -53,30 +43,35 @@ export type LocaleString = "zh-CN" | "en-US";
 export type ConversationListUpdateType = "push" | "filter";
 
 export interface ConversationStore {
+  conversationIniting: boolean;
   conversationList: ConversationItem[];
   currentConversation?: ConversationItem;
   unReadCount: number;
   currentGroupInfo?: GroupItem;
   currentMemberInGroup?: GroupMemberItem;
-  getConversationListByReq: (isOffset?: boolean) => Promise<boolean>;
+  getConversationListByReq: (
+    isOffset?: boolean,
+    forceLoadin?: boolean,
+  ) => Promise<boolean>;
   updateConversationList: (
     list: ConversationItem[],
     type: ConversationListUpdateType,
   ) => void;
   delConversationByCID: (conversationID: string) => void;
-  updateCurrentConversation: (conversation?: ConversationItem) => void;
+  // getCurrentConversationByReq: (conversationID?: string) => Promise<void>;
+  updateCurrentConversation: (
+    conversation?: ConversationItem,
+    isJump?: boolean,
+  ) => Promise<void>;
+  updateCurrentConversationFields: (fields: Partial<ConversationItem>) => void;
   getUnReadCountByReq: () => Promise<number>;
   updateUnReadCount: (count: number) => void;
   getCurrentGroupInfoByReq: (groupID: string) => Promise<void>;
   updateCurrentGroupInfo: (groupInfo: GroupItem) => void;
   getCurrentMemberInGroupByReq: (groupID: string) => Promise<void>;
+  setCurrentMemberInGroup: (memberInfo?: GroupMemberItem) => void;
   tryUpdateCurrentMemberInGroup: (member: GroupMemberItem) => void;
   clearConversationStore: () => void;
-}
-
-export interface GetMessageReverseParams {
-  message: ExMessageItem;
-  conversationID: string;
 }
 
 export interface ContactStore {
@@ -101,11 +96,11 @@ export interface ContactStore {
   updateGroup: (group: GroupItem, remove?: boolean) => void;
   pushNewGroup: (group: GroupItem) => void;
   getRecvFriendApplicationListByReq: () => Promise<void>;
-  updateRecvFriendApplication: (application: FriendApplicationItem) => void;
+  updateRecvFriendApplication: (application: FriendApplicationItem) => Promise<void>;
   getSendFriendApplicationListByReq: () => Promise<void>;
   updateSendFriendApplication: (application: FriendApplicationItem) => void;
   getRecvGroupApplicationListByReq: () => Promise<void>;
-  updateRecvGroupApplication: (application: GroupApplicationItem) => void;
+  updateRecvGroupApplication: (application: GroupApplicationItem) => Promise<void>;
   getSendGroupApplicationListByReq: () => Promise<void>;
   updateSendGroupApplication: (application: GroupApplicationItem) => void;
   updateUnHandleFriendApplicationCount: (num: number) => void;

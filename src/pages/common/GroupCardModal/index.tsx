@@ -1,9 +1,5 @@
 import { LeftOutlined } from "@ant-design/icons";
-import {
-  GroupJoinSource,
-  GroupVerificationType,
-  SessionType,
-} from "@openim/wasm-client-sdk";
+import { GroupJoinSource, SessionType } from "@openim/wasm-client-sdk";
 import { GroupItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import { useRequest } from "ahooks";
 import { Button, Input } from "antd";
@@ -19,11 +15,10 @@ import { useConversationToggle } from "@/hooks/useConversationToggle";
 import useGroupMembers from "@/hooks/useGroupMembers";
 import { OverlayVisibleHandle, useOverlayVisible } from "@/hooks/useOverlayVisible";
 import { IMSDK } from "@/layout/MainContentWrap";
-import { getDefaultAvatar } from "@/utils/avatar";
 import { feedbackToast } from "@/utils/common";
 
 interface IGroupCardModalProps {
-  groupData?: GroupItem;
+  groupData?: GroupItem & { inGroup?: boolean };
 }
 
 const GroupCardModal: ForwardRefRenderFunction<
@@ -51,32 +46,20 @@ const GroupCardModal: ForwardRefRenderFunction<
   }, [isOverlayOpen]);
 
   const createTimeStr = dayjs(groupData?.createTime ?? 0).format("YYYY/M/D");
-  const inThisGroup = fetchState.groupMemberList.length > 0;
 
   const sliceNum = groupData?.memberCount === 8 ? 8 : 7;
-  const renderList = inThisGroup
-    ? fetchState.groupMemberList.slice(0, sliceNum)
-    : new Array(sliceNum).fill(1).map((_, idx) => ({
-        userID: idx,
-        nickname: "",
-        faceURL: getDefaultAvatar(`ic_avatar_0${idx === 6 ? 1 : idx + 1}`),
-      }));
+  const renderList = fetchState.groupMemberList.slice(0, sliceNum);
 
-  const joinOrSendMessage = async () => {
-    if (inThisGroup) {
+  const joinOrSendMessage = () => {
+    if (groupData?.inGroup) {
       toSpecifiedConversation({
-        sourceID: groupData!.groupID,
+        sourceID: groupData.groupID,
         sessionType: SessionType.WorkingGroup,
       });
       closeOverlay();
       return;
     }
 
-    if (groupData?.needVerification === GroupVerificationType.AllNot) {
-      await sendApplication();
-      closeOverlay();
-      return;
-    }
     setIsSendRequest(true);
   };
 
@@ -171,11 +154,9 @@ const GroupCardModal: ForwardRefRenderFunction<
           </div>
         ) : (
           <div className="bg-[#F2F8FF] p-5.5">
-            {inThisGroup && (
-              <div className="mb-3">{`${t("placeholder.groupMember")}：${
-                groupData?.memberCount
-              }`}</div>
-            )}
+            <div className="mb-3">{`${t("placeholder.groupMember")}：${
+              groupData?.memberCount
+            }`}</div>
             <div className="flex items-center">
               {renderList.map((item) => (
                 <OIMAvatar
@@ -194,7 +175,9 @@ const GroupCardModal: ForwardRefRenderFunction<
                 loading={loading}
                 onClick={joinOrSendMessage}
               >
-                {inThisGroup ? t("placeholder.sendMessage") : t("placeholder.addGroup")}
+                {groupData?.inGroup
+                  ? t("placeholder.sendMessage")
+                  : t("placeholder.addGroup")}
               </Button>
             </div>
           </div>

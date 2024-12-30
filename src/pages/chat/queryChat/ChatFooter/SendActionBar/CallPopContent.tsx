@@ -22,20 +22,14 @@ const callList = [
   },
 ];
 
-const CallPopContent = ({
-  userInfo,
-  closeAllPop,
-}: {
-  userInfo?: PublicUserItem;
-  closeAllPop?: () => void;
-}) => {
+const CallPopContent = ({ closeAllPop }: { closeAllPop?: () => void }) => {
   const prepareCall = (idx: number) => {
     const conversation = useConversationStore.getState().currentConversation!;
     const mediaType = idx ? "audio" : "video";
     emitter.emit("OPEN_RTC_MODAL", {
       invitation: {
         inviterUserID: useUserStore.getState().selfInfo.userID,
-        inviteeUserIDList: [userInfo?.userID ?? conversation.userID],
+        inviteeUserIDList: [conversation.userID],
         groupID: "",
         roomID: uuidV4(),
         timeout: 60,

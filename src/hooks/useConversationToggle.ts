@@ -7,6 +7,13 @@ import { IMSDK } from "@/layout/MainContentWrap";
 import { useConversationStore } from "@/store";
 import { feedbackToast } from "@/utils/common";
 
+export type ToSpecifiedConversationParams = {
+  sourceID: string;
+  sessionType: SessionType;
+  isJump?: boolean;
+  isChildWindow?: boolean;
+};
+
 export function useConversationToggle() {
   const navigate = useNavigate();
   const updateCurrentConversation = useConversationStore(
@@ -41,21 +48,16 @@ export function useConversationToggle() {
   };
 
   const toSpecifiedConversation = useCallback(
-    async (
-      data: {
-        sourceID: string;
-        sessionType: SessionType;
-      },
-      isJump?: boolean,
-    ) => {
-      const conversation = await getConversation(data);
+    async (params: ToSpecifiedConversationParams) => {
+      const { sourceID, sessionType, isJump } = params;
+      const conversation = await getConversation({ sourceID, sessionType });
       if (
         !conversation ||
         useConversationStore.getState().currentConversation?.conversationID ===
           conversation.conversationID
       )
         return;
-      updateCurrentConversation({ ...conversation });
+      await updateCurrentConversation({ ...conversation }, isJump);
       navigate(`/chat/${conversation.conversationID}`);
     },
     [],

@@ -48,6 +48,24 @@
   }
 }
 
+.animate-container {
+  // background-color: var(--primary-active);
+  animation: animate 2s ease-in-out;
+}
+@keyframes animate {
+  from {
+    background-color: var(--primary-active);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+.card-shadow {
+  @apply w-60 cursor-pointer overflow-hidden rounded-md shadow-md;
+  box-shadow: 3px 3px 8px 1px rgba(81, 94, 112, 0.1);
+}
+
 .bubble {
   word-wrap: break-word;
   word-break: break-word;

@@ -1,4 +1,4 @@
-import { MessageItem } from "@openim/wasm-client-sdk/lib/types/entity";
+import { MessageItem } from "@openim/wasm-client-sdk";
 import { Popover, PopoverProps, Upload } from "antd";
 import { TooltipPlacement } from "antd/es/tooltip";
 import clsx from "clsx";
@@ -8,11 +8,14 @@ import { memo, ReactNode, useCallback, useState } from "react";
 import React from "react";
 
 import { message as antdMessage } from "@/AntdGlobalComp";
+import card from "@/assets/images/chatFooter/card.png";
 import emoji from "@/assets/images/chatFooter/emoji.png";
+import file from "@/assets/images/chatFooter/file.png";
 import image from "@/assets/images/chatFooter/image.png";
 import rtc from "@/assets/images/chatFooter/rtc.png";
 import video from "@/assets/images/chatFooter/video.png";
 import { EmojiData } from "@/components/CKEditor";
+import { emit } from "@/utils/events";
 
 import { SendMessageParams } from "../useSendMessage";
 import CallPopContent from "./CallPopContent";
@@ -44,6 +47,22 @@ const sendActionList = [
     placement: undefined,
   },
   {
+    title: t("placeholder.card"),
+    icon: card,
+    key: "card",
+    accept: undefined,
+    comp: null,
+    placement: undefined,
+  },
+  {
+    title: t("placeholder.file"),
+    icon: file,
+    key: "file",
+    accept: "*",
+    comp: null,
+    placement: undefined,
+  },
+  {
     title: t("placeholder.call"),
     icon: rtc,
     key: "rtc",
@@ -57,27 +76,38 @@ i18n.on("languageChanged", () => {
   sendActionList[0].title = t("placeholder.emoji");
   sendActionList[1].title = t("placeholder.image");
   sendActionList[2].title = t("placeholder.video");
-  sendActionList[3].title = t("placeholder.call");
+  sendActionList[3].title = t("placeholder.card");
+  sendActionList[4].title = t("placeholder.file");
+  sendActionList[5].title = t("placeholder.call");
 });
 
 const SendActionBar = ({
   sendEmoji,
   sendMessage,
-  createImageOrVideoMessage,
+  createFileMessage,
 }: {
   sendEmoji: (emoji: EmojiData) => void;
   sendMessage: (params: SendMessageParams) => Promise<void>;
-  createImageOrVideoMessage: (file: File) => Promise<MessageItem>;
+  createFileMessage: (file: File) => Promise<MessageItem>;
 }) => {
   const [visibleState, setVisibleState] = useState({
-    rtc: false,
     emoji: false,
+    cut: false,
+    rtc: false,
   });
 
   const closeAllPop = useCallback(
-    () => setVisibleState({ rtc: false, emoji: false }),
+    () => setVisibleState({ cut: false, rtc: false, emoji: false }),
     [],
   );
+
+  const actionClick = (key: string) => {
+    if (key === "card") {
+      emit("OPEN_CHOOSE_MODAL", {
+        type: "SELECT_CARD",
+      });
+    }
+  };
 
   const fileHandle = async (options: UploadRequestOption) => {
     const fileEl = options.file as File;
@@ -85,7 +115,7 @@ const SendActionBar = ({
       antdMessage.warning(t("empty.fileContentEmpty"));
       return;
     }
-    const message = await createImageOrVideoMessage(fileEl);
+    const message = await createFileMessage(fileEl);
     sendMessage({
       message,
     });
@@ -127,6 +157,7 @@ const SendActionBar = ({
               className={clsx("flex cursor-pointer items-center last:mr-0", {
                 "mr-5": !action.accept,
               })}
+              onClick={() => actionClick(action.key)}
             >
               <img src={action.icon} width={20} alt={action.title} />
             </div>

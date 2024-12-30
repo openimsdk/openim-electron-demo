@@ -19,10 +19,12 @@ import WindowControlBar from "@/components/WindowControlBar";
 import { CustomType } from "@/constants";
 import { OverlayVisibleHandle } from "@/hooks/useOverlayVisible";
 import ChooseModal, { ChooseModalState } from "@/pages/common/ChooseModal";
+import GlobalSearchModal from "@/pages/common/GlobalSearchModal";
 import GroupCardModal from "@/pages/common/GroupCardModal";
 import RtcCallModal from "@/pages/common/RtcCallModal";
 import { InviteData } from "@/pages/common/RtcCallModal/data";
 import UserCardModal, { CardInfo } from "@/pages/common/UserCardModal";
+import { useContactStore } from "@/store";
 import emitter, { OpenUserCardParams } from "@/utils/events";
 
 import { IMSDK } from "../MainContentWrap";
@@ -37,12 +39,15 @@ const TopSearchBar = () => {
   const groupCardRef = useRef<OverlayVisibleHandle>(null);
   const chooseModalRef = useRef<OverlayVisibleHandle>(null);
   const searchModalRef = useRef<OverlayVisibleHandle>(null);
+  const globalSearchModalRef = useRef<OverlayVisibleHandle>(null);
   const rtcRef = useRef<OverlayVisibleHandle>(null);
   const [chooseModalState, setChooseModalState] = useState<ChooseModalState>({
     type: "CRATE_GROUP",
   });
   const [userCardState, setUserCardState] = useState<UserCardState>();
-  const [groupCardData, setGroupCardData] = useState<GroupItem>();
+  const [groupCardData, setGroupCardData] = useState<
+    GroupItem & { inGroup?: boolean }
+  >();
   const [actionVisible, setActionVisible] = useState(false);
   const [isSearchGroup, setIsSearchGroup] = useState(false);
   const [inviteData, setInviteData] = useState<InviteData>({} as InviteData);
@@ -116,8 +121,6 @@ const TopSearchBar = () => {
         setChooseModalState({ type: "CRATE_GROUP" });
         chooseModalRef.current?.openOverlay();
         break;
-      case 3:
-        break;
       default:
         break;
     }
@@ -132,14 +135,25 @@ const TopSearchBar = () => {
 
   const openGroupCardWithData = useCallback((group: GroupItem) => {
     searchModalRef.current?.closeOverlay();
-    setGroupCardData(group);
+    const inGroup = useContactStore
+      .getState()
+      .groupList.some((g) => g.groupID === group.groupID);
+    setGroupCardData({ ...group, inGroup });
     groupCardRef.current?.openOverlay();
   }, []);
+
+  const openGlobalSearchModal = () => {
+    if (globalSearchModalRef.current?.isOverlayOpen) return;
+    globalSearchModalRef.current?.openOverlay();
+  };
 
   return (
     <div className="no-mobile app-drag flex h-10 min-h-[40px] items-center bg-[var(--top-search-bar)] dark:bg-[#141414]">
       <div className="flex w-full items-center justify-center">
-        <div className="app-no-drag flex h-[26px] w-1/3 cursor-pointer items-center justify-center rounded-md bg-[rgba(255,255,255,0.2)]">
+        <div
+          className="app-no-drag flex h-[26px] w-1/3 cursor-pointer items-center justify-center rounded-md bg-[rgba(255,255,255,0.2)]"
+          onClick={() => openGlobalSearchModal()}
+        >
           <img width={16} src={search} alt="" />
           <span className="ml-2 text-[#D2E3F8]">{t("placeholder.search")}</span>
         </div>
@@ -170,7 +184,8 @@ const TopSearchBar = () => {
         openUserCardWithData={openUserCardWithData}
         openGroupCardWithData={openGroupCardWithData}
       />
-      <RtcCallModal inviteData={inviteData} ref={rtcRef} />
+      <GlobalSearchModal ref={globalSearchModalRef} />
+      <RtcCallModal ref={rtcRef} inviteData={inviteData} />
     </div>
   );
 };

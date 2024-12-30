@@ -2,11 +2,9 @@ import { RightOutlined } from "@ant-design/icons";
 import { Badge, Divider, Layout, Popover, Upload } from "antd";
 import clsx from "clsx";
 import i18n, { t } from "i18next";
-import { UploadRequestOption } from "rc-upload/lib/interface";
 import React, { memo, useRef, useState } from "react";
 import ImageResizer from "react-image-file-resizer";
 import { UNSAFE_NavigationContext, useResolvedPath } from "react-router-dom";
-import { v4 as uuidV4 } from "uuid";
 
 import { modal } from "@/AntdGlobalComp";
 import { updateBusinessUserInfo } from "@/api/login";
@@ -18,11 +16,12 @@ import change_avatar from "@/assets/images/profile/change_avatar.png";
 import OIMAvatar from "@/components/OIMAvatar";
 import { useContactStore, useConversationStore, useUserStore } from "@/store";
 import { feedbackToast } from "@/utils/common";
-import emitter from "@/utils/events";
+import { emit } from "@/utils/events";
+import { uploadFile } from "@/utils/imCommon";
 
 import { OverlayVisibleHandle } from "../../hooks/useOverlayVisible";
-import { IMSDK } from "../MainContentWrap";
 import About from "./About";
+import ConversationNavMenuContent from "./ConversationNavMenuContent";
 import styles from "./left-nav-bar.module.scss";
 import PersonalSettings from "./PersonalSettings";
 
@@ -79,6 +78,8 @@ const NavItem = ({ nav: { icon, icon_active, title, path } }: { nav: NavItemType
       locationPathname.charAt(toPathname.length) === "/") ||
     location.hash.startsWith(`#${toPathname}`);
 
+  const [showConversationMenu, setShowConversationMenu] = useState(false);
+
   const unReadCount = useConversationStore((state) => state.unReadCount);
   const unHandleFriendApplicationCount = useContactStore(
     (state) => state.unHandleFriendApplicationCount,
@@ -88,9 +89,16 @@ const NavItem = ({ nav: { icon, icon_active, title, path } }: { nav: NavItemType
   );
 
   const tryNavigate = () => {
-    if (isActive) return;
+    if (isActive) {
+      return;
+    }
+
     // TODO Keep answering when jumping back to chat from another page (if there is one)
     navigator.push(path);
+  };
+
+  const closeConversationMenu = () => {
+    setShowConversationMenu(false);
   };
 
   const getBadge = () => {
@@ -105,16 +113,29 @@ const NavItem = ({ nav: { icon, icon_active, title, path } }: { nav: NavItemType
 
   return (
     <Badge size="small" count={getBadge()}>
-      <div
-        className={clsx(
-          "mb-3 flex h-[52px] w-12 cursor-pointer flex-col items-center justify-center rounded-md",
-          { "bg-[#e9e9eb]": isActive },
-        )}
-        onClick={tryNavigate}
+      <Popover
+        overlayClassName="conversation-popover"
+        placement="bottomRight"
+        title={null}
+        arrow={false}
+        open={path === "/chat" ? showConversationMenu : false}
+        onOpenChange={(vis) => setShowConversationMenu(vis)}
+        content={
+          <ConversationNavMenuContent closeConversationMenu={closeConversationMenu} />
+        }
+        trigger="contextMenu"
       >
-        <img width={20} src={isActive ? icon_active : icon} alt="" />
-        <div className="mt-1 text-xs text-gray-500">{title}</div>
-      </div>
+        <div
+          className={clsx(
+            "mb-3 flex h-[52px] w-12 cursor-pointer flex-col items-center justify-center rounded-md",
+            { "bg-[#e9e9eb]": isActive },
+          )}
+          onClick={tryNavigate}
+        >
+          <img width={20} src={isActive ? icon_active : icon} alt="" />
+          <div className="mt-1 text-xs text-gray-500">{title}</div>
+        </div>
+      </Popover>
     </Badge>
   );
 };
@@ -160,20 +181,15 @@ const LeftNavBar = memo(() => {
   const profileMenuClick = (idx: number) => {
     switch (idx) {
       case 0:
-        emitter.emit("OPEN_USER_CARD", { isSelf: true });
+        emit("OPEN_USER_CARD", {
+          isSelf: true,
+          userID: useUserStore.getState().selfInfo.userID,
+        });
         break;
       case 1:
-        // if (window.electronAPI) {
-        //   openPersonalSettings();
-        //   return;
-        // }
         personalSettingsRef.current?.openOverlay();
         break;
       case 2:
-        // if (window.electronAPI) {
-        //   openAbout();
-        //   return;
-        // }
         aboutRef.current?.openOverlay();
         break;
       case 3:
@@ -201,15 +217,15 @@ const LeftNavBar = memo(() => {
 
   const customUpload = async ({ file }: { file: File }) => {
     const resizedFile = await resizeFile(file);
+    const filePath = await window.electronAPI?.saveFileToDisk({
+      sync: true,
+      file,
+    });
+
     try {
       const {
         data: { url },
-      } = await IMSDK.uploadFile({
-        name: resizedFile.name,
-        contentType: resizedFile.type,
-        uuid: uuidV4(),
-        file: resizedFile,
-      });
+      } = await uploadFile(resizedFile, filePath);
       const newInfo = {
         faceURL: url,
       };

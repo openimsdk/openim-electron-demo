@@ -31,6 +31,7 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
   OverlayVisibleHandle,
   ISearchUserOrGroupProps
 > = ({ isSearchGroup, openUserCardWithData, openGroupCardWithData }, ref) => {
+  const [loading, setLoading] = useState(false);
   const [keyword, setKeyword] = useState("");
   const inputRef = useRef<InputRef>(null);
   const { isOverlayOpen, closeOverlay } = useOverlayVisible(ref);
@@ -43,17 +44,19 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
 
   const searchData = async () => {
     if (!keyword) return;
-
+    setLoading(true);
     if (isSearchGroup) {
       try {
         const { data } = await IMSDK.getSpecifiedGroupsInfo([keyword]);
         const groupInfo = data[0];
+        setLoading(false);
         if (!groupInfo) {
           message.warning(t("empty.noSearchResults"));
           return;
         }
         openGroupCardWithData(groupInfo);
       } catch (error) {
+        setLoading(false);
         if ((error as WSEvent).errCode === 1004) {
           message.warning(t("empty.noSearchResults"));
           return;
@@ -65,6 +68,7 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
         const {
           data: { total, users },
         } = await searchBusinessUserInfo(keyword);
+        setLoading(false);
         if (
           !total ||
           (users[0].userID !== keyword && users[0].phoneNumber !== keyword)
@@ -81,6 +85,7 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
           ...users[0],
         });
       } catch (error) {
+        setLoading(false);
         if ((error as WSEvent).errCode === 1004) {
           message.warning(t("empty.noSearchResults"));
           return;
@@ -136,6 +141,7 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
         </div>
         <div className="flex justify-end px-5.5 py-2.5">
           <Button
+            loading={loading}
             className="px-6"
             type="primary"
             disabled={!keyword}
