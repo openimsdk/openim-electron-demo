@@ -23,7 +23,7 @@ OpenIM provides an open-source Instant Messaging (IM) SDK for developers, servin
 This repository is based on the open-source version of the OpenIM SDK, offering an Electron-based IM application. You can use this application as a reference implementation of the OpenIM SDK. It references both `@openim/electron-client-sdk` and `@openim/wasm-client-sdk`, which are the Electron and Web versions of the SDK, respectively. This enables the creation of both PC Web applications and desktop applications (Windows, macOS, Linux).
 
 <p align="center">
-    <img src="./docs/images/preveiw.zh-CN.png" alt="Preview" width="80%"/>
+    <img src="./docs/images/preview.png" alt="Preview" width="80%"/>
 </p>
 
 ## License :page_facing_up:
