@@ -39,7 +39,7 @@ Before you start developing, please ensure that your system has the following so
 - **npm**: Version ≥ 6.x (installed with Node.js)
 - **Git**: For version control
 
-You also need to have the latest version of the [OpenIM Server deployed](https://docs.openim.io/zh-Hans/guides/gettingStarted/dockerCompose). After that, you can compile this project and connect it to your own server for testing.
+You also need to have the latest version of the [OpenIM Server deployed](https://docs.openim.io/guides/gettingStarted/dockerCompose). After that, you can compile this project and connect it to your own server for testing.
 
 ## Runtime Environment
 
@@ -78,7 +78,7 @@ Follow these steps to set up your local development environment:
 
    - In the `.env` file:
 
-     > If you haven't changed the default server port, simply change `VITE_BASE_HOST` to your server IP. If you need to set up a domain and HTTPS access, please refer to [nginx configuration](https://docs.openim.io/zh-Hans/guides/gettingStarted/nginxDomainConfig), use the configuration at the bottom, and modify `VITE_BASE_DOMAIN` to your domain name.
+     > If you haven't changed the default server port, simply change `VITE_BASE_HOST` to your server IP. If you need to set up a domain and HTTPS access, please refer to [nginx configuration](https://docs.openim.io/guides/gettingStarted/nginxDomainConfig), use the configuration at the bottom, and modify `VITE_BASE_DOMAIN` to your domain name.
 
      ```bash
      VITE_BASE_HOST=your-server-ip
@@ -201,7 +201,7 @@ The open-source version supports one-to-one audio and video calls. You need to f
 |                            | 100,000-member supergroup                                                        | ✅     |
 |                            | Second-level syncing                                                             | ✅     |
 |                            | Cluster deployment                                                               | ✅     |
-|                            | Multi-device kick-out strategy                                                   |        |
+|                            | Multi-device kick-out strategy                                                   | ✅     |
 | **Online Status**          | No mutual kick-out across all platforms                                          | ✅     |
 |                            | Each platform can only log in with one device                                    | ✅     |
 |                            | PC, Mobile, Pad, Web, Mini Program each can log in with one device               | ✅     |
