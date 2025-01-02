@@ -64,8 +64,8 @@ Follow these steps to set up your local development environment:
 1. Clone the repository
 
    ```bash
-   git clone https://github.com/openimsdk/openim-electron.git
-   cd openim-electron
+   git clone https://github.com/openimsdk/openim-electron-demo.git
+   cd openim-electron-demo
    ```
 
 2. Install dependencies

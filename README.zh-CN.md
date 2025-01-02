@@ -62,36 +62,36 @@ OpenIM 为开发者提供开源即时通讯 SDK，作为 Twilio、Sendbird 等�
 
 1. 拉取代码
 
-```bash
-	git clone https://github.com/openimsdk/openim-electron.git
-  cd openim-electron
-```
+   ```bash
+   git clone https://github.com/openimsdk/openim-electron-demo.git
+   cd openim-electron-demo
+   ```
 
 2. 安装依赖
 
-```bash
-npm install
-```
+   ```bash
+   npm install
+   ```
 
 3. 修改配置
 
-- `.env`
+   - `.env`
 
-  > 如果没有修改过服务端默认端口，则只需要修改`VITE_BASE_HOST`为您的服务器 ip 即可，如需配置域名和 https 访问，可以参考[nginx 配置](https://docs.openim.io/zh-Hans/guides/gettingStarted/nginxDomainConfig)，并采用最下方的配置项，并修改`VITE_BASE_DOMAIN`为您的域名。
+     > 如果没有修改过服务端默认端口，则只需要修改`VITE_BASE_HOST`为您的服务器 ip 即可，如需配置域名和 https 访问，可以参考[nginx 配置](https://docs.openim.io/zh-Hans/guides/gettingStarted/nginxDomainConfig)，并采用最下方的配置项，并修改`VITE_BASE_DOMAIN`为您的域名。
 
-  ```bash
-  VITE_BASE_HOST=your-server-ip
+     ```bash
+     VITE_BASE_HOST=your-server-ip
 
-  VITE_WS_URL=ws://$VITE_BASE_HOST:10001
-  VITE_API_URL=http://$VITE_BASE_HOST:10002
-  VITE_CHAT_URL=http://$VITE_BASE_HOST:10008
+     VITE_WS_URL=ws://$VITE_BASE_HOST:10001
+     VITE_API_URL=http://$VITE_BASE_HOST:10002
+     VITE_CHAT_URL=http://$VITE_BASE_HOST:10008
 
-  # VITE_BASE_DOMAIN=your-server-domain
+     # VITE_BASE_DOMAIN=your-server-domain
 
-  # VITE_WS_URL=wss://$VITE_BASE_DOMAIN/msg_gateway
-  # VITE_API_URL=https://$VITE_BASE_DOMAIN/api
-  # VITE_CHAT_URL=https://$VITE_BASE_DOMAIN/chat
-  ```
+     # VITE_WS_URL=wss://$VITE_BASE_DOMAIN/msg_gateway
+     # VITE_API_URL=https://$VITE_BASE_DOMAIN/api
+     # VITE_CHAT_URL=https://$VITE_BASE_DOMAIN/chat
+     ```
 
 4. 运行 `npm run dev` 来启动开发服务器。访问 [http://localhost:5173](http://localhost:5173) 查看结果。默认情况下将同时启动 Electron 应用程序。
 
