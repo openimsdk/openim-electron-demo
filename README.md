@@ -102,6 +102,10 @@ Follow these steps to set up your local development environment:
 
 The open-source version supports one-to-one audio and video calls. You need to first deploy and configure the [server](https://github.com/openimsdk/chat/blob/main/HOW_TO_SETUP_LIVEKIT_SERVER.md). For multi-party audio/video calls or video conferencing, please contact us at [contact@openim.io](mailto:contact@openim.io).
 
+### Note
+
+- To enable audio and video calls on the web, you can only debug locally (localhost) or deploy the application to an HTTPS site for use. This limitation is due to browser security policies.
+
 ## Build 🚀
 
 > This project allows separate builds for the Web application and the Electron application, but there are some differences in the build process.

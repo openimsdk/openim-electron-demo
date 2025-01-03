@@ -101,6 +101,10 @@ OpenIM 为开发者提供开源即时通讯 SDK，作为 Twilio、Sendbird 等�
 
 开源版支持一对一音视频通话，并且需要先部署并配置[服务端](https://github.com/openimsdk/chat/blob/main/HOW_TO_SETUP_LIVEKIT_SERVER.md)。多人音视频通话、视频会议请联系邮箱 [contact@openim.io](mailto:contact@openim.io)
 
+### 注意
+
+- 如果要在 web 端进行音视频通话，只能在本地（localhost）进行调试，或者部署到 https 站点上后使用，这是因为浏览器的安全策略限制。
+
 ## 构建 🚀
 
 > 该项目允许分别构建 Web 应用程序和 Electron 应用程序，但在构建过程中会有一些差异。
