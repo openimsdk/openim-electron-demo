@@ -47,6 +47,24 @@ const messageMenuList = [
     icon: remove,
     hidden: false,
   },
+  {
+    idx: 5,
+    title: t("placeholder.re"),
+    icon: remove,
+    hidden: false,
+  },
+  {
+    idx: 6,
+    title: t("placeholder.answerYes"),
+    icon: remove,
+    hidden: false,
+  },
+  {
+    idx: 7,
+    title: t("placeholder.answerNo"),
+    icon: remove,
+    hidden: false,
+  },
 ];
 
 i18n.on("languageChanged", () => {
@@ -55,6 +73,9 @@ i18n.on("languageChanged", () => {
   messageMenuList[2].title = t("placeholder.copy");
   messageMenuList[3].title = t("placeholder.revoke");
   messageMenuList[4].title = t("placeholder.delete");
+  messageMenuList[5].title = t("placeholder.re");
+  messageMenuList[6].title = t("placeholder.answerYes");
+  messageMenuList[7].title = t("placeholder.answerNo");
 });
 
 const canCopyTypes = [
