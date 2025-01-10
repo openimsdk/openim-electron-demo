@@ -7,6 +7,7 @@ import copy from "@/assets/images/messageMenu/copy.png";
 import emoji from "@/assets/images/messageMenu/emoji.png";
 import forward from "@/assets/images/messageMenu/forward.png";
 import remove from "@/assets/images/messageMenu/remove.png";
+import reply from "@/assets/images/messageMenu/reply.png";
 import revoke from "@/assets/images/messageMenu/revoke.png";
 import { IMSDK } from "@/layout/MainContentWrap";
 import { useUserStore } from "@/store";
@@ -49,20 +50,20 @@ const messageMenuList = [
   },
   {
     idx: 5,
-    title: t("placeholder.re"),
-    icon: remove,
+    title: t("placeholder.reply"),
+    icon: reply,
     hidden: false,
   },
   {
     idx: 6,
-    title: t("placeholder.answerYes"),
-    icon: remove,
+    title: t("placeholder.quickReplyYes"),
+    icon: reply,
     hidden: false,
   },
   {
     idx: 7,
-    title: t("placeholder.answerNo"),
-    icon: remove,
+    title: t("placeholder.quickReplyNo"),
+    icon: reply,
     hidden: false,
   },
 ];
@@ -73,9 +74,9 @@ i18n.on("languageChanged", () => {
   messageMenuList[2].title = t("placeholder.copy");
   messageMenuList[3].title = t("placeholder.revoke");
   messageMenuList[4].title = t("placeholder.delete");
-  messageMenuList[5].title = t("placeholder.re");
-  messageMenuList[6].title = t("placeholder.answerYes");
-  messageMenuList[7].title = t("placeholder.answerNo");
+  messageMenuList[5].title = t("placeholder.reply");
+  messageMenuList[6].title = t("placeholder.quickReplyYes");
+  messageMenuList[7].title = t("placeholder.quickReplyNo");
 });
 
 const canCopyTypes = [
