@@ -331,6 +331,7 @@
     "sendWithShiftEnter": "Send with Shift+Enter",
     "mentionAll": "Everyone",
     "forward": "Forward",
+    "quickReply": "Quick reply msg",
     "quickReplyYes": "yes",
     "quickReplyNo": "no",
     "mergeForward": "Merge and Forward",

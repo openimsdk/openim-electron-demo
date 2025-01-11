@@ -1,6 +1,6 @@
 import { CheckOutlined, DownOutlined } from "@ant-design/icons";
 import { useLatest } from "ahooks";
-import { Dropdown } from "antd";
+import { Button, Dropdown } from "antd";
 import { t } from "i18next";
 import { forwardRef, ForwardRefRenderFunction, memo, useRef, useState } from "react";
 
@@ -95,6 +95,23 @@ const ChatFooter: ForwardRefRenderFunction<unknown, unknown> = (_, ref) => {
             }
           />
           <div className="flex items-center justify-end py-2 pr-3">
+            <Dropdown.Button
+              overlayClassName="send-action-dropdown"
+              className="w-fit px-6 py-1"
+              type="primary"
+              icon={<DownOutlined />}
+              menu={{
+                items: sendActions.map((item) => ({
+                  label: item.label,
+                  key: item.key,
+                  itemIcon: sendAction === item.key ? <CheckOutlined /> : undefined,
+                  onClick: () => updateSendAction(item.key),
+                })),
+              }}
+              onClick={enterToSend}
+            >
+              {t("placeholder.quickReply")}
+            </Dropdown.Button>
             <Dropdown.Button
               overlayClassName="send-action-dropdown"
               className="w-fit px-6 py-1"
