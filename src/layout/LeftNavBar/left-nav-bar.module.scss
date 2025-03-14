@@ -1,0 +1,13 @@
+.avatar-wrapper {
+  @apply mr-4 relative;
+
+  &:hover {
+    .mask {
+      @apply opacity-100 cursor-pointer;
+    }
+  }
+
+  .mask {
+    @apply flex justify-center items-center bg-[rgba(0,0,0,.6)] absolute z-10 top-0 left-0 w-full h-full rounded-md opacity-0 transition-opacity;
+  }
+}

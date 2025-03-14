@@ -1,0 +1,18 @@
+.login {
+  :global {
+    .ant-form-item-label {
+      padding: 0;
+    }
+  }
+}
+
+.login-method-tab {
+  :global {
+    .ant-tabs-nav {
+      margin: 24px 0 12px 0;
+    }
+    .ant-tabs-tab {
+      padding: 6px 0;
+    }
+  }
+}

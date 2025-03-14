@@ -1,0 +1,281 @@
+.ant-avatar-image {
+  background-color: transparent !important;
+}
+
+.ant-badge {
+  z-index: 1;
+}
+
+.ant-spin-text {
+  color: var(--primary);
+}
+
+.ant-empty-description {
+  color: var(--sub-text) !important;
+}
+
+.ant-app,
+.lk-room-container {
+  height: var(--full-height);
+  & > .ant-spin-nested-loading {
+    height: var(--full-height);
+    .ant-spin-container {
+      height: var(--full-height);
+    }
+  }
+}
+
+.ant-popover .ant-popover-inner {
+  padding: 0;
+}
+
+.ant-image-mask-info {
+  color: #fff;
+}
+
+.grid-image {
+  .ant-image {
+    position: unset;
+  }
+}
+
+.message-image {
+  .ant-image-mask {
+    border-radius: 6px;
+  }
+}
+
+.quote-image {
+  .ant-image-mask {
+    opacity: 0 !important;
+  }
+}
+
+.conversation-popover {
+  .ant-popover-content {
+    transform: translateY(-36px);
+  }
+
+  @media only screen and (min-width: 600px) {
+    .ant-popover-content {
+      transform: translate(42px, -36px);
+    }
+  }
+}
+
+.profile-popover {
+  .ant-popover-content {
+    transform: translateX(12px);
+  }
+}
+
+.chat-drawer {
+  margin-top: var(--searchbar-height);
+
+  .ant-drawer-content-wrapper {
+    box-shadow: -7px 0px 7px 1px rgba(30, 116, 222, 0.05);
+    min-width: 460px;
+  }
+
+  .ant-drawer-header {
+    padding: 0 24px;
+    background-color: #e8eaef;
+    border: none;
+
+    .ant-drawer-header-title {
+      height: 64px;
+    }
+
+    .ant-drawer-close {
+      position: absolute;
+      right: 24px;
+      margin: 0;
+    }
+  }
+
+  .ant-drawer-body {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .anticon-close,
+  .anticon-right {
+    color: #8e9ab0;
+  }
+}
+
+.disabled-upload {
+  .ant-upload {
+    cursor: auto;
+  }
+}
+
+.message-drawer-tab {
+  height: 100%;
+
+  .ant-tabs-nav {
+    padding: 0 24px;
+    margin-top: 12px;
+
+    .ant-tabs-tab {
+      padding: 4px 0;
+    }
+
+    .ant-tabs-ink-bar {
+      height: 3px;
+      border-radius: 8px;
+      transform: scaleX(0.6);
+    }
+
+    &::before {
+      border: none;
+    }
+  }
+
+  .ant-tabs-content-holder {
+    flex: 1;
+
+    .ant-tabs-content {
+      height: 100%;
+      overflow-y: auto;
+
+      .ant-tabs-tabpane {
+        height: 100%;
+      }
+    }
+  }
+}
+
+.no-padding-modal {
+  .ant-modal-content {
+    padding: 0;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+}
+
+.global-search-modal {
+  .ant-modal-content {
+    border-radius: 16px;
+  }
+
+  .message-drawer-tab {
+    .ant-tabs-nav {
+      padding: 0 32px;
+      margin-bottom: 0;
+      border-bottom: 1px solid var(--gap-text);
+    }
+  }
+
+  .ant-tabs-content-holder {
+    .ant-tabs-content {
+      padding: 0 12px;
+      overflow-y: hidden;
+    }
+  }
+}
+
+.rtc-single-modal {
+  .ant-modal-content {
+    padding: 0;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+}
+
+.bold-label-form {
+  .ant-form-item-label {
+    label {
+      color: var(--base-black);
+      font-weight: 500;
+    }
+  }
+}
+
+.sub-label-form {
+  .ant-form-item-label {
+    text-align: start;
+    label {
+      color: var(--sub-text);
+    }
+  }
+}
+
+.ant-btn-primary {
+  background-color: var(--primary);
+
+  &:disabled {
+    opacity: 0.5;
+    color: #fff;
+    background-color: var(--primary);
+  }
+}
+
+.ant-switch {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.ant-breadcrumb-link {
+  line-height: 22px;
+}
+
+.no-addon-search {
+  .ant-input {
+    border-radius: 6px !important;
+  }
+  .ant-input-group-addon {
+    display: none;
+  }
+}
+
+.flex-1 > .ant-spin-container {
+  height: 100%;
+  width: 100%;
+}
+
+.h-full > .ant-spin-container {
+  height: 100%;
+  width: 100%;
+}
+
+.h-full > .ant-spin-container {
+  height: 100%;
+}
+
+.drop-file-moal {
+  .ant-modal-confirm-content {
+    max-width: 100% !important;
+  }
+}
+
+.ant-skeleton-with-avatar
+  .ant-skeleton-content
+  .ant-skeleton-title
+  + .ant-skeleton-paragraph {
+  margin-block-start: 12px;
+}
+
+.ant-skeleton-with-avatar .ant-skeleton-content .ant-skeleton-title {
+  margin-block-start: 0;
+}
+
+.ant-skeleton .ant-skeleton-header .ant-skeleton-avatar {
+  border-radius: 6px;
+}
+
+.send-action-dropdown {
+  .ant-dropdown-menu-item {
+    padding: 4px 6px !important;
+    width: 120px !important;
+
+    span {
+      font-size: 12px;
+      color: var(--sub-text);
+    }
+
+    .anticon-check {
+      color: var(--primary);
+    }
+  }
+}

@@ -1,0 +1,94 @@
+/**
+ * @see https://www.electron.build/configuration/configuration
+ */
+{
+  appId: "io.opencorp.desktop.base",
+  productName: "OpenCorp-Base",
+  asar: true,
+  asarUnpack: ["**/*.node"],
+  extends: null,
+  directories: {
+    output: "release/Base/${version}",
+  },
+  files: [
+    "dist",
+    "!dist/*.wasm",
+    "dist-electron",
+    "!node_modules/rxjs/**/*",
+    "!node_modules/koffi/src/**/*",
+    "!node_modules/koffi/build/**/*",
+    "!node_modules/koffi/vendor/**/*",
+    "!node_modules/@openim/wasm-client-sdk/assets/**/*",
+    "!node_modules/@openim/electron-client-sdk/assets/**/*",
+  ],
+  extraResources: [
+    {
+      from: "extraResources",
+      to: "extraResources",
+    },
+    {
+      from: "node_modules/rxjs",
+      to: "app.asar.unpacked/node_modules/rxjs",
+    },
+  ],
+  mac: {
+    artifactName: "${productName}_${version}_${arch}.${ext}",
+    target: ["dmg"],
+    icon: "./dist/icons/mac_icon.png",
+    extraResources: [
+      {
+        from: "node_modules/@openim/electron-client-sdk/assets/mac_${arch}/",
+        to: "app.asar.unpacked/node_modules/@openim/electron-client-sdk/assets/mac_${arch}",
+      },
+      {
+        from: "node_modules/koffi/build/koffi/darwin_${arch}/",
+        to: "koffi/darwin_${arch}",
+      },
+    ],
+  },
+  win: {
+    target: [
+      {
+        target: "nsis",
+      },
+    ],
+    artifactName: "${productName}_${version}.${ext}",
+    icon: "./dist/icons/icon.ico",
+    extraResources: [
+      {
+        from: "node_modules/@openim/electron-client-sdk/assets/win_${arch}/",
+        to: "app.asar.unpacked/node_modules/@openim/electron-client-sdk/assets/win_${arch}",
+      },
+      {
+        from: "node_modules/koffi/build/koffi/win32_${arch}/",
+        to: "koffi/win32_${arch}",
+      },
+    ],
+  },
+  linux: {
+    icon: "./dist/icons/icon.png",
+    target: "deb",
+    maintainer: "opencorp-base",
+    artifactName: "${productName}_${version}_${arch}.${ext}",
+    extraResources: [
+      {
+        from: "node_modules/@openim/electron-client-sdk/assets/linux_${arch}/",
+        to: "app.asar.unpacked/node_modules/@openim/electron-client-sdk/assets/linux_${arch}",
+      },
+      {
+        from: "node_modules/koffi/build/koffi/linux_${arch}/",
+        to: "koffi/linux_${arch}",
+      },
+    ],
+  },
+  nsis: {
+    oneClick: false,
+    perMachine: true,
+    allowElevation: true,
+    allowToChangeInstallationDirectory: true,
+    createDesktopShortcut: true,
+    createStartMenuShortcut: true,
+    deleteAppDataOnUninstall: true,
+    shortcutName: "OpenCorp-Base",
+  }
+}
