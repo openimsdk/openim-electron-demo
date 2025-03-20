@@ -1,6 +1,6 @@
 {
   "name": "OpenCorp-Base",
-  "version": "3.8.2",
+  "version": "3.8.3",
   "main": "dist-electron/main/index.js",
   "description": "OpenIM PC Client.",
   "author": "blooming",
@@ -36,8 +36,8 @@
     "*.{json,html,css,scss,xml,md}": ["prettier --write"]
   },
   "dependencies": {
-    "@openim/electron-client-sdk": "^1.0.7",
-    "@openim/wasm-client-sdk": "^3.8.0",
+    "@openim/electron-client-sdk": "^3.8.3-patch.3",
+    "@openim/wasm-client-sdk": "^3.8.3-patch.3",
     "electron-log": "^5.0.0",
     "electron-screenshots": "^0.5.23",
     "electron-store": "^8.1.0",
