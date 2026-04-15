@@ -88,7 +88,7 @@
     "date-fns": "^2.30.0",
     "dayjs": "^1.11.7",
     "electron-log": "^5.0.0",
-    "electron-screenshots": "^0.5.23",
+    "electron-screenshots": "^0.5.27",
     "electron-store": "^8.1.0",
     "electron-updater": "^5.3.0",
     "emoji-picker-element": "1.21.3",
