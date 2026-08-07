@@ -35,7 +35,7 @@ const LoginForm = ({ loginMethod, setFormType, updateLoginMethod }: LoginFormPro
   const [form] = Form.useForm();
   const [loginType, setLoginType] = useState<LoginType>(LoginType.Password);
   const { mutate: login, isLoading: loginLoading } = useLogin();
-  const { mutate: semdSms } = useSendSms();
+  const { mutate: sendSms } = useSendSms();
 
   const [countdown, setCountdown] = useState(0);
   useEffect(() => {
@@ -87,7 +87,7 @@ const LoginForm = ({ loginMethod, setFormType, updateLoginMethod }: LoginFormPro
       delete options.areaCode;
     }
 
-    semdSms(options, {
+    sendSms(options, {
       onSuccess() {
         setCountdown(60);
       },
