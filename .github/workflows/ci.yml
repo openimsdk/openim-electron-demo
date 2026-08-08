@@ -33,3 +33,6 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Check Electron package manifest
+        run: pnpm electron:package:check

@@ -39,7 +39,7 @@ Before you start developing, please ensure that your system has the following so
 - **pnpm**: Version 10.x. The repository pins pnpm 10.28.0 through the `packageManager` field.
 - **Git**: For version control
 
-You also need to have the latest version of the [OpenIM Server deployed](https://docs.openim.io/guides/gettingStarted/dockerCompose). After that, you can compile this project and connect it to your own server for testing.
+You also need to have the latest version of the [OpenIM Server deployed](https://docs.openim.io/docs/guides/deployment/docker-compose). After that, you can compile this project and connect it to your own server for testing.
 
 ## Runtime Environment
 
@@ -80,7 +80,7 @@ Follow these steps to set up your local development environment:
 
    - In the `.env` file:
 
-     > If you haven't changed the default server port, simply change `VITE_BASE_HOST` to your server IP. If you need to set up a domain and HTTPS access, please refer to [nginx configuration](https://docs.openim.io/guides/gettingStarted/nginxDomainConfig), use the configuration at the bottom, and modify `VITE_BASE_DOMAIN` to your domain name.
+     > If you haven't changed the default server port, simply change `VITE_BASE_HOST` to your server IP. If you need to set up a domain and HTTPS access, please refer to [nginx configuration](https://docs.openim.io/docs/guides/deployment/domain), use the configuration at the bottom, and modify `VITE_BASE_DOMAIN` to your domain name.
 
      ```bash
      VITE_BASE_HOST=your-server-ip
@@ -132,33 +132,27 @@ The open-source version supports one-to-one audio and video calls. You need to f
 
 ### Electron Application
 
-1. Install dependencies with the development `package.json` first. For packaging only, replace `package.json` with `package_electron.json`, which retains the Electron runtime dependencies and packaging scripts. Do not run `pnpm install` again while the packaging manifest is active.
+The packaging command builds the application, detects the actual runtime dependencies from `dist-electron`, temporarily supplies electron-builder with a minimized package manifest, and always restores the development manifest afterward. No manual copying of `package.json` is required.
 
-2. On the corresponding system, run one of the following commands to build the Electron application:
+On the corresponding system, run one of the following commands:
 
-   > For cross-compilation, it is only supported to build other system installers on macOS. On Windows or Linux, you can only build installers for the same system.
+> For cross-compilation, it is only supported to build other system installers on macOS. On Windows or Linux, you can only build installers for the same system.
 
-   - macOS:
-     ```bash
-     pnpm build:mac
-     ```
-   - Windows:
-     ```bash
-     pnpm build:win
-     ```
-   - Linux:
-     ```bash
-     pnpm build:linux
-     ```
+- macOS x64: `pnpm build:mac`
+- macOS arm64: `pnpm build:mac-arm`
+- Windows x64: `pnpm build:win`
+- Windows arm64: `pnpm build:win-arm`
+- Linux x64: `pnpm build:linux`
+- Linux arm64: `pnpm build:linux-arm`
+- All supported targets: `pnpm build:all`
 
-3. Restore the development manifest after packaging:
+Additional electron-builder arguments can be passed through the generic command, for example:
 
-   ```bash
-   cp package_dev.json package.json
-   pnpm install --frozen-lockfile
-   ```
+```bash
+pnpm electron:build -- --dir
+```
 
-4. The build artifacts will be located in the `release` directory.
+The build artifacts will be located in the `release` directory. CI runs `pnpm electron:package:check` to verify the generated runtime manifest without producing an installer.
 
 ## Features
 

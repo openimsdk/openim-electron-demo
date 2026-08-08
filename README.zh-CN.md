@@ -38,7 +38,7 @@ OpenIM 为开发者提供开源即时通讯 SDK，作为 Twilio、Sendbird 等�
 - **pnpm**：版本 10.x。仓库通过 `packageManager` 字段固定使用 pnpm 10.28.0。
 - **Git**：用于代码版本控制
 
-同时，您需要确保已经[部署](https://docs.openim.io/zh-Hans/guides/gettingStarted/dockerCompose)了最新版本的 OpenIM Server。接下来，您可以编译项目并连接自己的服务端进行测试。
+同时，您需要确保已经[部署](https://docs.openim.io/zh/docs/guides/deployment/docker-compose)了最新版本的 OpenIM Server。接下来，您可以编译项目并连接自己的服务端进行测试。
 
 ## 运行环境
 
@@ -79,7 +79,7 @@ OpenIM 为开发者提供开源即时通讯 SDK，作为 Twilio、Sendbird 等�
 
    - `.env`
 
-     > 如果没有修改过服务端默认端口，则只需要修改`VITE_BASE_HOST`为您的服务器 ip 即可，如需配置域名和 https 访问，可以参考[nginx 配置](https://docs.openim.io/zh-Hans/guides/gettingStarted/nginxDomainConfig)，并采用最下方的配置项，并修改`VITE_BASE_DOMAIN`为您的域名。
+     > 如果没有修改过服务端默认端口，则只需要修改`VITE_BASE_HOST`为您的服务器 ip 即可，如需配置域名和 https 访问，可以参考[nginx 配置](https://docs.openim.io/zh/docs/guides/deployment/domain)，并采用最下方的配置项，并修改`VITE_BASE_DOMAIN`为您的域名。
 
      ```bash
      VITE_BASE_HOST=your-server-ip
@@ -131,34 +131,27 @@ OpenIM 为开发者提供开源即时通讯 SDK，作为 Twilio、Sendbird 等�
 
 ### Electron 应用程序
 
-1. 先使用开发版 `package.json` 安装依赖。仅在打包阶段使用 `package_electron.json` 替换 `package.json`，该清单只保留 Electron 运行依赖和打包脚本。打包清单生效期间不要再次执行 `pnpm install`。
+打包命令会先构建应用，再根据 `dist-electron` 中实际引用的外部模块生成最小运行时清单，临时提供给 electron-builder，并在结束时自动恢复开发清单。不再需要手工复制或替换 `package.json`。
 
-2. 在对应系统下运行以下命令之一来构建 Electron 应用程序：
+在对应系统下运行以下命令之一：
 
-   > 如果需要交叉编译，仅支持在 mac 环境下打包其他系统安装包，windows 或 linux 下仅支持打包对应系统安装包。
+> 如果需要交叉编译，仅支持在 macOS 环境下打包其他系统安装包，Windows 或 Linux 下仅支持打包对应系统安装包。
 
-   - macOS:
-     ```bash
-     pnpm build:mac
-     ```
-   - Windows:
-     ```bash
-     pnpm build:win
-     ```
-   - Linux:
+- macOS x64：`pnpm build:mac`
+- macOS arm64：`pnpm build:mac-arm`
+- Windows x64：`pnpm build:win`
+- Windows arm64：`pnpm build:win-arm`
+- Linux x64：`pnpm build:linux`
+- Linux arm64：`pnpm build:linux-arm`
+- 全部支持的平台：`pnpm build:all`
 
-     ```bash
-     pnpm build:linux
-     ```
+需要传递额外的 electron-builder 参数时，可以使用通用命令，例如：
 
-3. 打包完成后恢复开发清单：
+```bash
+pnpm electron:build -- --dir
+```
 
-   ```bash
-   cp package_dev.json package.json
-   pnpm install --frozen-lockfile
-   ```
-
-4. 构建结果将位于 `release` 目录下。
+构建结果位于 `release` 目录。CI 会执行 `pnpm electron:package:check`，在不生成安装包的情况下校验自动生成的运行时清单。
 
 ## 功能列表
 

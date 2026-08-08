@@ -23,10 +23,6 @@
   ],
   extraResources: [
     {
-      from: "extraResources",
-      to: "extraResources",
-    },
-    {
       from: "node_modules/rxjs",
       to: "app.asar.unpacked/node_modules/rxjs",
     },
@@ -90,5 +86,5 @@
     createStartMenuShortcut: true,
     deleteAppDataOnUninstall: true,
     shortcutName: "OpenCorp-Base",
-  }
+  },
 }
