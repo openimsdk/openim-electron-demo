@@ -5,6 +5,7 @@
   "description": "OpenIM PC Client.",
   "author": "blooming",
   "private": true,
+  "packageManager": "pnpm@10.28.0",
   "debug": {
     "env": {
       "VITE_DEV_SERVER_URL": "http://127.0.0.1:7777/"
@@ -17,18 +18,19 @@
     "pree2e": "vite build --mode=test",
     "e2e": "playwright test",
     "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
     "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx --fix --quiet src",
-    "prepare": "husky install",
-    "postinstall": "patch-package"
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.4",
     "@commitlint/config-conventional": "^17.4.4",
     "@playwright/test": "^1.31.0",
     "@types/md5": "^2.3.2",
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
+    "@types/node": "20.5.1",
+    "@types/react": "18.3.31",
+    "@types/react-dom": "18.3.7",
     "@types/uuid": "^9.0.1",
     "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "^5.53.0",
@@ -45,23 +47,41 @@
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.1.2",
-    "patch-package": "^8.0.0",
     "postcss": "^8.4.21",
     "postcss-nesting": "^12.0.2",
     "prettier": "^2.8.4",
     "prettier-plugin-tailwindcss": "^0.2.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "sass": "^1.58.3",
     "tailwindcss": "^3.2.7",
     "terser": "^5.19.0",
-    "typescript": "^4.9.5",
+    "typescript": "5.1.6",
     "vite": "^4.1.4",
     "vite-electron-plugin": "^0.8.2",
     "vite-plugin-electron": "^0.11.1"
   },
   "engines": {
-    "node": "^14.18.0 || >=16.0.0"
+    "node": ">=18.12.0",
+    "pnpm": ">=10.0.0 <11.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/minimatch": "5.1.2"
+    },
+    "patchedDependencies": {
+      "@ckeditor/ckeditor5-ui@43.0.0": "patches/@ckeditor+ckeditor5-ui+43.0.0.patch"
+    },
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "electron",
+      "esbuild",
+      "koffi"
+    ],
+    "ignoredBuiltDependencies": [
+      "core-js",
+      "es5-ext"
+    ]
   },
   "lint-staged": {
     "src/**/*.{tsx,ts}": [
@@ -73,17 +93,17 @@
     ]
   },
   "dependencies": {
-    "@ant-design/icons": "^5.1.4",
+    "@ant-design/icons": "5.6.1",
     "@ckeditor/ckeditor5-react": "^8.0.0",
     "@livekit/components-react": "2.6.9",
     "@livekit/components-styles": "1.1.4",
-    "@openim/electron-client-sdk": "^3.8.3-patch.10",
-    "@openim/wasm-client-sdk": "^3.8.3-patch.10",
+    "@openim/electron-client-sdk": "3.8.3-patch.15.1",
+    "@openim/wasm-client-sdk": "3.8.3-patch.15.1",
     "adm-zip": "^0.5.10",
-    "ahooks": "^3.7.7",
+    "ahooks": "3.7.7",
     "antd": "5.10.0",
     "axios": "^1.4.0",
-    "ckeditor5": "^43.0.0",
+    "ckeditor5": "43.0.0",
     "clsx": "^1.2.1",
     "date-fns": "^2.30.0",
     "dayjs": "^1.11.7",
@@ -99,7 +119,7 @@
     "localforage": "^1.10.0",
     "md5": "^2.3.0",
     "mitt": "^3.0.0",
-    "react-draggable": "^4.4.5",
+    "react-draggable": "4.4.5",
     "react-i18next": "^12.3.1",
     "react-image-file-resizer": "^0.4.8",
     "react-query": "^3.39.3",

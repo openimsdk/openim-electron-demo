@@ -1,4 +1,4 @@
-import { CbEvents, LogLevel } from "@openim/wasm-client-sdk";
+import { LogLevel, SdkEvent } from "@openim/wasm-client-sdk";
 import { MessageType, SessionType } from "@openim/wasm-client-sdk";
 import {
   BlackUserItem,
@@ -10,9 +10,9 @@ import {
   GroupMemberItem,
   MessageItem,
   RevokedInfo,
+  SdkEventEnvelope,
+  SdkResponse,
   SelfUserInfo,
-  WSEvent,
-  WsResponse,
 } from "@openim/wasm-client-sdk/lib/types/entity";
 import { t } from "i18next";
 import { useEffect, useRef } from "react";
@@ -153,7 +153,7 @@ export function useGlobalEvent() {
       initStore();
     } catch (error) {
       console.error(error);
-      if ((error as WsResponse).errCode !== 10102) {
+      if ((error as SdkResponse).errCode !== 10102) {
         navigate("/login");
       }
     }
@@ -162,57 +162,57 @@ export function useGlobalEvent() {
 
   const setIMListener = () => {
     // account
-    IMSDK.on(CbEvents.OnSelfInfoUpdated, selfUpdateHandler);
-    IMSDK.on(CbEvents.OnConnecting, connectingHandler);
-    IMSDK.on(CbEvents.OnConnectFailed, connectFailedHandler);
-    IMSDK.on(CbEvents.OnConnectSuccess, connectSuccessHandler);
-    IMSDK.on(CbEvents.OnKickedOffline, kickHandler);
-    IMSDK.on(CbEvents.OnUserTokenExpired, expiredHandler);
-    IMSDK.on(CbEvents.OnUserTokenInvalid, expiredHandler);
+    IMSDK.on(SdkEvent.OnSelfInfoUpdated, selfUpdateHandler);
+    IMSDK.on(SdkEvent.OnConnecting, connectingHandler);
+    IMSDK.on(SdkEvent.OnConnectFailed, connectFailedHandler);
+    IMSDK.on(SdkEvent.OnConnectSuccess, connectSuccessHandler);
+    IMSDK.on(SdkEvent.OnKickedOffline, kickHandler);
+    IMSDK.on(SdkEvent.OnUserTokenExpired, expiredHandler);
+    IMSDK.on(SdkEvent.OnUserTokenInvalid, expiredHandler);
     // sync
-    IMSDK.on(CbEvents.OnSyncServerStart, syncStartHandler);
-    IMSDK.on(CbEvents.OnSyncServerProgress, syncProgressHandler);
-    IMSDK.on(CbEvents.OnSyncServerFinish, syncFinishHandler);
-    IMSDK.on(CbEvents.OnSyncServerFailed, syncFailedHandler);
+    IMSDK.on(SdkEvent.OnSyncServerStart, syncStartHandler);
+    IMSDK.on(SdkEvent.OnSyncServerProgress, syncProgressHandler);
+    IMSDK.on(SdkEvent.OnSyncServerFinish, syncFinishHandler);
+    IMSDK.on(SdkEvent.OnSyncServerFailed, syncFailedHandler);
     // message
-    IMSDK.on(CbEvents.OnRecvNewMessages, newMessageHandler);
-    IMSDK.on(CbEvents.OnNewRecvMessageRevoked, revokedMessageHandler);
+    IMSDK.on(SdkEvent.OnRecvNewMessages, newMessageHandler);
+    IMSDK.on(SdkEvent.OnNewRecvMessageRevoked, revokedMessageHandler);
     // conversation
-    IMSDK.on(CbEvents.OnConversationChanged, conversationChnageHandler);
-    IMSDK.on(CbEvents.OnNewConversation, newConversationHandler);
-    IMSDK.on(CbEvents.OnTotalUnreadMessageCountChanged, totalUnreadChangeHandler);
+    IMSDK.on(SdkEvent.OnConversationChanged, conversationChnageHandler);
+    IMSDK.on(SdkEvent.OnNewConversation, newConversationHandler);
+    IMSDK.on(SdkEvent.OnTotalUnreadMessageCountChanged, totalUnreadChangeHandler);
     // friend
-    IMSDK.on(CbEvents.OnFriendInfoChanged, friednInfoChangeHandler);
-    IMSDK.on(CbEvents.OnFriendAdded, friednAddedHandler);
-    IMSDK.on(CbEvents.OnFriendDeleted, friednDeletedHandler);
+    IMSDK.on(SdkEvent.OnFriendInfoChanged, friednInfoChangeHandler);
+    IMSDK.on(SdkEvent.OnFriendAdded, friednAddedHandler);
+    IMSDK.on(SdkEvent.OnFriendDeleted, friednDeletedHandler);
     // blacklist
-    IMSDK.on(CbEvents.OnBlackAdded, blackAddedHandler);
-    IMSDK.on(CbEvents.OnBlackDeleted, blackDeletedHandler);
+    IMSDK.on(SdkEvent.OnBlackAdded, blackAddedHandler);
+    IMSDK.on(SdkEvent.OnBlackDeleted, blackDeletedHandler);
     // group
-    IMSDK.on(CbEvents.OnJoinedGroupAdded, joinedGroupAddedHandler);
-    IMSDK.on(CbEvents.OnJoinedGroupDeleted, joinedGroupDeletedHandler);
-    IMSDK.on(CbEvents.OnGroupDismissed, joinedGroupDismissHandler);
-    IMSDK.on(CbEvents.OnGroupInfoChanged, groupInfoChangedHandler);
-    IMSDK.on(CbEvents.OnGroupMemberAdded, groupMemberAddedHandler);
-    IMSDK.on(CbEvents.OnGroupMemberDeleted, groupMemberDeletedHandler);
-    IMSDK.on(CbEvents.OnGroupMemberInfoChanged, groupMemberInfoChangedHandler);
+    IMSDK.on(SdkEvent.OnJoinedGroupAdded, joinedGroupAddedHandler);
+    IMSDK.on(SdkEvent.OnJoinedGroupDeleted, joinedGroupDeletedHandler);
+    IMSDK.on(SdkEvent.OnGroupDismissed, joinedGroupDismissHandler);
+    IMSDK.on(SdkEvent.OnGroupInfoChanged, groupInfoChangedHandler);
+    IMSDK.on(SdkEvent.OnGroupMemberAdded, groupMemberAddedHandler);
+    IMSDK.on(SdkEvent.OnGroupMemberDeleted, groupMemberDeletedHandler);
+    IMSDK.on(SdkEvent.OnGroupMemberInfoChanged, groupMemberInfoChangedHandler);
     // application
-    IMSDK.on(CbEvents.OnFriendApplicationAdded, friendApplicationProcessedHandler);
-    IMSDK.on(CbEvents.OnFriendApplicationAccepted, friendApplicationProcessedHandler);
-    IMSDK.on(CbEvents.OnFriendApplicationRejected, friendApplicationProcessedHandler);
-    IMSDK.on(CbEvents.OnGroupApplicationAdded, groupApplicationProcessedHandler);
-    IMSDK.on(CbEvents.OnGroupApplicationAccepted, groupApplicationProcessedHandler);
-    IMSDK.on(CbEvents.OnGroupApplicationRejected, groupApplicationProcessedHandler);
+    IMSDK.on(SdkEvent.OnFriendApplicationAdded, friendApplicationProcessedHandler);
+    IMSDK.on(SdkEvent.OnFriendApplicationAccepted, friendApplicationProcessedHandler);
+    IMSDK.on(SdkEvent.OnFriendApplicationRejected, friendApplicationProcessedHandler);
+    IMSDK.on(SdkEvent.OnGroupApplicationAdded, groupApplicationProcessedHandler);
+    IMSDK.on(SdkEvent.OnGroupApplicationAccepted, groupApplicationProcessedHandler);
+    IMSDK.on(SdkEvent.OnGroupApplicationRejected, groupApplicationProcessedHandler);
   };
 
-  const selfUpdateHandler = ({ data }: WSEvent<SelfUserInfo>) => {
+  const selfUpdateHandler = ({ data }: SdkEventEnvelope<SelfUserInfo>) => {
     updateSelfInfo(data);
   };
   const connectingHandler = () => {
     updateConnectState("loading");
     console.log("connecting...");
   };
-  const connectFailedHandler = ({ errCode, errMsg }: WSEvent) => {
+  const connectFailedHandler = ({ errCode, errMsg }: SdkEventEnvelope) => {
     updateConnectState("failed");
     console.error("connectFailedHandler", errCode, errMsg);
 
@@ -237,11 +237,11 @@ export function useGlobalEvent() {
     });
 
   // sync
-  const syncStartHandler = ({ data }: WSEvent<boolean>) => {
+  const syncStartHandler = ({ data }: SdkEventEnvelope<boolean>) => {
     updateSyncState("loading");
     updateReinstallState(data);
   };
-  const syncProgressHandler = ({ data }: WSEvent<number>) => {
+  const syncProgressHandler = ({ data }: SdkEventEnvelope<number>) => {
     updateProgressState(data);
   };
   const syncFinishHandler = () => {
@@ -257,14 +257,14 @@ export function useGlobalEvent() {
   };
 
   // message
-  const newMessageHandler = ({ data }: WSEvent<MessageItem[]>) => {
+  const newMessageHandler = ({ data }: SdkEventEnvelope<MessageItem[]>) => {
     if (useUserStore.getState().syncState === "loading" || resume.current) {
       return;
     }
     data.map((message) => handleNewMessage(message));
   };
 
-  const revokedMessageHandler = ({ data }: WSEvent<RevokedInfo>) => {
+  const revokedMessageHandler = ({ data }: SdkEventEnvelope<RevokedInfo>) => {
     updateOneMessage({
       clientMsgID: data.clientMsgID,
       contentType: MessageType.RevokeMessage,
@@ -321,33 +321,35 @@ export function useGlobalEvent() {
   };
 
   // conversation
-  const conversationChnageHandler = ({ data }: WSEvent<ConversationItem[]>) => {
+  const conversationChnageHandler = ({
+    data,
+  }: SdkEventEnvelope<ConversationItem[]>) => {
     updateConversationList(data, "filter");
   };
-  const newConversationHandler = ({ data }: WSEvent<ConversationItem[]>) => {
+  const newConversationHandler = ({ data }: SdkEventEnvelope<ConversationItem[]>) => {
     updateConversationList(data, "push");
   };
-  const totalUnreadChangeHandler = ({ data }: WSEvent<number>) => {
+  const totalUnreadChangeHandler = ({ data }: SdkEventEnvelope<number>) => {
     if (data === useConversationStore.getState().unReadCount) return;
     updateUnReadCount(data);
   };
 
   // friend
-  const friednInfoChangeHandler = ({ data }: WSEvent<FriendUserItem>) => {
+  const friednInfoChangeHandler = ({ data }: SdkEventEnvelope<FriendUserItem>) => {
     updateFriend(data);
   };
-  const friednAddedHandler = ({ data }: WSEvent<FriendUserItem>) => {
+  const friednAddedHandler = ({ data }: SdkEventEnvelope<FriendUserItem>) => {
     pushNewFriend(data);
   };
-  const friednDeletedHandler = ({ data }: WSEvent<FriendUserItem>) => {
+  const friednDeletedHandler = ({ data }: SdkEventEnvelope<FriendUserItem>) => {
     updateFriend(data, true);
   };
 
   // blacklist
-  const blackAddedHandler = ({ data }: WSEvent<BlackUserItem>) => {
+  const blackAddedHandler = ({ data }: SdkEventEnvelope<BlackUserItem>) => {
     pushNewBlack(data);
   };
-  const blackDeletedHandler = ({ data }: WSEvent<BlackUserItem>) => {
+  const blackDeletedHandler = ({ data }: SdkEventEnvelope<BlackUserItem>) => {
     IMSDK.getSpecifiedFriendsInfo({
       friendUserIDList: [data.userID],
     }).then(({ data }) => {
@@ -359,32 +361,32 @@ export function useGlobalEvent() {
   };
 
   // group
-  const joinedGroupAddedHandler = ({ data }: WSEvent<GroupItem>) => {
+  const joinedGroupAddedHandler = ({ data }: SdkEventEnvelope<GroupItem>) => {
     if (data.groupID === useConversationStore.getState().currentConversation?.groupID) {
       updateCurrentGroupInfo(data);
       getCurrentMemberInGroupByReq(data.groupID);
     }
     pushNewGroup(data);
   };
-  const joinedGroupDeletedHandler = ({ data }: WSEvent<GroupItem>) => {
+  const joinedGroupDeletedHandler = ({ data }: SdkEventEnvelope<GroupItem>) => {
     if (data.groupID === useConversationStore.getState().currentConversation?.groupID) {
       getCurrentGroupInfoByReq(data.groupID);
       setCurrentMemberInGroup();
     }
     updateGroup(data, true);
   };
-  const joinedGroupDismissHandler = ({ data }: WSEvent<GroupItem>) => {
+  const joinedGroupDismissHandler = ({ data }: SdkEventEnvelope<GroupItem>) => {
     if (data.groupID === useConversationStore.getState().currentConversation?.groupID) {
       getCurrentMemberInGroupByReq(data.groupID);
     }
   };
-  const groupInfoChangedHandler = ({ data }: WSEvent<GroupItem>) => {
+  const groupInfoChangedHandler = ({ data }: SdkEventEnvelope<GroupItem>) => {
     updateGroup(data);
     if (data.groupID === useConversationStore.getState().currentConversation?.groupID) {
       updateCurrentGroupInfo(data);
     }
   };
-  const groupMemberAddedHandler = ({ data }: WSEvent<GroupMemberItem>) => {
+  const groupMemberAddedHandler = ({ data }: SdkEventEnvelope<GroupMemberItem>) => {
     if (
       data.groupID === useConversationStore.getState().currentConversation?.groupID &&
       data.userID === useUserStore.getState().selfInfo.userID
@@ -392,7 +394,7 @@ export function useGlobalEvent() {
       getCurrentMemberInGroupByReq(data.groupID);
     }
   };
-  const groupMemberDeletedHandler = ({ data }: WSEvent<GroupMemberItem>) => {
+  const groupMemberDeletedHandler = ({ data }: SdkEventEnvelope<GroupMemberItem>) => {
     if (
       data.groupID === useConversationStore.getState().currentConversation?.groupID &&
       data.userID === useUserStore.getState().selfInfo.userID
@@ -400,7 +402,9 @@ export function useGlobalEvent() {
       getCurrentMemberInGroupByReq(data.groupID);
     }
   };
-  const groupMemberInfoChangedHandler = ({ data }: WSEvent<GroupMemberItem>) => {
+  const groupMemberInfoChangedHandler = ({
+    data,
+  }: SdkEventEnvelope<GroupMemberItem>) => {
     if (data.groupID === useConversationStore.getState().currentConversation?.groupID) {
       tryUpdateCurrentMemberInGroup(data);
     }
@@ -409,7 +413,7 @@ export function useGlobalEvent() {
   //application
   const friendApplicationProcessedHandler = ({
     data,
-  }: WSEvent<FriendApplicationItem>) => {
+  }: SdkEventEnvelope<FriendApplicationItem>) => {
     const isRecv = data.toUserID === useUserStore.getState().selfInfo.userID;
     if (isRecv) {
       updateRecvFriendApplication(data);
@@ -419,7 +423,7 @@ export function useGlobalEvent() {
   };
   const groupApplicationProcessedHandler = ({
     data,
-  }: WSEvent<GroupApplicationItem>) => {
+  }: SdkEventEnvelope<GroupApplicationItem>) => {
     const isRecv = data.userID !== useUserStore.getState().selfInfo.userID;
     if (isRecv) {
       updateRecvGroupApplication(data);
@@ -429,46 +433,46 @@ export function useGlobalEvent() {
   };
 
   const disposeIMListener = () => {
-    IMSDK.off(CbEvents.OnSelfInfoUpdated, selfUpdateHandler);
-    IMSDK.off(CbEvents.OnConnecting, connectingHandler);
-    IMSDK.off(CbEvents.OnConnectFailed, connectFailedHandler);
-    IMSDK.off(CbEvents.OnConnectSuccess, connectSuccessHandler);
-    IMSDK.off(CbEvents.OnKickedOffline, kickHandler);
-    IMSDK.off(CbEvents.OnUserTokenExpired, expiredHandler);
-    IMSDK.off(CbEvents.OnUserTokenInvalid, expiredHandler);
+    IMSDK.off(SdkEvent.OnSelfInfoUpdated, selfUpdateHandler);
+    IMSDK.off(SdkEvent.OnConnecting, connectingHandler);
+    IMSDK.off(SdkEvent.OnConnectFailed, connectFailedHandler);
+    IMSDK.off(SdkEvent.OnConnectSuccess, connectSuccessHandler);
+    IMSDK.off(SdkEvent.OnKickedOffline, kickHandler);
+    IMSDK.off(SdkEvent.OnUserTokenExpired, expiredHandler);
+    IMSDK.off(SdkEvent.OnUserTokenInvalid, expiredHandler);
     // sync
-    IMSDK.off(CbEvents.OnSyncServerStart, syncStartHandler);
-    IMSDK.off(CbEvents.OnSyncServerProgress, syncProgressHandler);
-    IMSDK.off(CbEvents.OnSyncServerFinish, syncFinishHandler);
-    IMSDK.off(CbEvents.OnSyncServerFailed, syncFailedHandler);
+    IMSDK.off(SdkEvent.OnSyncServerStart, syncStartHandler);
+    IMSDK.off(SdkEvent.OnSyncServerProgress, syncProgressHandler);
+    IMSDK.off(SdkEvent.OnSyncServerFinish, syncFinishHandler);
+    IMSDK.off(SdkEvent.OnSyncServerFailed, syncFailedHandler);
     // message
-    IMSDK.off(CbEvents.OnRecvNewMessages, newMessageHandler);
+    IMSDK.off(SdkEvent.OnRecvNewMessages, newMessageHandler);
     // conversation
-    IMSDK.off(CbEvents.OnConversationChanged, conversationChnageHandler);
-    IMSDK.off(CbEvents.OnNewConversation, newConversationHandler);
-    IMSDK.off(CbEvents.OnTotalUnreadMessageCountChanged, totalUnreadChangeHandler);
+    IMSDK.off(SdkEvent.OnConversationChanged, conversationChnageHandler);
+    IMSDK.off(SdkEvent.OnNewConversation, newConversationHandler);
+    IMSDK.off(SdkEvent.OnTotalUnreadMessageCountChanged, totalUnreadChangeHandler);
     // friend
-    IMSDK.off(CbEvents.OnFriendInfoChanged, friednInfoChangeHandler);
-    IMSDK.off(CbEvents.OnFriendAdded, friednAddedHandler);
-    IMSDK.off(CbEvents.OnFriendDeleted, friednDeletedHandler);
+    IMSDK.off(SdkEvent.OnFriendInfoChanged, friednInfoChangeHandler);
+    IMSDK.off(SdkEvent.OnFriendAdded, friednAddedHandler);
+    IMSDK.off(SdkEvent.OnFriendDeleted, friednDeletedHandler);
     // blacklist
-    IMSDK.off(CbEvents.OnBlackAdded, blackAddedHandler);
-    IMSDK.off(CbEvents.OnBlackDeleted, blackDeletedHandler);
+    IMSDK.off(SdkEvent.OnBlackAdded, blackAddedHandler);
+    IMSDK.off(SdkEvent.OnBlackDeleted, blackDeletedHandler);
     // group
-    IMSDK.off(CbEvents.OnJoinedGroupAdded, joinedGroupAddedHandler);
-    IMSDK.off(CbEvents.OnJoinedGroupDeleted, joinedGroupDeletedHandler);
-    IMSDK.off(CbEvents.OnGroupDismissed, joinedGroupDismissHandler);
-    IMSDK.off(CbEvents.OnGroupInfoChanged, groupInfoChangedHandler);
-    IMSDK.off(CbEvents.OnGroupMemberAdded, groupMemberAddedHandler);
-    IMSDK.off(CbEvents.OnGroupMemberDeleted, groupMemberDeletedHandler);
-    IMSDK.off(CbEvents.OnGroupMemberInfoChanged, groupMemberInfoChangedHandler);
+    IMSDK.off(SdkEvent.OnJoinedGroupAdded, joinedGroupAddedHandler);
+    IMSDK.off(SdkEvent.OnJoinedGroupDeleted, joinedGroupDeletedHandler);
+    IMSDK.off(SdkEvent.OnGroupDismissed, joinedGroupDismissHandler);
+    IMSDK.off(SdkEvent.OnGroupInfoChanged, groupInfoChangedHandler);
+    IMSDK.off(SdkEvent.OnGroupMemberAdded, groupMemberAddedHandler);
+    IMSDK.off(SdkEvent.OnGroupMemberDeleted, groupMemberDeletedHandler);
+    IMSDK.off(SdkEvent.OnGroupMemberInfoChanged, groupMemberInfoChangedHandler);
     // application
-    IMSDK.off(CbEvents.OnFriendApplicationAdded, friendApplicationProcessedHandler);
-    IMSDK.off(CbEvents.OnFriendApplicationAccepted, friendApplicationProcessedHandler);
-    IMSDK.off(CbEvents.OnFriendApplicationRejected, friendApplicationProcessedHandler);
-    IMSDK.off(CbEvents.OnGroupApplicationAdded, groupApplicationProcessedHandler);
-    IMSDK.off(CbEvents.OnGroupApplicationAccepted, groupApplicationProcessedHandler);
-    IMSDK.off(CbEvents.OnGroupApplicationRejected, groupApplicationProcessedHandler);
+    IMSDK.off(SdkEvent.OnFriendApplicationAdded, friendApplicationProcessedHandler);
+    IMSDK.off(SdkEvent.OnFriendApplicationAccepted, friendApplicationProcessedHandler);
+    IMSDK.off(SdkEvent.OnFriendApplicationRejected, friendApplicationProcessedHandler);
+    IMSDK.off(SdkEvent.OnGroupApplicationAdded, groupApplicationProcessedHandler);
+    IMSDK.off(SdkEvent.OnGroupApplicationAccepted, groupApplicationProcessedHandler);
+    IMSDK.off(SdkEvent.OnGroupApplicationRejected, groupApplicationProcessedHandler);
   };
 
   const setIpcListener = () => {

@@ -1,9 +1,9 @@
-import { CbEvents, MessageType } from "@openim/wasm-client-sdk";
+import { MessageType, SdkEvent } from "@openim/wasm-client-sdk";
 import {
   GroupItem,
   MessageItem,
-  RtcInvite,
-  WSEvent,
+  SdkEventEnvelope,
+  SignalingInvitation,
 } from "@openim/wasm-client-sdk/lib/types/entity";
 import { Popover } from "antd";
 import i18n, { t } from "i18next";
@@ -63,9 +63,9 @@ const TopSearchBar = () => {
       setInviteData(inviteData);
       rtcRef.current?.openOverlay();
     };
-    const newMessageHandler = ({ data }: WSEvent<MessageItem[]>) => {
+    const newMessageHandler = ({ data }: SdkEventEnvelope<MessageItem[]>) => {
       if (rtcRef.current?.isOverlayOpen) return;
-      let rtcInvite = undefined as undefined | RtcInvite;
+      let rtcInvite = undefined as undefined | SignalingInvitation;
       data.map((message) => {
         if (message.contentType === MessageType.CustomMessage) {
           const customData = JSON.parse(message.customElem!.data);
@@ -97,13 +97,13 @@ const TopSearchBar = () => {
     emitter.on("OPEN_GROUP_CARD", openGroupCardWithData);
     emitter.on("OPEN_CHOOSE_MODAL", chooseModalHandler);
     emitter.on("OPEN_RTC_MODAL", callRtcHandler);
-    IMSDK.on(CbEvents.OnRecvNewMessages, newMessageHandler);
+    IMSDK.on(SdkEvent.OnRecvNewMessages, newMessageHandler);
     return () => {
       emitter.off("OPEN_USER_CARD", userCardHandler);
       emitter.off("OPEN_GROUP_CARD", openGroupCardWithData);
       emitter.off("OPEN_CHOOSE_MODAL", chooseModalHandler);
       emitter.off("OPEN_RTC_MODAL", callRtcHandler);
-      IMSDK.off(CbEvents.OnRecvNewMessages, newMessageHandler);
+      IMSDK.off(SdkEvent.OnRecvNewMessages, newMessageHandler);
     };
   }, []);
 

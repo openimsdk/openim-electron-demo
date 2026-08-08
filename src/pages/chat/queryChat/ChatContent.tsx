@@ -1,4 +1,3 @@
-import { SessionType } from "@openim/wasm-client-sdk";
 import { Layout, Spin } from "antd";
 import clsx from "clsx";
 import { memo, useEffect, useRef } from "react";
@@ -87,7 +86,9 @@ const ChatContent = () => {
                 key={message.clientMsgID}
                 conversationID={conversationID}
                 message={message}
-                messageUpdateFlag={message.senderNickname + message.senderFaceUrl}
+                messageUpdateFlag={`${message.senderNickname ?? ""}${
+                  message.senderFaceUrl ?? ""
+                }`}
                 isSender={isSender}
               />
             );

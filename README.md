@@ -35,8 +35,8 @@ This repository adopts the GNU Affero General Public License v3 (AGPL-3.0) with 
 Before you start developing, please ensure that your system has the following software installed:
 
 - **Operating System**: Windows 10 or above, macOS 10.15 or above
-- **Node.js**: Version ≥ 16.x ([manual installation](https://nodejs.org/dist/latest-v20.x/) or via [nvm](https://github.com/nvm-sh/nvm))
-- **npm**: Version ≥ 6.x (installed with Node.js)
+- **Node.js**: Version ≥ 18.12 ([manual installation](https://nodejs.org/dist/latest-v20.x/) or via [nvm](https://github.com/nvm-sh/nvm))
+- **pnpm**: Version 10.x. The repository pins pnpm 10.28.0 through the `packageManager` field.
 - **Git**: For version control
 
 You also need to have the latest version of the [OpenIM Server deployed](https://docs.openim.io/guides/gettingStarted/dockerCompose). After that, you can compile this project and connect it to your own server for testing.
@@ -68,10 +68,12 @@ Follow these steps to set up your local development environment:
    cd openim-electron-demo
    ```
 
-2. Install dependencies
+2. Enable the pinned pnpm version and install dependencies
 
    ```bash
-   npm install
+   corepack enable
+   corepack prepare pnpm@10.28.0 --activate
+   pnpm install --frozen-lockfile
    ```
 
 3. Modify the configuration
@@ -94,9 +96,19 @@ Follow these steps to set up your local development environment:
      # VITE_CHAT_URL=https://$VITE_BASE_DOMAIN/chat
      ```
 
-4. Run `npm run dev` to start the development server. Access [http://localhost:5173](http://localhost:5173) to view the result. By default, the Electron application will also start.
+4. Run `pnpm dev` to start the development server. Access [http://localhost:5173](http://localhost:5173) to view the result. By default, the Electron application will also start.
 
 5. Start developing and testing! 🎉
+
+### Common Commands
+
+| Command          | Purpose                              |
+| ---------------- | ------------------------------------ |
+| `pnpm dev`       | Start Vite and the Electron app      |
+| `pnpm typecheck` | Run the complete TypeScript check    |
+| `pnpm lint`      | Run ESLint against the source code   |
+| `pnpm build`     | Build the Web and Electron processes |
+| `pnpm e2e`       | Run the Playwright end-to-end tests  |
 
 ## Audio/Video Calls
 
@@ -114,13 +126,13 @@ The open-source version supports one-to-one audio and video calls. You need to f
 
 1. Run the following command to build the Web application:
    ```bash
-   npm run build
+   pnpm build
    ```
 2. The build artifacts will be located in the `dist` directory.
 
 ### Electron Application
 
-1. Replace the content of `package.json` with the content from `package_electron.json`, retaining only the dependencies required by Electron. This significantly reduces the package size. Also, modify the build scripts accordingly.
+1. Install dependencies with the development `package.json` first. For packaging only, replace `package.json` with `package_electron.json`, which retains the Electron runtime dependencies and packaging scripts. Do not run `pnpm install` again while the packaging manifest is active.
 
 2. On the corresponding system, run one of the following commands to build the Electron application:
 
@@ -128,18 +140,25 @@ The open-source version supports one-to-one audio and video calls. You need to f
 
    - macOS:
      ```bash
-     npm run build:mac
+     pnpm build:mac
      ```
    - Windows:
      ```bash
-     npm run build:win
+     pnpm build:win
      ```
    - Linux:
      ```bash
-     npm run build:linux
+     pnpm build:linux
      ```
 
-3. The build artifacts will be located in the `release` directory.
+3. Restore the development manifest after packaging:
+
+   ```bash
+   cp package_dev.json package.json
+   pnpm install --frozen-lockfile
+   ```
+
+4. The build artifacts will be located in the `release` directory.
 
 ## Features
 
@@ -231,4 +250,11 @@ For more advanced features, audio/video calls, or video conferences, please cont
 
 2. **CKEditorError: ckeditor-duplicated-modules**
 
-   Answer: This is due to dependency conflicts. Run `npm dedupe` to clean up dependencies.
+   Answer: Do not mix npm or Yarn installations with this repository. Remove the stale `node_modules` directory and run `pnpm install --frozen-lockfile` so CKEditor uses the version and pnpm patch recorded in `pnpm-lock.yaml`.
+
+## Dependency Management
+
+- Use pnpm 10 for all dependency and script operations. Do not run npm or Yarn in this repository.
+- Commit `pnpm-lock.yaml` whenever `package.json` changes. CI and reproducible local installs should use `pnpm install --frozen-lockfile`.
+- Add or remove packages with `pnpm add`, `pnpm add -D`, and `pnpm remove`; do not edit the lockfile manually.
+- Native install scripts are intentionally restricted through `pnpm.onlyBuiltDependencies`. Review that allowlist when adding native dependencies.

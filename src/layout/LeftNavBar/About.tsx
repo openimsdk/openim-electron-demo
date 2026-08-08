@@ -1,6 +1,5 @@
 import { CloseOutlined, RightOutlined } from "@ant-design/icons";
-import { CbEvents } from "@openim/wasm-client-sdk";
-import { WSEvent } from "@openim/wasm-client-sdk/lib/types/entity";
+import { SdkEvent, SdkEventEnvelope } from "@openim/wasm-client-sdk";
 import { useRequest } from "ahooks";
 import { App, Button, Divider, Form, Input, Modal, Space, Spin } from "antd";
 import { t } from "i18next";
@@ -13,6 +12,18 @@ import { feedbackToast } from "@/utils/common";
 
 import { OverlayVisibleHandle, useOverlayVisible } from "../../hooks/useOverlayVisible";
 import { IMSDK } from "../MainContentWrap";
+
+type UploadLogsProgress = {
+  current: number;
+  size: number;
+};
+
+const isUploadLogsProgress = (data: unknown): data is UploadLogsProgress => {
+  if (!data || typeof data !== "object") return false;
+
+  const progress = data as Partial<UploadLogsProgress>;
+  return typeof progress.current === "number" && typeof progress.size === "number";
+};
 
 const About: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (_, ref) => {
   const [form] = Form.useForm();
@@ -49,7 +60,7 @@ export const AboutContent = ({ closeOverlay }: { closeOverlay?: () => void }) =>
   const { modal } = App.useApp();
   const [progress, setProgress] = useState(0);
 
-  const [_, copyToClipboard] = useCopyToClipboard();
+  const [, copyToClipboard] = useCopyToClipboard();
 
   const { loading, runAsync } = useRequest(IMSDK.uploadLogs, {
     manual: true,
@@ -71,16 +82,17 @@ export const AboutContent = ({ closeOverlay }: { closeOverlay?: () => void }) =>
   };
 
   useEffect(() => {
-    const uploadHandler = ({
-      data: { current, size },
-    }: WSEvent<{ current: number; size: number }>) => {
+    const uploadHandler = ({ data }: SdkEventEnvelope) => {
+      if (!isUploadLogsProgress(data) || data.size <= 0) return;
+
+      const { current, size } = data;
       const progress = (current / size) * 100;
       console.log("OnUploadLogsProgress", Number(progress.toFixed(0)), current, size);
       setProgress(Number(progress.toFixed(0)));
     };
-    IMSDK.on(CbEvents.OnUploadLogsProgress, uploadHandler);
+    IMSDK.on(SdkEvent.OnUploadLogsProgress, uploadHandler);
     return () => {
-      IMSDK.off(CbEvents.OnUploadLogsProgress, uploadHandler);
+      IMSDK.off(SdkEvent.OnUploadLogsProgress, uploadHandler);
     };
   }, []);
 

@@ -3,11 +3,11 @@ import {
   useLocalParticipant,
   useRoomContext,
 } from "@livekit/components-react";
-import { CbEvents, MessageType } from "@openim/wasm-client-sdk";
+import { MessageType, SdkEvent } from "@openim/wasm-client-sdk";
 import {
   MessageItem,
-  RtcInvite,
-  WSEvent,
+  SdkEventEnvelope,
+  SignalingInvitation,
 } from "@openim/wasm-client-sdk/lib/types/entity";
 import clsx from "clsx";
 import { t } from "i18next";
@@ -33,7 +33,7 @@ interface IRtcControlProps {
   isWaiting: boolean;
   isRecv: boolean;
   isConnected: boolean;
-  invitation: RtcInvite;
+  invitation: SignalingInvitation;
   connectRtc: (data?: AuthData) => void;
   closeOverlay: () => void;
   sendCustomSignal: (recvID: string, customType: CustomType) => Promise<void>;
@@ -55,7 +55,7 @@ export const RtcControl = ({
   const isVideoCall = invitation.mediaType === "video";
 
   useEffect(() => {
-    const acceptHandler = async ({ roomID }: RtcInvite) => {
+    const acceptHandler = async ({ roomID }: SignalingInvitation) => {
       if (invitation.roomID !== roomID) return;
       const { data } = await getRtcConnectData(
         roomID,
@@ -63,16 +63,16 @@ export const RtcControl = ({
       );
       connectRtc(data);
     };
-    const rejectHandler = ({ roomID }: RtcInvite) => {
+    const rejectHandler = ({ roomID }: SignalingInvitation) => {
       if (invitation.roomID !== roomID) return;
       closeOverlay();
     };
-    const hangupHandler = ({ roomID }: RtcInvite) => {
+    const hangupHandler = ({ roomID }: SignalingInvitation) => {
       if (invitation.roomID !== roomID) return;
       room.disconnect();
       closeOverlay();
     };
-    const cancelHandler = ({ roomID }: RtcInvite) => {
+    const cancelHandler = ({ roomID }: SignalingInvitation) => {
       if (invitation.roomID !== roomID) return;
       if (!isWaiting) return;
       closeOverlay();
@@ -87,11 +87,11 @@ export const RtcControl = ({
       }
     };
 
-    const newMessageHandler = ({ data }: WSEvent<MessageItem[]>) => {
+    const newMessageHandler = ({ data }: SdkEventEnvelope<MessageItem[]>) => {
       data.map((message) => {
         if (message.contentType === MessageType.CustomMessage) {
           const customData = JSON.parse(message.customElem!.data) as {
-            data: RtcInvite;
+            data: SignalingInvitation;
             customType: CustomType;
           };
           if (customData.customType === CustomType.CallingAccept) {
@@ -110,10 +110,10 @@ export const RtcControl = ({
       });
     };
 
-    IMSDK.on(CbEvents.OnRecvNewMessages, newMessageHandler);
+    IMSDK.on(SdkEvent.OnRecvNewMessages, newMessageHandler);
     room.on(RoomEvent.ParticipantDisconnected, participantDisconnectedHandler);
     return () => {
-      IMSDK.off(CbEvents.OnRecvNewMessages, newMessageHandler);
+      IMSDK.off(SdkEvent.OnRecvNewMessages, newMessageHandler);
       room.off(RoomEvent.ParticipantDisconnected, participantDisconnectedHandler);
     };
   }, [room, invitation.roomID, isWaiting]);

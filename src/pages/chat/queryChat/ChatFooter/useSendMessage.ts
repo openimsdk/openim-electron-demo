@@ -1,6 +1,8 @@
-import { MessageStatus } from "@openim/wasm-client-sdk";
-import { MessageItem, WsResponse } from "@openim/wasm-client-sdk/lib/types/entity";
-import { SendMsgParams } from "@openim/wasm-client-sdk/lib/types/params";
+import {
+  MessageItem,
+  MessageStatus,
+  SendMessageParams as SdkSendMessageParams,
+} from "@openim/wasm-client-sdk";
 import { useCallback } from "react";
 
 import { IMSDK } from "@/layout/MainContentWrap";
@@ -9,7 +11,7 @@ import { emit } from "@/utils/events";
 
 import { pushNewMessage, updateOneMessage } from "../useHistoryMessageList";
 
-export type SendMessageParams = Partial<Omit<SendMsgParams, "message">> & {
+export type SendMessageParams = Partial<Omit<SdkSendMessageParams, "message">> & {
   message: MessageItem;
   needPush?: boolean;
 };

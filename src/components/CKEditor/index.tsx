@@ -1,10 +1,8 @@
 import "./index.scss";
 import "ckeditor5/ckeditor5.css";
 
-import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
-import { Essentials } from "@ckeditor/ckeditor5-essentials";
-import { Paragraph } from "@ckeditor/ckeditor5-paragraph";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
+import { ClassicEditor, Essentials, Paragraph } from "ckeditor5";
 import {
   forwardRef,
   ForwardRefRenderFunction,

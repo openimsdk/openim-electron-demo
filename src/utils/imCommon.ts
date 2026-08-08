@@ -55,13 +55,15 @@ const linkWrap = ({
   fromAt,
 }: {
   userID: string;
-  groupID: string;
+  groupID?: string;
   name: string;
   fromAt?: boolean;
 }) => {
-  return `<span class='link-el${fromAt ? "" : " member-el"
-    } max-w-[200px] truncate inline-block align-bottom' onclick='userClick("${userID}","${groupID ?? ""
-    }")'>${name}</span>`;
+  return `<span class='link-el${
+    fromAt ? "" : " member-el"
+  } max-w-[200px] truncate inline-block align-bottom' onclick='userClick("${userID}","${
+    groupID ?? ""
+  }")'>${name}</span>`;
 };
 
 export const notificationMessageFormat = (msg: MessageItem) => {
@@ -126,11 +128,11 @@ export const notificationMessageFormat = (msg: MessageItem) => {
         let inviteStr = "";
         invitedUserList.slice(0, 3).map(
           (user: any) =>
-          (inviteStr += `${linkWrap({
-            userID: user.userID,
-            groupID: msg.groupID,
-            name: getName(user),
-          })}、`),
+            (inviteStr += `${linkWrap({
+              userID: user.userID,
+              groupID: msg.groupID,
+              name: getName(user),
+            })}、`),
         );
         inviteStr = inviteStr.slice(0, -1);
         return t("messageDescription.invitedToGroupMessage", {
@@ -139,12 +141,13 @@ export const notificationMessageFormat = (msg: MessageItem) => {
             groupID: msg.groupID,
             name: getName(inviteOpUser),
           }),
-          invitedUser: `${inviteStr}${invitedUserList.length > 3
-            ? `${t("placeholder.and")}${t("placeholder.somePerson", {
-              num: invitedUserList.length,
-            })}`
-            : ""
-            }`,
+          invitedUser: `${inviteStr}${
+            invitedUserList.length > 3
+              ? `${t("placeholder.and")}${t("placeholder.somePerson", {
+                  num: invitedUserList.length,
+                })}`
+              : ""
+          }`,
         });
       case MessageType.MemberKicked:
         const kickDetails = JSON.parse(msg.notificationElem!.detail);
@@ -153,11 +156,11 @@ export const notificationMessageFormat = (msg: MessageItem) => {
         let kickStr = "";
         kickdUserList.slice(0, 3).map(
           (user: any) =>
-          (kickStr += `${linkWrap({
-            userID: user.userID,
-            groupID: msg.groupID,
-            name: getName(user),
-          })}、`),
+            (kickStr += `${linkWrap({
+              userID: user.userID,
+              groupID: msg.groupID,
+              name: getName(user),
+            })}、`),
         );
         kickStr = kickStr.slice(0, -1);
         return t("messageDescription.kickInGroupMessage", {
@@ -272,12 +275,13 @@ export const formatMessageByType = (message?: MessageItem): string => {
         inviteStr = inviteStr.slice(0, -1);
         return t("messageDescription.invitedToGroupMessage", {
           operator: getName(inviteOpUser),
-          invitedUser: `${inviteStr}${invitedUserList.length > 3
-            ? `${t("placeholder.and")}${t("placeholder.somePerson", {
-              num: invitedUserList.length,
-            })}`
-            : ""
-            }`,
+          invitedUser: `${inviteStr}${
+            invitedUserList.length > 3
+              ? `${t("placeholder.and")}${t("placeholder.somePerson", {
+                  num: invitedUserList.length,
+                })}`
+              : ""
+          }`,
         });
       case MessageType.MemberKicked:
         const kickDetails = JSON.parse(message.notificationElem!.detail);
@@ -288,12 +292,13 @@ export const formatMessageByType = (message?: MessageItem): string => {
         kickStr = kickStr.slice(0, -1);
         return t("messageDescription.kickInGroupMessage", {
           operator: getName(kickOpUser),
-          kickedUser: `${kickStr}${kickdUserList.length > 3
-            ? `${t("placeholder.and")}${t("placeholder.somePerson", {
-              num: kickdUserList.length,
-            })}`
-            : ""
-            }`,
+          kickedUser: `${kickStr}${
+            kickdUserList.length > 3
+              ? `${t("placeholder.and")}${t("placeholder.somePerson", {
+                  num: kickdUserList.length,
+                })}`
+              : ""
+          }`,
         });
       case MessageType.MemberQuit:
         const quitDetails = JSON.parse(message.notificationElem!.detail);
@@ -415,15 +420,13 @@ export const calcApplicationBadge = async () => {
   const unHandleFriendApplicationNum = useContactStore
     .getState()
     .recvFriendApplicationList.filter(
-      (application) =>
-        application.handleResult === 0,
+      (application) => application.handleResult === 0,
     ).length;
 
   const unHandleGroupApplicationNum = useContactStore
     .getState()
     .recvGroupApplicationList.filter(
-      (application) =>
-        application.handleResult === 0,
+      (application) => application.handleResult === 0,
     ).length;
   useContactStore
     .getState()

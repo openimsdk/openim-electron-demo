@@ -41,7 +41,7 @@ export const NewFriends = () => {
         });
         const newApplication = {
           ...application,
-          handleResult: ApplicationHandleResult.Agree,
+          handleResult: ApplicationHandleResult.Accepted,
         };
         if (isRecv) {
           updateRecvFriendApplication(newApplication);
@@ -64,7 +64,7 @@ export const NewFriends = () => {
         });
         const newApplication = {
           ...application,
-          handleResult: ApplicationHandleResult.Reject,
+          handleResult: ApplicationHandleResult.Rejected,
         };
         if (isRecv) {
           updateRecvFriendApplication(newApplication);

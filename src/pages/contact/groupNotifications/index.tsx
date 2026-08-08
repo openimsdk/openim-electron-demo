@@ -41,7 +41,7 @@ export const GroupNotifications = () => {
         });
         const newApplication = {
           ...application,
-          handleResult: ApplicationHandleResult.Agree,
+          handleResult: ApplicationHandleResult.Accepted,
         };
         if (isRecv) {
           updateRecvGroupApplication(newApplication);
@@ -65,7 +65,7 @@ export const GroupNotifications = () => {
         });
         const newApplication = {
           ...application,
-          handleResult: ApplicationHandleResult.Reject,
+          handleResult: ApplicationHandleResult.Rejected,
         };
         if (isRecv) {
           updateRecvGroupApplication(newApplication);

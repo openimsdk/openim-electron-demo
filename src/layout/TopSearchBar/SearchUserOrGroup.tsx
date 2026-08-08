@@ -1,5 +1,5 @@
 import { CloseOutlined } from "@ant-design/icons";
-import { GroupItem, WSEvent } from "@openim/wasm-client-sdk/lib/types/entity";
+import { GroupItem, SdkEventEnvelope } from "@openim/wasm-client-sdk/lib/types/entity";
 import { Button, Input, InputRef } from "antd";
 import { t } from "i18next";
 import {
@@ -57,7 +57,7 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
         openGroupCardWithData(groupInfo);
       } catch (error) {
         setLoading(false);
-        if ((error as WSEvent).errCode === 1004) {
+        if ((error as SdkEventEnvelope).errCode === 1004) {
           message.warning(t("empty.noSearchResults"));
           return;
         }
@@ -86,7 +86,7 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
         });
       } catch (error) {
         setLoading(false);
-        if ((error as WSEvent).errCode === 1004) {
+        if ((error as SdkEventEnvelope).errCode === 1004) {
           message.warning(t("empty.noSearchResults"));
           return;
         }

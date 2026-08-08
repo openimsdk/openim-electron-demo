@@ -1,12 +1,23 @@
-import { MessageItem } from "@openim/wasm-client-sdk";
+import type { getSDK, MessageItem } from "@openim/wasm-client-sdk";
 import { v4 as uuidV4 } from "uuid";
 
 import { IMSDK } from "@/layout/MainContentWrap";
-import { base64toFile, canSendImageTypeList } from "@/utils/common";
 
 export interface FileWithPath extends File {
   path?: string;
 }
+
+type WasmFileMessageSdk = Pick<ReturnType<typeof getSDK>, "createImageMessageByFile">;
+
+const supportsWasmFileMessage = (sdk: unknown): sdk is WasmFileMessageSdk =>
+  typeof (sdk as Partial<WasmFileMessageSdk>)?.createImageMessageByFile === "function";
+
+const assertMessage = (message: MessageItem | ""): MessageItem => {
+  if (!message) {
+    throw new Error("OpenIM SDK returned an empty image message");
+  }
+  return message;
+};
 
 export function useFileMessage() {
   const getImageMessage = async (file: FileWithPath) => {
@@ -21,9 +32,17 @@ export function useFileMessage() {
     };
 
     if (window.electronAPI) {
-      const imageMessage = (await IMSDK.createImageMessageFromFullPath(file.path!))
-        .data;
-      imageMessage.pictureElem!.sourcePicture.url = baseInfo.url;
+      if (!file.path) {
+        throw new Error("A local file path is required in Electron");
+      }
+
+      const imageMessage = assertMessage(
+        (await IMSDK.createImageMessageFromFullPath(file.path)).data,
+      );
+      if (!imageMessage.pictureElem) {
+        throw new Error("OpenIM SDK returned an image message without pictureElem");
+      }
+      imageMessage.pictureElem.sourcePicture.url = baseInfo.url;
       return imageMessage;
     }
     const options = {
@@ -34,11 +53,14 @@ export function useFileMessage() {
       file,
     };
 
+    if (!supportsWasmFileMessage(IMSDK)) {
+      throw new Error("The WASM image file API is unavailable");
+    }
     return (await IMSDK.createImageMessageByFile(options)).data;
   };
 
   const getPicInfo = (file: File): Promise<HTMLImageElement> =>
-    new Promise((resolve, reject) => {
+    new Promise((resolve) => {
       const _URL = window.URL || window.webkitURL;
       const img = new Image();
       img.onload = function () {
@@ -47,8 +69,7 @@ export function useFileMessage() {
       img.src = _URL.createObjectURL(file);
     });
 
-
   return {
-    getImageMessage
+    getImageMessage,
   };
 }

@@ -1,4 +1,4 @@
-import { MessageItem, ViewType } from "@openim/wasm-client-sdk";
+import { MessageItem, MessageViewType } from "@openim/wasm-client-sdk";
 import { useLatest, useRequest } from "ahooks";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -79,7 +79,7 @@ export function useHistoryMessageList() {
           ? latestLoadState.current.messageList[0]?.clientMsgID
           : "",
         conversationID: conversationID ?? "",
-        viewType: ViewType.History,
+        viewType: MessageViewType.History,
       });
       if (conversationID !== reqConversationID) return;
       setTimeout(() =>

@@ -1,4 +1,4 @@
-import type { MessageReceiveOptType } from "@openim/wasm-client-sdk";
+import type { MessageReceiveOption } from "@openim/wasm-client-sdk";
 import { useMutation } from "react-query";
 import { v4 as uuidv4 } from "uuid";
 
@@ -162,7 +162,7 @@ export interface BusinessUserInfo {
   allowAddFriend: BusinessAllowType;
   allowBeep: BusinessAllowType;
   allowVibration: BusinessAllowType;
-  globalRecvMsgOpt: MessageReceiveOptType;
+  globalRecvMsgOpt: MessageReceiveOption;
 }
 
 export enum BusinessAllowType {

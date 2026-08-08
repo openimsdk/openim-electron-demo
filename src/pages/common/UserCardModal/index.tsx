@@ -1,9 +1,9 @@
-import { CbEvents } from "@openim/wasm-client-sdk";
+import { SdkEvent } from "@openim/wasm-client-sdk";
 import { SessionType } from "@openim/wasm-client-sdk";
 import {
   FriendUserItem,
   GroupMemberItem,
-  WSEvent,
+  SdkEventEnvelope,
 } from "@openim/wasm-client-sdk/lib/types/entity";
 import { useLatest } from "ahooks";
 import { Button, Divider, Spin } from "antd";
@@ -126,17 +126,17 @@ const UserCardModal: ForwardRefRenderFunction<
 
   useEffect(() => {
     if (!isOverlayOpen) return;
-    const friendAddedHandler = ({ data }: WSEvent<FriendUserItem>) => {
+    const friendAddedHandler = ({ data }: SdkEventEnvelope<FriendUserItem>) => {
       if (data.userID === userID) {
         refetch();
       }
     };
-    IMSDK.on(CbEvents.OnFriendAdded, friendAddedHandler);
+    IMSDK.on(SdkEvent.OnFriendAdded, friendAddedHandler);
     refreshData(
       props.cardInfo ? { cardInfo: props.cardInfo } : latestFullCardInfo.current,
     );
     return () => {
-      IMSDK.off(CbEvents.OnFriendAdded, friendAddedHandler);
+      IMSDK.off(SdkEvent.OnFriendAdded, friendAddedHandler);
     };
   }, [isOverlayOpen, props.cardInfo]);
 

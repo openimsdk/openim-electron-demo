@@ -50,10 +50,10 @@ const ApplicationItem = ({
   };
 
   const getStatusStr = () => {
-    if (source.handleResult === ApplicationHandleResult.Agree) {
+    if (source.handleResult === ApplicationHandleResult.Accepted) {
       return t("application.agreed");
     }
-    if (source.handleResult === ApplicationHandleResult.Reject) {
+    if (source.handleResult === ApplicationHandleResult.Rejected) {
       return t("application.refused");
     }
     return t("application.pending");

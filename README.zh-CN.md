@@ -34,8 +34,8 @@ OpenIM 为开发者提供开源即时通讯 SDK，作为 Twilio、Sendbird 等�
 在开始开发之前，请确保您的系统已安装以下软件：
 
 - **操作系统**：Windows 10 或更高版本、macOS 10.15 或更高版本
-- **Node.js**：版本 ≥ 16.x（[手动安装](https://nodejs.org/dist/latest-v20.x/) 或使用 [nvm](https://github.com/nvm-sh/nvm) 进行版本管理）
-- **npm**：版本 ≥ 6.x（随 Node.js 一起安装）
+- **Node.js**：版本 ≥ 18.12（[手动安装](https://nodejs.org/dist/latest-v20.x/) 或使用 [nvm](https://github.com/nvm-sh/nvm) 进行版本管理）
+- **pnpm**：版本 10.x。仓库通过 `packageManager` 字段固定使用 pnpm 10.28.0。
 - **Git**：用于代码版本控制
 
 同时，您需要确保已经[部署](https://docs.openim.io/zh-Hans/guides/gettingStarted/dockerCompose)了最新版本的 OpenIM Server。接下来，您可以编译项目并连接自己的服务端进行测试。
@@ -67,10 +67,12 @@ OpenIM 为开发者提供开源即时通讯 SDK，作为 Twilio、Sendbird 等�
    cd openim-electron-demo
    ```
 
-2. 安装依赖
+2. 启用仓库指定的 pnpm 版本并安装依赖
 
    ```bash
-   npm install
+   corepack enable
+   corepack prepare pnpm@10.28.0 --activate
+   pnpm install --frozen-lockfile
    ```
 
 3. 修改配置
@@ -93,9 +95,19 @@ OpenIM 为开发者提供开源即时通讯 SDK，作为 Twilio、Sendbird 等�
      # VITE_CHAT_URL=https://$VITE_BASE_DOMAIN/chat
      ```
 
-4. 运行 `npm run dev` 来启动开发服务器。访问 [http://localhost:5173](http://localhost:5173) 查看结果。默认情况下将同时启动 Electron 应用程序。
+4. 运行 `pnpm dev` 来启动开发服务器。访问 [http://localhost:5173](http://localhost:5173) 查看结果。默认情况下将同时启动 Electron 应用程序。
 
 5. 开始开发测试！ 🎉
+
+### 常用命令
+
+| 命令             | 用途                           |
+| ---------------- | ------------------------------ |
+| `pnpm dev`       | 启动 Vite 和 Electron 应用     |
+| `pnpm typecheck` | 执行完整 TypeScript 类型检查   |
+| `pnpm lint`      | 对源码执行 ESLint 检查         |
+| `pnpm build`     | 构建 Web 和 Electron 进程代码  |
+| `pnpm e2e`       | 执行 Playwright 端到端测试用例 |
 
 ## 音视频通话
 
@@ -113,13 +125,13 @@ OpenIM 为开发者提供开源即时通讯 SDK，作为 Twilio、Sendbird 等�
 
 1. 运行以下命令来构建 Web 应用程序：
    ```bash
-   npm run build
+   pnpm build
    ```
 2. 构建结果将位于 `dist` 目录。
 
 ### Electron 应用程序
 
-1. 使用 `package_electron.json` 替换 `package.json` 文件的内容，只保留 Electron 运行所需的依赖项，这将显著减小包的大小。同时，修改打包脚本。
+1. 先使用开发版 `package.json` 安装依赖。仅在打包阶段使用 `package_electron.json` 替换 `package.json`，该清单只保留 Electron 运行依赖和打包脚本。打包清单生效期间不要再次执行 `pnpm install`。
 
 2. 在对应系统下运行以下命令之一来构建 Electron 应用程序：
 
@@ -127,19 +139,26 @@ OpenIM 为开发者提供开源即时通讯 SDK，作为 Twilio、Sendbird 等�
 
    - macOS:
      ```bash
-     npm run build:mac
+     pnpm build:mac
      ```
    - Windows:
      ```bash
-     npm run build:win
+     pnpm build:win
      ```
    - Linux:
 
      ```bash
-     npm run build:linux
+     pnpm build:linux
      ```
 
-3. 构建结果将位于 `release` 目录下。
+3. 打包完成后恢复开发清单：
+
+   ```bash
+   cp package_dev.json package.json
+   pnpm install --frozen-lockfile
+   ```
+
+4. 构建结果将位于 `release` 目录下。
 
 ## 功能列表
 
@@ -231,4 +250,11 @@ OpenIM 为开发者提供开源即时通讯 SDK，作为 Twilio、Sendbird 等�
 
 2. CKEditorError: ckeditor-duplicated-modules
 
-答：依赖冲突，执行`npm dedupe`整理依赖
+答：不要在本仓库混用 npm 或 Yarn。清理旧的 `node_modules` 后执行 `pnpm install --frozen-lockfile`，确保 CKEditor 使用 `pnpm-lock.yaml` 中记录的版本和 pnpm 补丁。
+
+## 依赖管理规范
+
+- 所有依赖安装和脚本执行统一使用 pnpm 10，不要在本仓库运行 npm 或 Yarn。
+- `package.json` 发生变化时必须同步提交 `pnpm-lock.yaml`；CI 和可复现的本地安装使用 `pnpm install --frozen-lockfile`。
+- 使用 `pnpm add`、`pnpm add -D` 和 `pnpm remove` 增删依赖，不要手工修改锁文件。
+- 原生依赖安装脚本通过 `pnpm.onlyBuiltDependencies` 显式限制；增加原生依赖时需要同步审查白名单。
