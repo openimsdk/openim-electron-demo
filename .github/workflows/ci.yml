@@ -36,3 +36,14 @@ jobs:
 
       - name: Check Electron package manifest
         run: pnpm electron:package:check
+
+      - name: Package Linux application
+        run: pnpm electron:build -- --linux --x64 --dir
+
+      - name: Install virtual display
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes xvfb
+
+      - name: Smoke-test packaged application
+        run: xvfb-run --auto-servernum pnpm electron:smoke

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { builtinModules } from "node:module";
+import { builtinModules, createRequire } from "node:module";
 import {
   copyFileSync,
   existsSync,
@@ -17,9 +17,6 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 const packagePath = path.join(repoRoot, "package.json");
 const backupPath = path.join(repoRoot, ".electron-package.backup.json");
 const electronOutputPath = path.join(repoRoot, "dist-electron");
-// electron-builder 23 flattens pnpm dependencies while packaging. Keep runtime
-// dependencies with conflicting hoisted development versions explicit here.
-const requiredRuntimePackages = ["ajv"];
 const pnpmCommand = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 const electronBuilderCommand = path.join(
   repoRoot,
@@ -93,12 +90,84 @@ const detectRuntimePackageNames = () => {
   return [...packageNames].sort();
 };
 
+const resolvePackageManifestPath = (packageName, requiringManifestPath) => {
+  const packageRequire = createRequire(requiringManifestPath);
+  try {
+    return packageRequire.resolve(`${packageName}/package.json`);
+  } catch (error) {
+    if (error?.code !== "ERR_PACKAGE_PATH_NOT_EXPORTED") {
+      throw error;
+    }
+  }
+
+  let currentPath = path.dirname(packageRequire.resolve(packageName));
+  while (true) {
+    const manifestPath = path.join(currentPath, "package.json");
+    if (existsSync(manifestPath)) {
+      const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+      if (manifest.name === packageName) {
+        return manifestPath;
+      }
+    }
+    const parentPath = path.dirname(currentPath);
+    if (parentPath === currentPath) break;
+    currentPath = parentPath;
+  }
+  throw new Error(`Unable to resolve package manifest for ${packageName}`);
+};
+
+const collectInstalledDependencyNames = (rootPackageNames) => {
+  const dependencyNames = new Set();
+  const visitedManifests = new Set();
+
+  const visit = (packageName, requiringManifestPath, optional = false) => {
+    let manifestPath;
+    try {
+      manifestPath = resolvePackageManifestPath(packageName, requiringManifestPath);
+    } catch (error) {
+      if (optional) return;
+      throw new Error(
+        `Unable to resolve runtime dependency ${packageName}: ${error.message}`,
+      );
+    }
+    if (visitedManifests.has(manifestPath)) return;
+    visitedManifests.add(manifestPath);
+
+    const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+    dependencyNames.add(manifest.name ?? packageName);
+    for (const dependencyName of Object.keys(manifest.dependencies ?? {})) {
+      visit(dependencyName, manifestPath);
+    }
+    for (const dependencyName of Object.keys(manifest.optionalDependencies ?? {})) {
+      visit(dependencyName, manifestPath, true);
+    }
+  };
+
+  for (const packageName of rootPackageNames) {
+    visit(packageName, packagePath);
+  }
+  return dependencyNames;
+};
+
 const createRuntimeManifest = (rootPackage) => {
   const dependencies = {};
-  const runtimePackageNames = new Set([
-    ...detectRuntimePackageNames(),
-    ...requiredRuntimePackages,
-  ]);
+  const importedPackageNames = detectRuntimePackageNames();
+  const installedDependencyNames =
+    collectInstalledDependencyNames(importedPackageNames);
+  const declaredDependencies = {
+    ...rootPackage.dependencies,
+    ...rootPackage.optionalDependencies,
+  };
+  const runtimePackageNames = new Set(importedPackageNames);
+
+  // electron-builder 23 flattens pnpm's dependency tree. Promote any explicitly
+  // declared dependency in the runtime closure so the intended version wins over
+  // a conflicting development dependency hoisted at the workspace root.
+  for (const packageName of Object.keys(declaredDependencies)) {
+    if (installedDependencyNames.has(packageName)) {
+      runtimePackageNames.add(packageName);
+    }
+  }
   for (const packageName of [...runtimePackageNames].sort()) {
     const version =
       rootPackage.dependencies?.[packageName] ??
@@ -139,15 +208,20 @@ const ensurePublishMode = (args) => {
 
 const getBuilderCommands = () => {
   const extraArgs = ensurePublishMode(forwardedArgs);
-  if (!buildAll) {
-    return [extraArgs];
+  const commands = buildAll
+    ? [
+        ["--win", "--x64", ...extraArgs],
+        ["--mac", "--x64", "--arm64", ...extraArgs],
+        ["--linux", "--x64", ...extraArgs],
+        ["--linux", "--arm64", ...extraArgs],
+      ]
+    : [extraArgs];
+  for (const args of commands) {
+    if (args.includes("--win") && args.includes("--arm64")) {
+      throw new Error("Windows arm64 is not supported by the OpenIM native SDK");
+    }
   }
-  return [
-    ["--win", "--x64", ...extraArgs],
-    ["--mac", "--x64", "--arm64", ...extraArgs],
-    ["--linux", "--x64", ...extraArgs],
-    ["--linux", "--arm64", ...extraArgs],
-  ];
+  return commands;
 };
 
 const restoreStaleBackup = () => {
@@ -158,6 +232,7 @@ const restoreStaleBackup = () => {
 };
 
 restoreStaleBackup();
+const builderCommands = getBuilderCommands();
 
 if (!dryRun) {
   run(pnpmCommand, ["build"]);
@@ -166,7 +241,6 @@ if (!dryRun) {
 const originalPackageText = readFileSync(packagePath, "utf8");
 const rootPackage = JSON.parse(originalPackageText);
 const runtimeManifest = createRuntimeManifest(rootPackage);
-const builderCommands = getBuilderCommands();
 
 console.log(
   `Electron runtime dependencies: ${Object.keys(runtimeManifest.dependencies).join(

@@ -140,7 +140,6 @@ OpenIM 为开发者提供开源即时通讯 SDK，作为 Twilio、Sendbird 等�
 - macOS x64：`pnpm build:mac`
 - macOS arm64：`pnpm build:mac-arm`
 - Windows x64：`pnpm build:win`
-- Windows arm64：`pnpm build:win-arm`
 - Linux x64：`pnpm build:linux`
 - Linux arm64：`pnpm build:linux-arm`
 - 全部支持的平台：`pnpm build:all`
@@ -151,7 +150,7 @@ OpenIM 为开发者提供开源即时通讯 SDK，作为 Twilio、Sendbird 等�
 pnpm electron:build -- --dir
 ```
 
-构建结果位于 `release` 目录。CI 会执行 `pnpm electron:package:check`，在不生成安装包的情况下校验自动生成的运行时清单。
+构建结果位于 `release` 目录。CI 会校验自动生成的运行时清单、创建 Linux x64 目录包，并在虚拟显示环境中启动打包应用完成冒烟测试。
 
 ## 功能列表
 

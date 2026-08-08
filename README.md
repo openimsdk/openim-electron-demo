@@ -141,7 +141,6 @@ On the corresponding system, run one of the following commands:
 - macOS x64: `pnpm build:mac`
 - macOS arm64: `pnpm build:mac-arm`
 - Windows x64: `pnpm build:win`
-- Windows arm64: `pnpm build:win-arm`
 - Linux x64: `pnpm build:linux`
 - Linux arm64: `pnpm build:linux-arm`
 - All supported targets: `pnpm build:all`
@@ -152,7 +151,7 @@ Additional electron-builder arguments can be passed through the generic command,
 pnpm electron:build -- --dir
 ```
 
-The build artifacts will be located in the `release` directory. CI runs `pnpm electron:package:check` to verify the generated runtime manifest without producing an installer.
+The build artifacts will be located in the `release` directory. CI validates the generated runtime manifest, creates a Linux x64 directory package, and starts the packaged application in a virtual display as a smoke test.
 
 ## Features
 

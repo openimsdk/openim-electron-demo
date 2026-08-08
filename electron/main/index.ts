@@ -16,6 +16,9 @@ const init = () => {
   createMainWindow();
   createAppMenu();
   createTray();
+  if (process.env.OPENIM_SMOKE_TEST === "1") {
+    process.stdout.write("OPENIM_ELECTRON_READY\n");
+  }
 };
 
 setAppGlobalData();

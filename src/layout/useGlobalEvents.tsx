@@ -447,6 +447,7 @@ export function useGlobalEvent() {
     IMSDK.off(SdkEvent.OnSyncServerFailed, syncFailedHandler);
     // message
     IMSDK.off(SdkEvent.OnRecvNewMessages, newMessageHandler);
+    IMSDK.off(SdkEvent.OnNewRecvMessageRevoked, revokedMessageHandler);
     // conversation
     IMSDK.off(SdkEvent.OnConversationChanged, conversationChnageHandler);
     IMSDK.off(SdkEvent.OnNewConversation, newConversationHandler);
