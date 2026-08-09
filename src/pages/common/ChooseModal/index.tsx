@@ -1,6 +1,6 @@
 import { CloseOutlined } from "@ant-design/icons";
 import { GroupType, SessionType } from "@openim/wasm-client-sdk";
-import { Button, Input, Modal, Upload } from "antd";
+import { Button, Input, Modal, Upload, UploadProps } from "antd";
 import clsx from "clsx";
 import i18n, { t } from "i18next";
 import {
@@ -8,6 +8,7 @@ import {
   forwardRef,
   ForwardRefRenderFunction,
   memo,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -18,7 +19,6 @@ import OIMAvatar from "@/components/OIMAvatar";
 import { useConversationToggle } from "@/hooks/useConversationToggle";
 import { OverlayVisibleHandle, useOverlayVisible } from "@/hooks/useOverlayVisible";
 import { IMSDK } from "@/layout/MainContentWrap";
-import { FileWithPath } from "@/pages/chat/queryChat/ChatFooter/SendActionBar/useFileMessage";
 import { feedbackToast } from "@/utils/common";
 import { emit } from "@/utils/events";
 import { uploadFile } from "@/utils/imCommon";
@@ -37,6 +37,14 @@ export interface SelectUserExtraData {
   notConversation: boolean;
   list: CheckListItem[];
 }
+
+const isSelectUserExtraData = (value: unknown): value is SelectUserExtraData => {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Partial<SelectUserExtraData>;
+  return (
+    typeof candidate.notConversation === "boolean" && Array.isArray(candidate.list)
+  );
+};
 
 export interface ChooseModalState {
   type: ChooseModalType;
@@ -125,15 +133,24 @@ export const ChooseContact: FC<ChooseContactProps> = ({
 
   const { toSpecifiedConversation } = useConversationToggle();
 
+  const resetState = useCallback(() => {
+    chooseBoxRef.current?.resetState();
+    setGroupBaseInfo({
+      groupName: "",
+      groupAvatar: "",
+    });
+  }, []);
+
   useEffect(() => {
+    let updateTimer: ReturnType<typeof setTimeout> | undefined;
     if (isOverlayOpen && type === "CRATE_GROUP" && extraData) {
-      setTimeout(
+      updateTimer = setTimeout(
         () => chooseBoxRef.current?.updatePrevCheckList(extraData as CheckListItem[]),
         100,
       );
     }
     if (isOverlayOpen && type === "SELECT_USER" && extraData) {
-      setTimeout(
+      updateTimer = setTimeout(
         () =>
           chooseBoxRef.current?.updatePrevCheckList(
             (extraData as SelectUserExtraData).list,
@@ -142,7 +159,8 @@ export const ChooseContact: FC<ChooseContactProps> = ({
       );
     }
     if (!isOverlayOpen) resetState();
-  }, [isOverlayOpen]);
+    return () => clearTimeout(updateTimer);
+  }, [extraData, isOverlayOpen, resetState, type]);
 
   const confirmChoose = async () => {
     const choosedList = chooseBoxRef.current?.getCheckedList() ?? [];
@@ -155,47 +173,61 @@ export const ChooseContact: FC<ChooseContactProps> = ({
     setLoading(true);
     try {
       switch (type) {
-        case "CRATE_GROUP":
+        case "CRATE_GROUP": {
           if (choosedList.length === 1) {
-            toSpecifiedConversation({
-              sourceID: choosedList[0].userID!,
+            const sourceID = choosedList[0].userID;
+            if (!sourceID) break;
+            await toSpecifiedConversation({
+              sourceID,
               sessionType: SessionType.Single,
             });
             break;
           }
+          const memberUserIDs = choosedList.flatMap((item) =>
+            item.userID ? [item.userID] : [],
+          );
           await IMSDK.createGroup({
             groupInfo: {
               groupType: GroupType.WorkingGroup,
               groupName: groupBaseInfo.groupName,
               faceURL: groupBaseInfo.groupAvatar,
             },
-            memberUserIDs: choosedList.map((item) => item.userID!),
+            memberUserIDs,
             adminUserIDs: [],
           });
           break;
+        }
         case "INVITE_TO_GROUP":
+          if (typeof extraData !== "string") break;
           await IMSDK.inviteUserToGroup({
-            groupID: extraData as string,
-            userIDList: choosedList.map((item) => item.userID!),
+            groupID: extraData,
+            userIDList: choosedList.flatMap((item) =>
+              item.userID ? [item.userID] : [],
+            ),
             reason: "",
           });
           break;
         case "KICK_FORM_GROUP":
+          if (typeof extraData !== "string") break;
           await IMSDK.kickGroupMember({
-            groupID: extraData as string,
-            userIDList: choosedList.map((item) => item.userID!),
+            groupID: extraData,
+            userIDList: choosedList.flatMap((item) =>
+              item.userID ? [item.userID] : [],
+            ),
             reason: "",
           });
           break;
         case "TRANSFER_IN_GROUP":
+          if (typeof extraData !== "string" || !choosedList[0]?.userID) break;
           await IMSDK.transferGroupOwner({
-            groupID: extraData as string,
-            newOwnerUserID: choosedList[0].userID!,
+            groupID: extraData,
+            newOwnerUserID: choosedList[0].userID,
           });
           break;
         case "SELECT_USER":
+          if (!isSelectUserExtraData(extraData)) break;
           emit("SELECT_USER", {
-            notConversation: (extraData as SelectUserExtraData).notConversation,
+            notConversation: extraData.notConversation,
             choosedList,
           });
           break;
@@ -209,23 +241,21 @@ export const ChooseContact: FC<ChooseContactProps> = ({
     closeOverlay();
   };
 
-  const resetState = () => {
-    chooseBoxRef.current?.resetState();
-    setGroupBaseInfo({
-      groupName: "",
-      groupAvatar: "",
-    });
-  };
-
-  const customUpload = async ({ file }: { file: FileWithPath }) => {
-    try {
-      const {
-        data: { url },
-      } = await uploadFile(file);
-      setGroupBaseInfo((prev) => ({ ...prev, groupAvatar: url }));
-    } catch (error) {
-      feedbackToast({ error: t("toast.updateAvatarFailed") });
-    }
+  const customUpload: NonNullable<UploadProps["customRequest"]> = (options) => {
+    if (!(options.file instanceof File)) return;
+    const file = options.file;
+    void (async () => {
+      try {
+        const {
+          data: { url },
+        } = await uploadFile(file);
+        setGroupBaseInfo((prev) => ({ ...prev, groupAvatar: url }));
+        options.onSuccess?.({ url });
+      } catch (error) {
+        feedbackToast({ error: t("toast.updateAvatarFailed") });
+        options.onError?.(error instanceof Error ? error : new Error(String(error)));
+      }
+    })();
   };
 
   const isCheckInGroup = type === "INVITE_TO_GROUP";
@@ -263,7 +293,7 @@ export const ChooseContact: FC<ChooseContactProps> = ({
               <Upload
                 accept="image/*"
                 showUploadList={false}
-                customRequest={customUpload as any}
+                customRequest={customUpload}
               >
                 <span className="ml-3 cursor-pointer text-xs text-[var(--primary)]">
                   {t("placeholder.clickToModify")}
@@ -299,7 +329,7 @@ export const ChooseContact: FC<ChooseContactProps> = ({
           className="px-6"
           type="primary"
           loading={loading}
-          onClick={confirmChoose}
+          onClick={() => void confirmChoose()}
         >
           {t("confirm")}
         </Button>

@@ -35,8 +35,8 @@ export const MainContentWrap = () => {
       }
     };
 
-    loginCheck();
-  }, [location.pathname]);
+    void loginCheck();
+  }, [location.pathname, navigate]);
 
   useEffect(() => {
     window.userClick = (userID?: string, groupID?: string) => {
@@ -68,11 +68,11 @@ export const MainContentWrap = () => {
             key: "closeAction",
           })) || "miniSize",
       });
-      window.electronAPI?.ipcInvoke("main-win-ready");
+      void window.electronAPI?.ipcInvoke("main-win-ready");
     };
 
-    initSettingStore();
-  }, []);
+    void initSettingStore();
+  }, [updateAppSettings]);
 
   return <Outlet />;
 };

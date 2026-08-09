@@ -7,15 +7,17 @@ import { IMessageItemProps } from ".";
 const min = (a: number, b: number) => (a > b ? b : a);
 
 const MediaMessageRender: FC<IMessageItemProps> = ({ message }) => {
-  const imageHeight = message.pictureElem!.sourcePicture.height;
-  const imageWidth = message.pictureElem!.sourcePicture.width;
-  const snapshotMaxHeight = message.pictureElem!.snapshotPicture?.height ?? imageHeight;
+  const pictureElem = message.pictureElem;
+  if (!pictureElem) throw new Error("Picture message is missing pictureElem");
+
+  const imageHeight = pictureElem.sourcePicture.height;
+  const imageWidth = pictureElem.sourcePicture.width;
+  const snapshotMaxHeight = pictureElem.snapshotPicture?.height ?? imageHeight;
   const minHeight = min(200, imageWidth) * (imageHeight / imageWidth) + 2;
   const adaptedHight = min(minHeight, snapshotMaxHeight) + 10;
   const adaptedWidth = min(imageWidth, 200) + 10;
 
-  const sourceUrl =
-    message.pictureElem!.snapshotPicture?.url || message.pictureElem!.sourcePicture.url;
+  const sourceUrl = pictureElem.snapshotPicture?.url || pictureElem.sourcePicture.url;
   const isSending = message.status === MessageStatus.Sending;
   const minStyle = { minHeight: `${adaptedHight}px`, minWidth: `${adaptedWidth}px` };
 

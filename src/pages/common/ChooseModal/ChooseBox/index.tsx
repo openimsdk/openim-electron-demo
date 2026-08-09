@@ -1,13 +1,10 @@
-import { SearchOutlined } from "@ant-design/icons";
-import { SessionType } from "@openim/wasm-client-sdk";
 import { GroupMemberItem } from "@openim/wasm-client-sdk/lib/types/entity";
-import { useDebounceFn, useLatest } from "ahooks";
-import { Breadcrumb, Input, Spin } from "antd";
+import { useLatest } from "ahooks";
+import { Breadcrumb, Spin } from "antd";
 import { BreadcrumbItemType } from "antd/es/breadcrumb/Breadcrumb";
 import clsx from "clsx";
 import i18n, { t } from "i18next";
 import {
-  ChangeEvent,
   FC,
   forwardRef,
   ForwardRefRenderFunction,
@@ -15,14 +12,11 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
-  useRef,
   useState,
 } from "react";
 import { Virtuoso } from "react-virtuoso";
 
 import friend from "@/assets/images/chooseModal/friend.png";
-import group from "@/assets/images/chooseModal/group.png";
-import recently from "@/assets/images/chooseModal/recently.png";
 import { useCurrentMemberRole } from "@/hooks/useCurrentMemberRole";
 import useGroupMembers from "@/hooks/useGroupMembers";
 import { IMSDK } from "@/layout/MainContentWrap";
@@ -65,8 +59,13 @@ const ChooseBox: ForwardRefRenderFunction<ChooseBoxHandle, IChooseBoxProps> = (
   props,
   ref,
 ) => {
-  const { className, isCheckInGroup, showGroupMember, chooseOneOnly, checkMemberRole } =
-    props;
+  const {
+    className,
+    isCheckInGroup = false,
+    showGroupMember = false,
+    chooseOneOnly,
+    checkMemberRole,
+  } = props;
 
   const [checkedList, setCheckedList] = useState<CheckListItem[]>([]);
   const latestCheckedList = useLatest(checkedList);
@@ -96,7 +95,7 @@ const ChooseBox: ForwardRefRenderFunction<ChooseBoxHandle, IChooseBoxProps> = (
         setCheckedList((state) => [...state, data]);
       }
     },
-    [chooseOneOnly],
+    [chooseOneOnly, latestCheckedList, showGroupMember],
   );
 
   const isChecked = useCallback(
@@ -106,7 +105,7 @@ const ChooseBox: ForwardRefRenderFunction<ChooseBoxHandle, IChooseBoxProps> = (
           (item.userID && item.userID === data.userID) ||
           (item.groupID && item.groupID === data.groupID && !showGroupMember),
       ),
-    [checkedList.length, showGroupMember],
+    [checkedList, showGroupMember],
   );
 
   const resetState = () => {
@@ -141,7 +140,7 @@ const ChooseBox: ForwardRefRenderFunction<ChooseBoxHandle, IChooseBoxProps> = (
           />
         ) : (
           <ForwardCommonLeft
-            isCheckInGroup={isCheckInGroup!}
+            isCheckInGroup={isCheckInGroup}
             isChecked={isChecked}
             checkClick={checkClick}
           />
@@ -187,48 +186,54 @@ const CommonLeft: FC<ICommonLeftProps> = ({
     setBreadcrumb([]);
   };
 
-  const checkInGroup = async (list: CheckListItem[]) => {
-    const currentGroupID = useConversationStore.getState().currentConversation?.groupID;
-    if (!isCheckInGroup || !currentGroupID) {
-      return list;
-    }
-    const tmpList = JSON.parse(JSON.stringify(list)) as CheckListItem[];
-    const userIDList = tmpList
-      .filter((item) => Boolean(item.userID))
-      .map((item) => item.userID!);
-    try {
-      const { data } = await IMSDK.getUsersInGroup({
-        groupID: currentGroupID,
-        userIDList,
-      });
-      tmpList.map((item) => {
-        item.disabled = data.includes(item.userID!);
-      });
-    } catch (error) {
-      console.error(error);
-    }
-    return tmpList;
-  };
+  const checkInGroup = useCallback(
+    async (list: CheckListItem[]) => {
+      const currentGroupID =
+        useConversationStore.getState().currentConversation?.groupID;
+      if (!isCheckInGroup || !currentGroupID) return list;
 
-  const menuClick = useCallback(async (idx: number) => {
-    const pushItem = {
-      title: "",
-      className: "text-xs text-[var(--primary)]",
-    };
-    switch (idx) {
-      case 0:
-        setCheckList(await checkInGroup(useContactStore.getState().friendList));
-        pushItem.title = t("placeholder.myFriend");
-        break;
-      case 1:
-        setCheckList(await checkInGroup(useContactStore.getState().groupList));
-        pushItem.title = t("placeholder.myGroup");
-        break;
-      default:
-        break;
-    }
-    setBreadcrumb((state) => [...state, pushItem]);
-  }, []);
+      const userIDList = list.flatMap((item) => (item.userID ? [item.userID] : []));
+      try {
+        const { data } = await IMSDK.getUsersInGroup({
+          groupID: currentGroupID,
+          userIDList,
+        });
+        return list.map((item) => ({
+          ...item,
+          disabled: item.userID ? data.includes(item.userID) : false,
+        }));
+      } catch (error) {
+        console.error(error);
+        return list;
+      }
+    },
+    [isCheckInGroup],
+  );
+
+  const menuClick = useCallback(
+    (idx: number) => {
+      void (async () => {
+        const pushItem = {
+          title: "",
+          className: "text-xs text-[var(--primary)]",
+        };
+        switch (idx) {
+          case 0:
+            setCheckList(await checkInGroup(useContactStore.getState().friendList));
+            pushItem.title = t("placeholder.myFriend");
+            break;
+          case 1:
+            setCheckList(await checkInGroup(useContactStore.getState().groupList));
+            pushItem.title = t("placeholder.myGroup");
+            break;
+          default:
+            return;
+        }
+        setBreadcrumb((state) => [...state, pushItem]);
+      })();
+    },
+    [checkInGroup],
+  );
 
   if (breadcrumb.length < 1) {
     return (
@@ -292,18 +297,18 @@ const GroupMemberList: FC<IGroupMemberListProps> = ({
 
   useEffect(() => {
     if (currentMemberInGroup?.groupID) {
-      getMemberData(true);
+      void getMemberData(true);
     }
     return () => {
       resetState();
     };
-  }, [currentMemberInGroup?.groupID]);
+  }, [currentMemberInGroup?.groupID, getMemberData, resetState]);
 
   const endReached = () => {
     if (fetchState.loading || !fetchState.hasMore) {
       return;
     }
-    getMemberData();
+    void getMemberData();
   };
 
   const isDisabled = (member: GroupMemberItem) => {

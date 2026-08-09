@@ -45,9 +45,9 @@ export const useUserStore = create<UserStore>()((set, get) => ({
           set((state) => ({ selfInfo: { ...state.selfInfo, ...users[0] } })),
         );
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         feedbackToast({ error, msg: t("toast.getSelfInfoFailed") });
-        get().userLogout();
+        void get().userLogout();
       });
   },
   updateSelfInfo: (info: Partial<BusinessUserInfo>) => {

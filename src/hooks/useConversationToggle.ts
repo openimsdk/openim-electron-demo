@@ -14,38 +14,38 @@ export type ToSpecifiedConversationParams = {
   isChildWindow?: boolean;
 };
 
+const getConversation = async ({
+  sourceID,
+  sessionType,
+}: {
+  sourceID: string;
+  sessionType: SessionType;
+}): Promise<ConversationItem | undefined> => {
+  let conversation = useConversationStore
+    .getState()
+    .conversationList.find(
+      (item) => item.userID === sourceID || item.groupID === sourceID,
+    );
+  if (!conversation) {
+    try {
+      conversation = (
+        await IMSDK.getOneConversation({
+          sourceID,
+          sessionType,
+        })
+      ).data;
+    } catch (error) {
+      feedbackToast({ error });
+    }
+  }
+  return conversation;
+};
+
 export function useConversationToggle() {
   const navigate = useNavigate();
   const updateCurrentConversation = useConversationStore(
     (state) => state.updateCurrentConversation,
   );
-
-  const getConversation = async ({
-    sourceID,
-    sessionType,
-  }: {
-    sourceID: string;
-    sessionType: SessionType;
-  }): Promise<ConversationItem | undefined> => {
-    let conversation = useConversationStore
-      .getState()
-      .conversationList.find(
-        (item) => item.userID === sourceID || item.groupID === sourceID,
-      );
-    if (!conversation) {
-      try {
-        conversation = (
-          await IMSDK.getOneConversation({
-            sourceID,
-            sessionType,
-          })
-        ).data;
-      } catch (error) {
-        feedbackToast({ error });
-      }
-    }
-    return conversation;
-  };
 
   const toSpecifiedConversation = useCallback(
     async (params: ToSpecifiedConversationParams) => {
@@ -60,7 +60,7 @@ export function useConversationToggle() {
       await updateCurrentConversation({ ...conversation }, isJump);
       navigate(`/chat/${conversation.conversationID}`);
     },
-    [],
+    [navigate, updateCurrentConversation],
   );
 
   return {

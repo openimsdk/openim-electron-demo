@@ -24,12 +24,12 @@ const GroupMemberRow = ({
 
   useEffect(() => {
     if (currentGroupInfo?.groupID) {
-      getMemberData(true);
+      void getMemberData(true);
     }
     return () => {
       resetState();
     };
-  }, [currentGroupInfo?.groupID]);
+  }, [currentGroupInfo.groupID, getMemberData, resetState]);
 
   const sliceCount = isNomal ? 17 : 16;
 

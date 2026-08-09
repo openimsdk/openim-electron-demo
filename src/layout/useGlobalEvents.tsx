@@ -92,19 +92,22 @@ export function useGlobalEvent() {
   );
 
   useEffect(() => {
-    loginCheck();
+    void loginCheck();
     setIMListener();
-    setIpcListener();
+    const unsubscribeAppResume = setIpcListener();
 
-    window.addEventListener("online", () => {
-      IMSDK.networkStatusChanged();
-    });
-    window.addEventListener("offline", () => {
-      IMSDK.networkStatusChanged();
-    });
+    const handleNetworkChange = () => void IMSDK.networkStatusChanged();
+    window.addEventListener("online", handleNetworkChange);
+    window.addEventListener("offline", handleNetworkChange);
     return () => {
       disposeIMListener();
+      unsubscribeAppResume?.();
+      window.removeEventListener("online", handleNetworkChange);
+      window.removeEventListener("offline", handleNetworkChange);
     };
+    // SDK listeners are process-lifetime subscriptions. Their handlers read current
+    // Zustand state, and re-subscribing during render would duplicate SDK events.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loginCheck = async () => {
@@ -115,7 +118,7 @@ export function useGlobalEvent() {
       navigate("/login");
       return;
     }
-    tryLogin();
+    void tryLogin();
   };
 
   const tryLogin = async () => {
@@ -232,7 +235,7 @@ export function useGlobalEvent() {
       msg,
       error: msg,
       onClose: () => {
-        userLogout(true);
+        void userLogout(true);
       },
     });
 
@@ -261,7 +264,7 @@ export function useGlobalEvent() {
     if (useUserStore.getState().syncState === "loading" || resume.current) {
       return;
     }
-    data.map((message) => handleNewMessage(message));
+    data.forEach((message) => handleNewMessage(message));
   };
 
   const revokedMessageHandler = ({ data }: SdkEventEnvelope<RevokedInfo>) => {
@@ -278,8 +281,13 @@ export function useGlobalEvent() {
 
   const handleNewMessage = (newServerMsg: MessageItem) => {
     if (newServerMsg.contentType === MessageType.CustomMessage) {
-      const customData = JSON.parse(newServerMsg.customElem!.data);
+      if (!newServerMsg.customElem?.data) return;
+      const customData = JSON.parse(newServerMsg.customElem.data) as unknown;
       if (
+        customData &&
+        typeof customData === "object" &&
+        "customType" in customData &&
+        typeof customData.customType === "number" &&
         CustomType.CallingInvite <= customData.customType &&
         customData.customType <= CustomType.CallingHungup
       ) {
@@ -350,7 +358,7 @@ export function useGlobalEvent() {
     pushNewBlack(data);
   };
   const blackDeletedHandler = ({ data }: SdkEventEnvelope<BlackUserItem>) => {
-    IMSDK.getSpecifiedFriendsInfo({
+    void IMSDK.getSpecifiedFriendsInfo({
       friendUserIDList: [data.userID],
     }).then(({ data }) => {
       if (data.length) {
@@ -477,7 +485,7 @@ export function useGlobalEvent() {
   };
 
   const setIpcListener = () => {
-    window.electronAPI?.subscribe("appResume", () => {
+    return window.electronAPI?.subscribe("appResume", () => {
       if (resume.current) {
         return;
       }

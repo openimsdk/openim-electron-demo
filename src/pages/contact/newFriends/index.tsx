@@ -9,7 +9,6 @@ import { IMSDK } from "@/layout/MainContentWrap";
 import { useUserStore } from "@/store";
 import { useContactStore } from "@/store/contact";
 import { feedbackToast } from "@/utils/common";
-import { calcApplicationBadge } from "@/utils/imCommon";
 
 export const NewFriends = () => {
   const { t } = useTranslation();
@@ -52,7 +51,7 @@ export const NewFriends = () => {
         feedbackToast({ error });
       }
     },
-    [],
+    [updateRecvFriendApplication, updateSendFriendApplication],
   );
 
   const onReject = useCallback(
@@ -75,7 +74,7 @@ export const NewFriends = () => {
         feedbackToast({ error });
       }
     },
-    [],
+    [updateRecvFriendApplication, updateSendFriendApplication],
   );
 
   return (

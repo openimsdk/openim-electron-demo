@@ -170,7 +170,7 @@ export const AboutContent = ({ closeOverlay }: { closeOverlay?: () => void }) =>
           <>
             <div
               className="flex cursor-pointer items-center justify-between border-b border-[var(--gap-text)] px-3 py-2"
-              onClick={() => tryLogReport(10000)}
+              onClick={() => void tryLogReport(10000)}
             >
               <div>{t("placeholder.reportLog")}</div>
               <RightOutlined rev={undefined} />

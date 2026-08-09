@@ -26,6 +26,11 @@ module.exports = {
     "prettier",
     "simple-import-sort",
   ],
+  settings: {
+    react: {
+      version: "detect",
+    },
+  },
   rules: {
     eqeqeq: "error",
     "no-else-return": "error",

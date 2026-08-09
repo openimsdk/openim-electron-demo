@@ -11,6 +11,7 @@ export type PermissionField = "applyMemberFriend" | "lookMemberInfo";
 
 export function useGroupSettings({ closeOverlay }: { closeOverlay: () => void }) {
   const currentGroupInfo = useConversationStore((state) => state.currentGroupInfo);
+  const currentGroupID = currentGroupInfo?.groupID;
 
   const modalRef = useRef<{
     destroy: () => void;
@@ -18,17 +19,17 @@ export function useGroupSettings({ closeOverlay }: { closeOverlay: () => void })
 
   const updateGroupInfo = useCallback(
     async (value: Partial<GroupItem>) => {
-      if (!currentGroupInfo) return;
+      if (!currentGroupID) return;
       try {
         await IMSDK.setGroupInfo({
           ...value,
-          groupID: currentGroupInfo.groupID,
+          groupID: currentGroupID,
         });
       } catch (error) {
         feedbackToast({ error, msg: t("toast.updateGroupInfoFailed") });
       }
     },
-    [currentGroupInfo?.groupID],
+    [currentGroupID],
   );
 
   const tryDismissGroup = () => {

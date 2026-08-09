@@ -7,11 +7,11 @@ export interface IElectronAPI {
   getVersion: () => string;
   getPlatform: () => Platform;
   getSystemVersion: () => string;
-  subscribe: (channel: string, callback: (...args: any[]) => void) => () => void;
-  subscribeOnce: (channel: string, callback: (...args: any[]) => void) => void;
+  subscribe: (channel: string, callback: (...args: unknown[]) => void) => () => void;
+  subscribeOnce: (channel: string, callback: (...args: unknown[]) => void) => void;
   unsubscribeAll: (channel: string) => void;
-  ipcInvoke: <T = unknown>(channel: string, ...arg: any) => Promise<T>;
-  ipcSendSync: <T = unknown>(channel: string, ...arg: any) => T;
+  ipcInvoke: <T = unknown>(channel: string, ...args: unknown[]) => Promise<T>;
+  ipcSendSync: <T = unknown>(channel: string, ...args: unknown[]) => T;
   saveFileToDisk: (params: { file: File; sync?: boolean }) => Promise<string>;
   getFileByPath: (filePath: string) => Promise<File | null>;
 }

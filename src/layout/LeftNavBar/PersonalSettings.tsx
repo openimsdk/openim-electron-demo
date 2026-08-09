@@ -3,14 +3,11 @@ import { Checkbox, Divider, Modal } from "antd";
 import { t } from "i18next";
 import { forwardRef, ForwardRefRenderFunction, memo, useRef } from "react";
 
-import { modal } from "@/AntdGlobalComp";
 import i18n from "@/i18n";
 import { useUserStore } from "@/store";
 import { LocaleString } from "@/store/type";
-import { feedbackToast } from "@/utils/common";
 
 import { OverlayVisibleHandle, useOverlayVisible } from "../../hooks/useOverlayVisible";
-import { IMSDK } from "../MainContentWrap";
 import BlackList from "./BlackList";
 
 const PersonalSettings: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
@@ -58,8 +55,8 @@ export const PersonalSettingsContent = ({
 
   const localeChange = (checked: boolean, locale: LocaleString) => {
     if (!checked) return;
-    window.electronAPI?.ipcInvoke("changeLanguage", locale);
-    i18n.changeLanguage(locale);
+    void window.electronAPI?.ipcInvoke("changeLanguage", locale);
+    void i18n.changeLanguage(locale);
     updateAppSettings({
       locale,
     });
@@ -67,7 +64,7 @@ export const PersonalSettingsContent = ({
 
   const closeActionChange = (checked: boolean, action: "miniSize" | "quit") => {
     if (checked) {
-      window.electronAPI?.ipcInvoke("setKeyStore", {
+      void window.electronAPI?.ipcInvoke("setKeyStore", {
         key: "closeAction",
         data: action,
       });

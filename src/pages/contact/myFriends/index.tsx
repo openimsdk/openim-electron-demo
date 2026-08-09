@@ -28,7 +28,7 @@ export const MyFriends = () => {
     return () => {
       cancel();
     };
-  }, []);
+  }, [cancel]);
 
   const scrollToLetter = useCallback(
     (idx: number) => {

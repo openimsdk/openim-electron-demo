@@ -40,10 +40,10 @@ const GroupCardModal: ForwardRefRenderFunction<
   });
 
   useEffect(() => {
-    if (isOverlayOpen) {
-      getMemberData(true);
+    if (isOverlayOpen && groupData?.groupID) {
+      void getMemberData(true);
     }
-  }, [isOverlayOpen]);
+  }, [getMemberData, groupData?.groupID, isOverlayOpen]);
 
   const createTimeStr = dayjs(groupData?.createTime ?? 0).format("YYYY/M/D");
 
@@ -52,7 +52,7 @@ const GroupCardModal: ForwardRefRenderFunction<
 
   const joinOrSendMessage = () => {
     if (groupData?.inGroup) {
-      toSpecifiedConversation({
+      void toSpecifiedConversation({
         sourceID: groupData.groupID,
         sessionType: SessionType.WorkingGroup,
       });
@@ -64,9 +64,10 @@ const GroupCardModal: ForwardRefRenderFunction<
   };
 
   const sendApplication = async () => {
+    if (!groupData?.groupID) return;
     try {
       await runAsync({
-        groupID: groupData!.groupID,
+        groupID: groupData.groupID,
         reqMsg,
         joinSource: GroupJoinSource.Search,
       });
@@ -146,7 +147,7 @@ const GroupCardModal: ForwardRefRenderFunction<
                 className="w-[60%]"
                 type="primary"
                 loading={loading}
-                onClick={sendApplication}
+                onClick={() => void sendApplication()}
               >
                 {t("placeholder.send")}
               </Button>

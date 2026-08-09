@@ -49,20 +49,25 @@ export const RtcLayout = ({
   const isVideoCall = inviteData?.invitation?.mediaType === "video";
   const tracks = useTracks([Track.Source.Camera]);
   const remoteParticipant = tracks.find((track) => !isLocal(track.participant));
+  const remoteParticipantInstance = remoteParticipant?.participant;
   const isWaiting = !connect && !isConnected;
   const [isRemoteVideoMuted, setIsRemoteVideoMuted] = useState(false);
 
   const connectState = useConnectionState();
 
   useEffect(() => {
-    if (!remoteParticipant?.participant.identity) return;
+    if (!remoteParticipantInstance?.identity) return;
     const trackMuteUpdate = () => {
-      setIsRemoteVideoMuted(!remoteParticipant?.participant.isCameraEnabled);
+      setIsRemoteVideoMuted(!remoteParticipantInstance.isCameraEnabled);
     };
-    remoteParticipant?.participant.on(ParticipantEvent.TrackMuted, trackMuteUpdate);
-    remoteParticipant?.participant.on(ParticipantEvent.TrackUnmuted, trackMuteUpdate);
+    remoteParticipantInstance.on(ParticipantEvent.TrackMuted, trackMuteUpdate);
+    remoteParticipantInstance.on(ParticipantEvent.TrackUnmuted, trackMuteUpdate);
     trackMuteUpdate();
-  }, [remoteParticipant?.participant.identity]);
+    return () => {
+      remoteParticipantInstance.off(ParticipantEvent.TrackMuted, trackMuteUpdate);
+      remoteParticipantInstance.off(ParticipantEvent.TrackUnmuted, trackMuteUpdate);
+    };
+  }, [remoteParticipantInstance]);
 
   const renderContent = () => {
     if (!isWaiting && isVideoCall && !isRemoteVideoMuted) return null;
@@ -91,16 +96,17 @@ export const RtcLayout = ({
           )}
         >
           {renderContent()}
-          <RtcControl
-            isWaiting={isWaiting}
-            isRecv={isRecv}
-            isConnected={isConnected}
-            // @ts-ignore
-            invitation={inviteData?.invitation}
-            closeOverlay={closeOverlay}
-            connectRtc={connectRtc}
-            sendCustomSignal={sendCustomSignal}
-          />
+          {inviteData?.invitation && (
+            <RtcControl
+              isWaiting={isWaiting}
+              isRecv={isRecv}
+              isConnected={isConnected}
+              invitation={inviteData.invitation}
+              closeOverlay={closeOverlay}
+              connectRtc={connectRtc}
+              sendCustomSignal={sendCustomSignal}
+            />
+          )}
         </div>
         {isConnected && (
           <TrackLoop tracks={tracks}>

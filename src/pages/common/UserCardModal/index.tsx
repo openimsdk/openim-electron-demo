@@ -68,50 +68,86 @@ const UserCardModal: ForwardRefRenderFunction<
 
   const { isOverlayOpen, closeOverlay } = useOverlayVisible(ref);
   const { toSpecifiedConversation } = useConversationToggle();
-  const [_, copyToClipboard] = useCopyToClipboard();
+  const [, copyToClipboard] = useCopyToClipboard();
 
-  const getCardInfo = async (): Promise<{
+  const setUserInfoRow = useCallback(
+    (info: CardInfo) => {
+      let tmpFields: FieldRow[] = [
+        {
+          title: t("placeholder.nickName"),
+          value: info.nickname || "",
+        },
+      ];
+      const isFriend = info.remark !== undefined;
+
+      if (isFriend) {
+        tmpFields.push({
+          title: t("placeholder.remark"),
+          value: info.remark || "-",
+          editable: true,
+        });
+      }
+      if (isFriend || isSelf) {
+        tmpFields = [
+          ...tmpFields,
+          {
+            title: t("placeholder.gender"),
+            value: getGender(info.gender ?? 0),
+          },
+          {
+            title: t("placeholder.birth"),
+            value: info.birth ? dayjs(info.birth).format("YYYY/M/D") : "-",
+          },
+          {
+            title: t("placeholder.phoneNumber"),
+            value: info.phoneNumber || "-",
+          },
+          {
+            title: t("placeholder.email"),
+            value: info.email || "-",
+          },
+        ];
+      }
+      setUserFields(tmpFields);
+    },
+    [isSelf],
+  );
+
+  const getCardInfo = useCallback(async (): Promise<{
     cardInfo: CardInfo;
     memberInfo?: GroupMemberItem | null;
   }> => {
-    if (isSelf) {
-      return {
-        cardInfo: selfInfo,
-      };
-    }
-    let userInfo: CardInfo | null = null;
+    if (isSelf) return { cardInfo: selfInfo };
+    if (!userID) return { cardInfo: {} };
+
     const friendInfo = useContactStore
       .getState()
       .friendList.find((item) => item.userID === userID);
-    if (friendInfo) {
-      userInfo = { ...friendInfo };
-    } else {
-      const { data } = await IMSDK.getUsersInfo([userID!]);
+    let userInfo: CardInfo = friendInfo ? { ...friendInfo } : {};
+    if (!friendInfo) {
+      const { data } = await IMSDK.getUsersInfo([userID]);
       userInfo = { ...(data[0] ?? {}) };
     }
 
     try {
       const {
         data: { users },
-      } = await getBusinessUserInfo([userID!]);
+      } = await getBusinessUserInfo([userID]);
       userInfo = { ...userInfo, ...users[0] };
     } catch (error) {
       console.error("get business user info failed", userID, error);
     }
-    return {
-      cardInfo: userInfo,
-    };
-  };
+    return { cardInfo: userInfo };
+  }, [isSelf, selfInfo, userID]);
 
-  const refreshData = (data?: { cardInfo: CardInfo | null }) => {
-    if (!data) {
-      return;
-    }
-    const { cardInfo } = data;
-
-    setCardInfo(cardInfo!);
-    setUserInfoRow(cardInfo!);
-  };
+  const refreshData = useCallback(
+    (data?: { cardInfo: CardInfo | null }) => {
+      if (!data?.cardInfo) return;
+      setCardInfo(data.cardInfo);
+      setUserInfoRow(data.cardInfo);
+    },
+    [setUserInfoRow],
+  );
 
   const {
     data: fullCardInfo,
@@ -128,7 +164,7 @@ const UserCardModal: ForwardRefRenderFunction<
     if (!isOverlayOpen) return;
     const friendAddedHandler = ({ data }: SdkEventEnvelope<FriendUserItem>) => {
       if (data.userID === userID) {
-        refetch();
+        void refetch();
       }
     };
     IMSDK.on(SdkEvent.OnFriendAdded, friendAddedHandler);
@@ -138,56 +174,16 @@ const UserCardModal: ForwardRefRenderFunction<
     return () => {
       IMSDK.off(SdkEvent.OnFriendAdded, friendAddedHandler);
     };
-  }, [isOverlayOpen, props.cardInfo]);
+  }, [isOverlayOpen, latestFullCardInfo, props.cardInfo, refetch, refreshData, userID]);
 
   const refreshSelfInfo = useCallback(() => {
     const latestInfo = useUserStore.getState().selfInfo;
     setCardInfo(latestInfo);
     setUserInfoRow(latestInfo);
-  }, [isSelf]);
+  }, [setUserInfoRow]);
 
   const updateCardRemark = (remark: string) => {
-    setUserInfoRow({ ...cardInfo!, remark });
-  };
-  const setUserInfoRow = (info: CardInfo) => {
-    let tmpFields = [] as FieldRow[];
-    tmpFields.push({
-      title: t("placeholder.nickName"),
-      value: info.nickname || "",
-    });
-    const isFriend = info?.remark !== undefined;
-
-    if (isFriend) {
-      tmpFields.push({
-        title: t("placeholder.remark"),
-        value: info.remark || "-",
-        editable: true,
-      });
-    }
-    if (isFriend || isSelf) {
-      tmpFields = [
-        ...tmpFields,
-        ...[
-          {
-            title: t("placeholder.gender"),
-            value: getGender(info.gender!),
-          },
-          {
-            title: t("placeholder.birth"),
-            value: info.birth ? dayjs(info.birth).format("YYYY/M/D") : "-",
-          },
-          {
-            title: t("placeholder.phoneNumber"),
-            value: info.phoneNumber || "-",
-          },
-          {
-            title: t("placeholder.email"),
-            value: info.email || "-",
-          },
-        ],
-      ];
-    }
-    setUserFields(tmpFields);
+    if (cardInfo) setUserInfoRow({ ...cardInfo, remark });
   };
 
   const backToCard = () => {
@@ -228,8 +224,8 @@ const UserCardModal: ForwardRefRenderFunction<
       maskTransitionName=""
     >
       <Spin spinning={isLoading}>
-        {isSendRequest ? (
-          <SendRequest cardInfo={cardInfo!} backToCard={backToCard} />
+        {isSendRequest && cardInfo ? (
+          <SendRequest cardInfo={cardInfo} backToCard={backToCard} />
         ) : (
           <div className="flex max-h-[520px] min-h-[484px] flex-col overflow-hidden bg-[url(@/assets/images/common/card_bg.png)] bg-[length:332px_134px] bg-no-repeat px-5.5">
             <div className="h-[104px] min-h-[104px] w-full cursor-move" />
@@ -290,12 +286,13 @@ const UserCardModal: ForwardRefRenderFunction<
                 <Button
                   type="primary"
                   className="flex-1"
-                  onClick={() =>
-                    toSpecifiedConversation({
-                      sourceID: userID!,
+                  onClick={() => {
+                    if (!userID) return;
+                    void toSpecifiedConversation({
+                      sourceID: userID,
                       sessionType: SessionType.Single,
-                    }).then(closeOverlay)
-                  }
+                    }).then(closeOverlay);
+                  }}
                 >
                   {t("placeholder.sendMessage")}
                 </Button>
@@ -333,9 +330,10 @@ const UserCardDataGroup: FC<IUserCardDataGroupProps> = ({
   updateCardRemark,
 }) => {
   const tryUpdateRemark = async (remark: string) => {
+    if (!userID) return;
     try {
       await IMSDK.updateFriends({
-        friendUserIDs: [userID!],
+        friendUserIDs: [userID],
         remark,
       });
       updateCardRemark?.(remark);

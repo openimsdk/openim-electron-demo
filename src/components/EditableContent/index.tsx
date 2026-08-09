@@ -51,15 +51,14 @@ const EditableContent: FC<IEditableContentProps> = ({
     setTimeout(() => inputRef.current?.focus());
   };
 
-  const onPressEnter = async (
-    e: React.KeyboardEvent<HTMLInputElement> & { target: { value: string } },
-  ) => {
+  const onPressEnter = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const nextValue = e.currentTarget.value;
     setEditState((state) => ({ ...state, loading: true }));
-    await onChange?.(e.target.value);
+    await onChange?.(nextValue);
     setEditState({
       isEdit: false,
       loading: false,
-      innerValue: e.target.value,
+      innerValue: nextValue,
     });
   };
 
@@ -75,7 +74,7 @@ const EditableContent: FC<IEditableContentProps> = ({
             setEditState((state) => ({ ...state, innerValue: e.target.value }))
           }
           ref={inputRef}
-          onPressEnter={onPressEnter}
+          onPressEnter={(event) => void onPressEnter(event)}
           suffix={<EnterOutlined rev={undefined} />}
         />
       ) : (

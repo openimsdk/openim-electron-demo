@@ -61,7 +61,7 @@ const BlackItem = ({
         <OIMAvatar src={black.faceURL} text={black.nickname} />
         <div className="ml-3">{black.nickname}</div>
       </div>
-      <Button type="primary" ghost loading={loading} onClick={tryRemove}>
+      <Button type="primary" ghost loading={loading} onClick={() => void tryRemove()}>
         {t("placeholder.remove")}
       </Button>
     </div>

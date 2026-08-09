@@ -1,5 +1,5 @@
 import { RightOutlined } from "@ant-design/icons";
-import { Button, Divider, Upload } from "antd";
+import { Button, Divider, Upload, UploadProps } from "antd";
 import clsx from "clsx";
 import { t } from "i18next";
 import { memo, useCallback } from "react";
@@ -15,7 +15,6 @@ import { feedbackToast } from "@/utils/common";
 import { emit } from "@/utils/events";
 import { uploadFile } from "@/utils/imCommon";
 
-import { FileWithPath } from "../ChatFooter/SendActionBar/useFileMessage";
 import GroupMemberRow from "./GroupMemberRow";
 import { useGroupSettings } from "./useGroupSettings";
 
@@ -31,17 +30,23 @@ const GroupSettings = ({
   const { currentGroupInfo, updateGroupInfo, tryQuitGroup, tryDismissGroup } =
     useGroupSettings({ closeOverlay });
 
-  const [_, copyToClipboard] = useCopyToClipboard();
+  const [, copyToClipboard] = useCopyToClipboard();
 
-  const customUpload = async ({ file }: { file: FileWithPath }) => {
-    try {
-      const {
-        data: { url },
-      } = await uploadFile(file);
-      await updateGroupInfo({ faceURL: url });
-    } catch (error) {
-      feedbackToast({ error: t("toast.updateAvatarFailed") });
-    }
+  const customUpload: NonNullable<UploadProps["customRequest"]> = (options) => {
+    if (!(options.file instanceof File)) return;
+    const file = options.file;
+    void (async () => {
+      try {
+        const {
+          data: { url },
+        } = await uploadFile(file);
+        await updateGroupInfo({ faceURL: url });
+        options.onSuccess?.({ url });
+      } catch (error) {
+        feedbackToast({ error: t("toast.updateAvatarFailed") });
+        options.onError?.(error instanceof Error ? error : new Error(String(error)));
+      }
+    })();
   };
 
   const updateGroupName = useCallback(
@@ -69,7 +74,7 @@ const GroupSettings = ({
             className={clsx({ "disabled-upload": isNomal })}
             openFileDialogOnClick={hasPermissions}
             showUploadList={false}
-            customRequest={customUpload as any}
+            customRequest={customUpload}
           >
             <div className="relative">
               <OIMAvatar

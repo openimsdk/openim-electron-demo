@@ -1,5 +1,5 @@
-import { useLatest, useThrottleFn, useUpdateEffect } from "ahooks";
-import { useEffect } from "react";
+import { useLatest, useUpdateEffect } from "ahooks";
+import { useCallback, useEffect, useRef } from "react";
 
 import { IMSDK } from "@/layout/MainContentWrap";
 import { useConversationStore, useUserStore } from "@/store";
@@ -11,38 +11,41 @@ export default function useConversationState() {
     (state) => state.currentConversation,
   );
   const latestCurrentConversation = useLatest(currentConversation);
+  const throttleTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  const checkConversationState = useCallback(() => {
+    const conversation = latestCurrentConversation.current;
+    if (!conversation || latestSyncState.current === "loading") return;
+
+    if (conversation.unreadCount > 0) {
+      void IMSDK.markConversationMessageAsRead(conversation.conversationID);
+    }
+  }, [latestCurrentConversation, latestSyncState]);
+
+  const throttleCheckConversationState = useCallback(() => {
+    clearTimeout(throttleTimer.current);
+    throttleTimer.current = setTimeout(checkConversationState, 2000);
+  }, [checkConversationState]);
 
   useUpdateEffect(() => {
     if (syncState !== "loading") {
       checkConversationState();
     }
-  }, [syncState]);
+  }, [checkConversationState, syncState]);
 
   useUpdateEffect(() => {
     throttleCheckConversationState();
-  }, [currentConversation?.unreadCount]);
+  }, [currentConversation?.unreadCount, throttleCheckConversationState]);
 
   useEffect(() => {
     checkConversationState();
-  }, [currentConversation?.conversationID]);
+  }, [checkConversationState, currentConversation?.conversationID]);
 
-  const checkConversationState = () => {
-    if (
-      !latestCurrentConversation.current ||
-      latestSyncState.current === "loading"
-    )
-      return;
-
-    if (latestCurrentConversation.current.unreadCount > 0) {
-      IMSDK.markConversationMessageAsRead(
-        latestCurrentConversation.current.conversationID,
-      );
-    }
-  };
-
-  const { run: throttleCheckConversationState } = useThrottleFn(
-    checkConversationState,
-    { wait: 2000, leading: false },
+  useEffect(
+    () => () => {
+      clearTimeout(throttleTimer.current);
+    },
+    [],
   );
 
   return {

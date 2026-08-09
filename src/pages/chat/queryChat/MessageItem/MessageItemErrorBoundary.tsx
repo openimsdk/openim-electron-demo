@@ -26,6 +26,7 @@ class MessageItemErrorBoundary extends Component<
     console.error("MessageItemErrorBoundary:::");
     console.error(this.state.message);
     console.error(error);
+    console.error(errorInfo.componentStack);
 
     this.setState({ hasError: true });
   }

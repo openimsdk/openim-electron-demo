@@ -1,6 +1,4 @@
-import {
-  GroupMemberItem,
-} from "@openim/wasm-client-sdk/lib/types/entity";
+import { GroupMemberItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import { useLatest } from "ahooks";
 import { useCallback, useState } from "react";
 
@@ -71,10 +69,10 @@ export default function useGroupMembers(props?: UseGroupMembersProps) {
         }));
       }
     },
-    [groupID],
+    [groupID, latestFetchState],
   );
 
-  const resetState = () => {
+  const resetState = useCallback(() => {
     setFetchState({
       offset: 0,
       count: 20,
@@ -82,7 +80,7 @@ export default function useGroupMembers(props?: UseGroupMembersProps) {
       hasMore: true,
       groupMemberList: [],
     });
-  };
+  }, []);
 
   return {
     fetchState,

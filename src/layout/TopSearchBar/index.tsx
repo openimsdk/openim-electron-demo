@@ -32,6 +32,18 @@ type UserCardState = OpenUserCardParams & {
   cardInfo?: CardInfo;
 };
 
+const isCallingInviteData = (
+  value: unknown,
+): value is { customType: CustomType; data: SignalingInvitation } => {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as { customType?: unknown; data?: unknown };
+  return (
+    candidate.customType === CustomType.CallingInvite &&
+    Boolean(candidate.data) &&
+    typeof candidate.data === "object"
+  );
+};
+
 const TopSearchBar = () => {
   const userCardRef = useRef<OverlayVisibleHandle>(null);
   const groupCardRef = useRef<OverlayVisibleHandle>(null);
@@ -48,81 +60,6 @@ const TopSearchBar = () => {
   const [actionVisible, setActionVisible] = useState(false);
   const [isSearchGroup, setIsSearchGroup] = useState(false);
   const [inviteData, setInviteData] = useState<InviteData>({} as InviteData);
-
-  useEffect(() => {
-    const userCardHandler = (params: OpenUserCardParams) => {
-      setUserCardState({ ...params });
-      userCardRef.current?.openOverlay();
-    };
-    const chooseModalHandler = (params: ChooseModalState) => {
-      setChooseModalState({ ...params });
-      chooseModalRef.current?.openOverlay();
-    };
-    const callRtcHandler = (inviteData: InviteData) => {
-      if (rtcRef.current?.isOverlayOpen) return;
-      setInviteData(inviteData);
-      rtcRef.current?.openOverlay();
-    };
-    const newMessageHandler = ({ data }: SdkEventEnvelope<MessageItem[]>) => {
-      if (rtcRef.current?.isOverlayOpen) return;
-      let rtcInvite = undefined as undefined | SignalingInvitation;
-      data.map((message) => {
-        if (message.contentType === MessageType.CustomMessage) {
-          const customData = JSON.parse(message.customElem!.data);
-          if (customData.customType === CustomType.CallingInvite) {
-            rtcInvite = customData.data;
-          }
-        }
-      });
-      if (rtcInvite) {
-        getBusinessUserInfo([rtcInvite.inviterUserID]).then(({ data: { users } }) => {
-          if (users.length === 0) return;
-          setInviteData({
-            invitation: rtcInvite,
-            participant: {
-              userInfo: {
-                nickname: users[0].nickname,
-                faceURL: users[0].faceURL,
-                userID: users[0].userID,
-                ex: "",
-              },
-            },
-          });
-          rtcRef.current?.openOverlay();
-        });
-      }
-    };
-
-    emitter.on("OPEN_USER_CARD", userCardHandler);
-    emitter.on("OPEN_GROUP_CARD", openGroupCardWithData);
-    emitter.on("OPEN_CHOOSE_MODAL", chooseModalHandler);
-    emitter.on("OPEN_RTC_MODAL", callRtcHandler);
-    IMSDK.on(SdkEvent.OnRecvNewMessages, newMessageHandler);
-    return () => {
-      emitter.off("OPEN_USER_CARD", userCardHandler);
-      emitter.off("OPEN_GROUP_CARD", openGroupCardWithData);
-      emitter.off("OPEN_CHOOSE_MODAL", chooseModalHandler);
-      emitter.off("OPEN_RTC_MODAL", callRtcHandler);
-      IMSDK.off(SdkEvent.OnRecvNewMessages, newMessageHandler);
-    };
-  }, []);
-
-  const actionClick = (idx: number) => {
-    switch (idx) {
-      case 0:
-      case 1:
-        setIsSearchGroup(Boolean(idx));
-        searchModalRef.current?.openOverlay();
-        break;
-      case 2:
-        setChooseModalState({ type: "CRATE_GROUP" });
-        chooseModalRef.current?.openOverlay();
-        break;
-      default:
-        break;
-    }
-    setActionVisible(false);
-  };
 
   const openUserCardWithData = useCallback((cardInfo: CardInfo) => {
     searchModalRef.current?.closeOverlay();
@@ -142,6 +79,86 @@ const TopSearchBar = () => {
     setGroupCardData({ ...group, inGroup });
     groupCardRef.current?.openOverlay();
   }, []);
+
+  useEffect(() => {
+    const userCardHandler = (params: OpenUserCardParams) => {
+      setUserCardState({ ...params });
+      userCardRef.current?.openOverlay();
+    };
+    const chooseModalHandler = (params: ChooseModalState) => {
+      setChooseModalState({ ...params });
+      chooseModalRef.current?.openOverlay();
+    };
+    const callRtcHandler = (inviteData: InviteData) => {
+      if (rtcRef.current?.isOverlayOpen) return;
+      setInviteData(inviteData);
+      rtcRef.current?.openOverlay();
+    };
+    const newMessageHandler = ({ data }: SdkEventEnvelope<MessageItem[]>) => {
+      if (rtcRef.current?.isOverlayOpen) return;
+      let rtcInvite: SignalingInvitation | undefined;
+      data.forEach((message) => {
+        if (
+          message.contentType !== MessageType.CustomMessage ||
+          !message.customElem?.data
+        ) {
+          return;
+        }
+        const customData = JSON.parse(message.customElem.data) as unknown;
+        if (isCallingInviteData(customData)) rtcInvite = customData.data;
+      });
+      if (rtcInvite) {
+        const invitation = rtcInvite;
+        void getBusinessUserInfo([invitation.inviterUserID]).then(
+          ({ data: { users } }) => {
+            if (users.length === 0) return;
+            setInviteData({
+              invitation,
+              participant: {
+                userInfo: {
+                  nickname: users[0].nickname,
+                  faceURL: users[0].faceURL,
+                  userID: users[0].userID,
+                  ex: "",
+                },
+              },
+            });
+            rtcRef.current?.openOverlay();
+          },
+        );
+      }
+    };
+
+    emitter.on("OPEN_USER_CARD", userCardHandler);
+    emitter.on("OPEN_GROUP_CARD", openGroupCardWithData);
+    emitter.on("OPEN_CHOOSE_MODAL", chooseModalHandler);
+    emitter.on("OPEN_RTC_MODAL", callRtcHandler);
+    IMSDK.on(SdkEvent.OnRecvNewMessages, newMessageHandler);
+    return () => {
+      emitter.off("OPEN_USER_CARD", userCardHandler);
+      emitter.off("OPEN_GROUP_CARD", openGroupCardWithData);
+      emitter.off("OPEN_CHOOSE_MODAL", chooseModalHandler);
+      emitter.off("OPEN_RTC_MODAL", callRtcHandler);
+      IMSDK.off(SdkEvent.OnRecvNewMessages, newMessageHandler);
+    };
+  }, [openGroupCardWithData]);
+
+  const actionClick = (idx: number) => {
+    switch (idx) {
+      case 0:
+      case 1:
+        setIsSearchGroup(Boolean(idx));
+        searchModalRef.current?.openOverlay();
+        break;
+      case 2:
+        setChooseModalState({ type: "CRATE_GROUP" });
+        chooseModalRef.current?.openOverlay();
+        break;
+      default:
+        break;
+    }
+    setActionVisible(false);
+  };
 
   return (
     <div className="no-mobile app-drag flex h-10 min-h-[40px] items-center bg-[var(--top-search-bar)] dark:bg-[#141414]">

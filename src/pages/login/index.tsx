@@ -1,5 +1,5 @@
 import { t } from "i18next";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useCopyToClipboard } from "react-use";
 
 import login_bg from "@/assets/images/login/login_bg.png";
@@ -20,7 +20,7 @@ export const Login = () => {
   const [formType, setFormType] = useState<FormType>(0);
   const [loginMethod, setLoginMethod] = useState<"phone" | "email">(getLoginMethod());
 
-  const [_, copyToClipboard] = useCopyToClipboard();
+  const [, copyToClipboard] = useCopyToClipboard();
 
   const updateLoginMethod = useCallback((method: "phone" | "email") => {
     setLoginMethod(method);

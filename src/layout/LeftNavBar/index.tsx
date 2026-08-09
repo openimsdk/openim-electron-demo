@@ -1,5 +1,5 @@
 import { RightOutlined } from "@ant-design/icons";
-import { Badge, Divider, Layout, Popover, Upload } from "antd";
+import { Badge, Divider, Layout, Popover, Upload, UploadProps } from "antd";
 import clsx from "clsx";
 import i18n, { t } from "i18next";
 import React, { memo, useRef, useState } from "react";
@@ -77,8 +77,6 @@ const NavItem = ({ nav: { icon, icon_active, title, path } }: { nav: NavItemType
       locationPathname.charAt(toPathname.length) === "/") ||
     location.hash.startsWith(`#${toPathname}`);
 
-  const [showConversationMenu, setShowConversationMenu] = useState(false);
-
   const unReadCount = useConversationStore((state) => state.unReadCount);
   const unHandleFriendApplicationCount = useContactStore(
     (state) => state.unHandleFriendApplicationCount,
@@ -94,10 +92,6 @@ const NavItem = ({ nav: { icon, icon_active, title, path } }: { nav: NavItemType
 
     // TODO Keep answering when jumping back to chat from another page (if there is one)
     navigator.push(path);
-  };
-
-  const closeConversationMenu = () => {
-    setShowConversationMenu(false);
   };
 
   const getBadge = () => {
@@ -201,25 +195,33 @@ const LeftNavBar = memo(() => {
     });
   };
 
-  const customUpload = async ({ file }: { file: File }) => {
-    const resizedFile = await resizeFile(file);
-    const filePath = await window.electronAPI?.saveFileToDisk({
-      sync: true,
-      file,
-    });
-
-    try {
-      const {
-        data: { url },
-      } = await uploadFile(resizedFile, filePath);
-      const newInfo = {
-        faceURL: url,
-      };
-      await updateBusinessUserInfo(newInfo);
-      updateSelfInfo(newInfo);
-    } catch (error) {
-      feedbackToast({ error: t("toast.updateAvatarFailed") });
-    }
+  const customUpload: NonNullable<UploadProps["customRequest"]> = ({
+    file,
+    onError,
+    onSuccess,
+  }) => {
+    if (!(file instanceof File)) return;
+    void (async () => {
+      try {
+        const resizedFile = await resizeFile(file);
+        const filePath = await window.electronAPI?.saveFileToDisk({
+          sync: true,
+          file,
+        });
+        const {
+          data: { url },
+        } = await uploadFile(resizedFile, filePath);
+        const newInfo = {
+          faceURL: url,
+        };
+        await updateBusinessUserInfo(newInfo);
+        updateSelfInfo(newInfo);
+        onSuccess?.(newInfo);
+      } catch (error) {
+        feedbackToast({ error: t("toast.updateAvatarFailed") });
+        onError?.(error instanceof Error ? error : new Error(String(error)));
+      }
+    })();
   };
 
   const ProfileContent = (
@@ -228,7 +230,7 @@ const LeftNavBar = memo(() => {
         <Upload
           accept=".jpeg,.png,.webp"
           showUploadList={false}
-          customRequest={customUpload as any}
+          customRequest={customUpload}
         >
           <div className={styles["avatar-wrapper"]}>
             <OIMAvatar src={selfInfo.faceURL} text={selfInfo.nickname} />

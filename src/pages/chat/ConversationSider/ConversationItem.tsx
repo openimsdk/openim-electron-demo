@@ -1,5 +1,4 @@
 import type {
-  ConversationItem,
   ConversationItem as ConversationItemType,
   MessageItem,
 } from "@openim/wasm-client-sdk/lib/types/entity";
@@ -8,8 +7,9 @@ import clsx from "clsx";
 import { t } from "i18next";
 import { memo, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+
 import OIMAvatar from "@/components/OIMAvatar";
-import { useConversationStore, useUserStore } from "@/store";
+import { useConversationStore } from "@/store";
 import { formatConversionTime, getConversationContent } from "@/utils/imCommon";
 
 import styles from "./conversation-item.module.scss";
@@ -24,8 +24,6 @@ const ConversationItem = ({ isActive, conversation }: IConversationProps) => {
   const updateCurrentConversation = useConversationStore(
     (state) => state.updateCurrentConversation,
   );
-  const currentUser = useUserStore((state) => state.selfInfo.userID);
-
   const toSpecifiedConversation = async () => {
     if (isActive) {
       return;
@@ -47,7 +45,7 @@ const ConversationItem = ({ isActive, conversation }: IConversationProps) => {
       content = t("messageDescription.catchMessage");
     }
     return content;
-  }, [conversation.draftText, conversation.latestMsg, isActive, currentUser]);
+  }, [conversation.latestMsg]);
 
   const latestMessageTime = formatConversionTime(conversation.latestMsgSendTime);
 
@@ -58,7 +56,7 @@ const ConversationItem = ({ isActive, conversation }: IConversationProps) => {
         "border border-transparent",
         isActive && `bg-[var(--primary-active)]`,
       )}
-      onClick={toSpecifiedConversation}
+      onClick={() => void toSpecifiedConversation()}
     >
       <Badge size="small" count={conversation.unreadCount}>
         <OIMAvatar

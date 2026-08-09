@@ -38,6 +38,14 @@ interface IRtcControlProps {
   closeOverlay: () => void;
   sendCustomSignal: (recvID: string, customType: CustomType) => Promise<void>;
 }
+
+const isRtcSignal = (
+  value: unknown,
+): value is { data: SignalingInvitation; customType: CustomType } => {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as { data?: unknown; customType?: unknown };
+  return Boolean(candidate.data) && typeof candidate.customType === "number";
+};
 export const RtcControl = ({
   isWaiting,
   isRecv,
@@ -51,7 +59,9 @@ export const RtcControl = ({
   const localParticipantState = useLocalParticipant();
   const counterRef = useRef<CounterHandle>(null);
 
-  const recvID = isRecv ? invitation.inviterUserID : invitation.inviteeUserIDList[0];
+  const inviterUserID = invitation.inviterUserID;
+  const inviteeUserID = invitation.inviteeUserIDList[0];
+  const recvID = isRecv ? inviterUserID : inviteeUserID;
   const isVideoCall = invitation.mediaType === "video";
 
   useEffect(() => {
@@ -79,23 +89,21 @@ export const RtcControl = ({
     };
     const participantDisconnectedHandler = (remoteParticipant: RemoteParticipant) => {
       const identity = remoteParticipant.identity;
-      if (
-        identity === invitation.inviterUserID ||
-        identity === invitation.inviteeUserIDList[0]
-      ) {
+      if (identity === inviterUserID || identity === inviteeUserID) {
         room.disconnect();
       }
     };
 
     const newMessageHandler = ({ data }: SdkEventEnvelope<MessageItem[]>) => {
-      data.map((message) => {
-        if (message.contentType === MessageType.CustomMessage) {
-          const customData = JSON.parse(message.customElem!.data) as {
-            data: SignalingInvitation;
-            customType: CustomType;
-          };
+      data.forEach((message) => {
+        if (
+          message.contentType === MessageType.CustomMessage &&
+          message.customElem?.data
+        ) {
+          const customData = JSON.parse(message.customElem.data) as unknown;
+          if (!isRtcSignal(customData)) return;
           if (customData.customType === CustomType.CallingAccept) {
-            acceptHandler(customData.data);
+            void acceptHandler(customData.data);
           }
           if (customData.customType === CustomType.CallingReject) {
             rejectHandler(customData.data);
@@ -116,20 +124,30 @@ export const RtcControl = ({
       IMSDK.off(SdkEvent.OnRecvNewMessages, newMessageHandler);
       room.off(RoomEvent.ParticipantDisconnected, participantDisconnectedHandler);
     };
-  }, [room, invitation.roomID, isWaiting]);
+  }, [
+    closeOverlay,
+    connectRtc,
+    invitation.roomID,
+    inviteeUserID,
+    inviterUserID,
+    isWaiting,
+    room,
+  ]);
 
   const hungup = () => {
+    if (!recvID) return;
     if (isWaiting) {
       const customType = isRecv ? CustomType.CallingReject : CustomType.CallingCancel;
-      sendCustomSignal(recvID, customType);
+      void sendCustomSignal(recvID, customType);
       closeOverlay();
       return;
     }
-    sendCustomSignal(recvID, CustomType.CallingHungup);
+    void sendCustomSignal(recvID, CustomType.CallingHungup);
     room.disconnect();
   };
 
   const acceptInvitation = async () => {
+    if (!recvID) return;
     try {
       await sendCustomSignal(recvID, CustomType.CallingAccept);
       const { data } = await getRtcConnectData(
@@ -185,7 +203,7 @@ export const RtcControl = ({
       {isRecv && isWaiting && (
         <div
           className="mx-12 flex cursor-pointer flex-col items-center"
-          onClick={acceptInvitation}
+          onClick={() => void acceptInvitation()}
         >
           <img width={48} src={rtc_accept} alt="" />
           <span

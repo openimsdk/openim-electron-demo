@@ -38,33 +38,16 @@ const RtcCallModal: ForwardRefRenderFunction<
   });
   const selfID = useUserStore((state) => state.selfInfo.userID);
   const { isOverlayOpen, closeOverlay } = useOverlayVisible(ref);
-  const timer = useRef<NodeJS.Timeout>();
+  const timer = useRef<ReturnType<typeof setTimeout>>();
 
   const isRecv = selfID !== invitation?.inviterUserID;
-
-  useEffect(() => {
-    if (!isOverlayOpen) return;
-    tryInvite();
-  }, [isOverlayOpen, isRecv]);
-
-  const checkTimeout = () => {
-    if (timer.current) clearTimer();
-    timer.current = setTimeout(() => {
-      clearTimer();
-
-      if (!invitation) return;
-
-      sendCustomSignal(invitation?.inviteeUserIDList[0], CustomType.CallingCancel);
-      closeOverlay();
-    }, (invitation?.timeout ?? 30) * 1000);
-  };
 
   const clearTimer = useCallback(() => clearTimeout(timer.current), []);
 
   const closeOverlayAndClearTimer = useCallback(() => {
     clearTimer();
     closeOverlay();
-  }, []);
+  }, [clearTimer, closeOverlay]);
 
   const sendCustomSignal = useCallback(
     async (recvID: string, customType: CustomType) => {
@@ -86,31 +69,54 @@ const RtcCallModal: ForwardRefRenderFunction<
         isOnlineOnly: true,
       });
     },
-    [invitation?.roomID],
+    [invitation],
   );
 
-  const tryInvite = async () => {
-    if (!isRecv) {
+  const checkTimeout = useCallback(() => {
+    clearTimer();
+    timer.current = setTimeout(() => {
+      clearTimer();
+      const recvID = invitation?.inviteeUserIDList[0];
+      if (!recvID) return;
+      void sendCustomSignal(recvID, CustomType.CallingCancel);
+      closeOverlay();
+    }, (invitation?.timeout ?? 30) * 1000);
+  }, [clearTimer, closeOverlay, invitation, sendCustomSignal]);
+
+  const tryInvite = useCallback(async () => {
+    const recvID = invitation?.inviteeUserIDList[0];
+    if (!isRecv && recvID) {
       try {
-        await sendCustomSignal(
-          invitation.inviteeUserIDList[0],
-          CustomType.CallingInvite,
-        );
+        await sendCustomSignal(recvID, CustomType.CallingInvite);
         checkTimeout();
       } catch (error) {
         feedbackToast({ msg: t("toast.inviteUserFailed"), error });
         closeOverlay();
       }
     }
-  };
+  }, [
+    checkTimeout,
+    closeOverlay,
+    invitation?.inviteeUserIDList,
+    isRecv,
+    sendCustomSignal,
+  ]);
 
-  const connectRtc = useCallback((data?: AuthData) => {
-    if (data) {
-      setAuthData(data);
-    }
-    clearTimer();
-    setTimeout(() => setConnect(true));
-  }, []);
+  useEffect(() => {
+    if (!isOverlayOpen) return;
+    void tryInvite();
+  }, [isOverlayOpen, tryInvite]);
+
+  const connectRtc = useCallback(
+    (data?: AuthData) => {
+      if (data) {
+        setAuthData(data);
+      }
+      clearTimer();
+      setTimeout(() => setConnect(true));
+    },
+    [clearTimer],
+  );
 
   return (
     <DraggableModalWrap
@@ -123,7 +129,7 @@ const RtcCallModal: ForwardRefRenderFunction<
       mask={false}
       centered
       width="auto"
-      onCancel={closeOverlay}
+      onCancel={closeOverlayAndClearTimer}
       destroyOnClose
       ignoreClasses=".ignore-drag, .no-padding-modal, .cursor-pointer"
       className="no-padding-modal rtc-single-modal"

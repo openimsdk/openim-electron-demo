@@ -136,7 +136,7 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
             addonAfter={null}
             spellCheck={false}
             onChange={(e) => setKeyword(e.target.value)}
-            onSearch={searchData}
+            onSearch={() => void searchData()}
           />
         </div>
         <div className="flex justify-end px-5.5 py-2.5">
@@ -145,7 +145,7 @@ const SearchUserOrGroup: ForwardRefRenderFunction<
             className="px-6"
             type="primary"
             disabled={!keyword}
-            onClick={searchData}
+            onClick={() => void searchData()}
           >
             {t("confirm")}
           </Button>

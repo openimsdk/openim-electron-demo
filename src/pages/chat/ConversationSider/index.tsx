@@ -81,7 +81,7 @@ const ConversationSider = () => {
           className="flex-1"
           data={conversationList}
           ref={virtuoso}
-          endReached={endReached}
+          endReached={() => void endReached()}
           computeItemKey={(_, item) => item.conversationID}
           itemContent={(_, conversation) => (
             <ConversationItemComp

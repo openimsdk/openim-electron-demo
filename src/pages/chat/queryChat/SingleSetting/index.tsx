@@ -8,10 +8,10 @@ import OIMAvatar from "@/components/OIMAvatar";
 import SettingRow from "@/components/SettingRow";
 import { OverlayVisibleHandle, useOverlayVisible } from "@/hooks/useOverlayVisible";
 import { IMSDK } from "@/layout/MainContentWrap";
+import { useConversationStore } from "@/store";
 import { useContactStore } from "@/store/contact";
 import { feedbackToast } from "@/utils/common";
 import { emit } from "@/utils/events";
-import { useConversationStore } from "@/store";
 
 // export interface SingleSettingProps {}
 

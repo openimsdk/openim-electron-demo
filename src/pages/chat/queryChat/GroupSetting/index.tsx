@@ -1,6 +1,6 @@
 import { Drawer } from "antd";
 import { t } from "i18next";
-import { forwardRef, ForwardRefRenderFunction, memo, useRef, useState } from "react";
+import { forwardRef, ForwardRefRenderFunction, memo, useState } from "react";
 
 import { OverlayVisibleHandle, useOverlayVisible } from "@/hooks/useOverlayVisible";
 

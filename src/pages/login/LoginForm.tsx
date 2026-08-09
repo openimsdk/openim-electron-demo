@@ -1,4 +1,4 @@
-import { Button, Form, Input, QRCode, Select, Space, Tabs } from "antd";
+import { Button, Form, Input, Select, Space, Tabs } from "antd";
 import { t } from "i18next";
 import md5 from "md5";
 import { useEffect, useState } from "react";
@@ -32,7 +32,7 @@ type LoginFormProps = {
 
 const LoginForm = ({ loginMethod, setFormType, updateLoginMethod }: LoginFormProps) => {
   const navigate = useNavigate();
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<API.Login.LoginParams>();
   const [loginType, setLoginType] = useState<LoginType>(LoginType.Password);
   const { mutate: login, isLoading: loginLoading } = useLogin();
   const { mutate: sendSms } = useSendSms();
@@ -73,19 +73,19 @@ const LoginForm = ({ loginMethod, setFormType, updateLoginMethod }: LoginFormPro
   };
 
   const sendSmsHandle = () => {
-    const options = {
-      phoneNumber: form.getFieldValue("phoneNumber"),
-      email: form.getFieldValue("email"),
-      areaCode: form.getFieldValue("areaCode"),
-      usedFor: 3,
-    };
-    if (loginMethod === "phone") {
-      delete options.email;
-    }
-    if (loginMethod === "email") {
-      delete options.phoneNumber;
-      delete options.areaCode;
-    }
+    const { phoneNumber, email, areaCode: selectedAreaCode } = form.getFieldsValue();
+    const options: API.Login.SendSmsParams =
+      loginMethod === "phone"
+        ? {
+            phoneNumber,
+            areaCode: selectedAreaCode,
+            usedFor: API.Login.UsedFor.Login,
+          }
+        : {
+            email,
+            areaCode: selectedAreaCode,
+            usedFor: API.Login.UsedFor.Login,
+          };
 
     sendSms(options, {
       onSuccess() {

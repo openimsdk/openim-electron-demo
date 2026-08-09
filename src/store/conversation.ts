@@ -2,7 +2,6 @@ import {
   ConversationItem,
   GroupItem,
   GroupMemberItem,
-  MessageItem,
 } from "@openim/wasm-client-sdk/lib/types/entity";
 import { t } from "i18next";
 import { create } from "zustand";
@@ -68,10 +67,7 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
 
     set(() => ({ conversationList: conversationSort([...list, ...filterArr]) }));
   },
-  updateCurrentConversation: async (
-    conversation?: ConversationItem,
-    isJump?: boolean,
-  ) => {
+  updateCurrentConversation: async (conversation?: ConversationItem) => {
     if (!conversation) {
       set(() => ({
         currentConversation: undefined,

@@ -23,9 +23,10 @@ const SendRequest = ({
   });
 
   const sendApplication = async () => {
+    if (!cardInfo.userID) return;
     try {
       await runAsync({
-        toUserID: cardInfo.userID!,
+        toUserID: cardInfo.userID,
         reqMsg,
       });
       feedbackToast({ msg: t("toast.sendFreiendRequestSuccess") });
@@ -85,7 +86,7 @@ const SendRequest = ({
           <Button
             className="flex-1"
             type="primary"
-            onClick={sendApplication}
+            onClick={() => void sendApplication()}
             loading={loading}
           >
             {t("placeholder.send")}

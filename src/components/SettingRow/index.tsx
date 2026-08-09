@@ -43,7 +43,7 @@ const SettingRow: FC<ISettingRowProps> = ({
           className="bg-[#8e9aaf]"
           loading={loading}
           checked={value}
-          onClick={onClick}
+          onClick={(checked) => void onClick(checked)}
         />
       )}
     </div>

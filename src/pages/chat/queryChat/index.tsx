@@ -1,8 +1,5 @@
-import { InfoCircleOutlined } from "@ant-design/icons";
-import { SessionType } from "@openim/wasm-client-sdk";
 import { useUnmount } from "ahooks";
 import { Layout } from "antd";
-import { t } from "i18next";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import { useConversationStore } from "@/store";

@@ -1,5 +1,4 @@
 import {
-  AtTextElem,
   BlackUserItem,
   ConversationItem,
   FriendApplicationItem,
@@ -7,7 +6,6 @@ import {
   GroupApplicationItem,
   GroupItem,
   GroupMemberItem,
-  MessageItem,
 } from "@openim/wasm-client-sdk/lib/types/entity";
 
 import { BusinessUserInfo } from "@/api/login";
@@ -48,9 +46,7 @@ export interface ConversationStore {
   unReadCount: number;
   currentGroupInfo?: GroupItem;
   currentMemberInGroup?: GroupMemberItem;
-  getConversationListByReq: (
-    isOffset?: boolean
-  ) => Promise<boolean>;
+  getConversationListByReq: (isOffset?: boolean) => Promise<boolean>;
   updateConversationList: (
     list: ConversationItem[],
     type: ConversationListUpdateType,
@@ -91,11 +87,11 @@ export interface ContactStore {
   updateGroup: (group: GroupItem, remove?: boolean) => void;
   pushNewGroup: (group: GroupItem) => void;
   getRecvFriendApplicationListByReq: () => Promise<void>;
-  updateRecvFriendApplication: (application: FriendApplicationItem) => Promise<void>;
+  updateRecvFriendApplication: (application: FriendApplicationItem) => void;
   getSendFriendApplicationListByReq: () => Promise<void>;
   updateSendFriendApplication: (application: FriendApplicationItem) => void;
   getRecvGroupApplicationListByReq: () => Promise<void>;
-  updateRecvGroupApplication: (application: GroupApplicationItem) => Promise<void>;
+  updateRecvGroupApplication: (application: GroupApplicationItem) => void;
   getSendGroupApplicationListByReq: () => Promise<void>;
   updateSendGroupApplication: (application: GroupApplicationItem) => void;
   updateUnHandleFriendApplicationCount: (num: number) => void;

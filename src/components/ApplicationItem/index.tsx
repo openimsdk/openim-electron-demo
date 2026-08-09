@@ -68,18 +68,22 @@ const ApplicationItem = ({
 
   const loadingWrap = async (isAgree: boolean) => {
     setLoading(true);
-    await (isAgree ? onAccept(source, isRecv) : onReject(source, isRecv));
-    setLoading(false);
+    try {
+      await (isAgree ? onAccept(source, isRecv) : onReject(source, isRecv));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const tryShowCard = useCallback(async () => {
     if (isGroup) {
-      const { data } = await IMSDK.getSpecifiedGroupsInfo([source.groupID!]);
+      if (!source.groupID) return;
+      const { data } = await IMSDK.getSpecifiedGroupsInfo([source.groupID]);
       emit("OPEN_GROUP_CARD", data[0]);
       return;
     }
     window.userClick(isRecv ? source.fromUserID : source.toUserID);
-  }, []);
+  }, [isGroup, isRecv, source.fromUserID, source.groupID, source.toUserID]);
 
   return (
     <Spin spinning={loading}>
@@ -89,7 +93,7 @@ const ApplicationItem = ({
             src={getAvatarUrl()}
             text={getTitle()}
             isgroup={isGroup && !isRecv}
-            onClick={tryShowCard}
+            onClick={() => void tryShowCard()}
           />
           <div className="ml-3">
             <p className="text-sm">{getTitle()}</p>
@@ -114,7 +118,7 @@ const ApplicationItem = ({
               <Button
                 block={true}
                 size="small"
-                onClick={() => loadingWrap(false)}
+                onClick={() => void loadingWrap(false)}
                 className="!h-full !rounded-md border-2 border-[#0089FF] text-[#0089FF]"
               >
                 {t("application.refuse")}
@@ -126,7 +130,7 @@ const ApplicationItem = ({
                 size="small"
                 type="primary"
                 className="!h-full !rounded-md bg-[#0289fa]"
-                onClick={() => loadingWrap(true)}
+                onClick={() => void loadingWrap(true)}
               >
                 {t("application.agree")}
               </Button>

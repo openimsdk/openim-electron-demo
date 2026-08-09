@@ -52,7 +52,7 @@ export const GroupNotifications = () => {
         feedbackToast({ error });
       }
     },
-    [],
+    [updateRecvGroupApplication, updateSendGroupApplication],
   );
 
   const onReject = useCallback(
@@ -76,7 +76,7 @@ export const GroupNotifications = () => {
         feedbackToast({ error });
       }
     },
-    [],
+    [updateRecvGroupApplication, updateSendGroupApplication],
   );
 
   return (

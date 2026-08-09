@@ -1,6 +1,6 @@
 import { MessageItem as MessageItemType, MessageType } from "@openim/wasm-client-sdk";
 import clsx from "clsx";
-import { FC, memo, useCallback, useRef, useState } from "react";
+import { FC, memo, useRef } from "react";
 
 import OIMAvatar from "@/components/OIMAvatar";
 import { formatMessageTime } from "@/utils/imCommon";
@@ -32,14 +32,7 @@ const MessageItem: FC<IMessageItemProps> = ({
   conversationID,
 }) => {
   const messageWrapRef = useRef<HTMLDivElement>(null);
-  const [showMessageMenu, setShowMessageMenu] = useState(false);
   const MessageRenderComponent = components[message.contentType] || CatchMessageRender;
-
-  const closeMessageMenu = useCallback(() => {
-    setShowMessageMenu(false);
-  }, []);
-
-  const canShowMessageMenu = !disabled;
 
   return (
     <>

@@ -53,11 +53,14 @@ const SendActionBar = ({
 
   const closePop = () => setVisibleState(false);
 
-  const fileHandle = async (options: UploadRequestOption) => {
-    const message = await getImageMessage(options.file as File);
-    sendMessage({
-      message,
-    });
+  const fileHandle = (options: UploadRequestOption) => {
+    if (!(options.file instanceof File)) return;
+    const file = options.file;
+    void (async () => {
+      const message = await getImageMessage(file);
+      await sendMessage({ message });
+      options.onSuccess?.(message);
+    })();
   };
 
   return (

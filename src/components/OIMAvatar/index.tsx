@@ -25,7 +25,6 @@ const OIMAvatar: React.FC<IOIMAvatarProps> = (props) => {
     color = "#fff",
     bgColor = "#0289FA",
     isgroup = false,
-    isnotification,
   } = props;
   const [errorHolder, setErrorHolder] = React.useState<string>();
 
@@ -37,7 +36,7 @@ const OIMAvatar: React.FC<IOIMAvatarProps> = (props) => {
       return src;
     }
     return isgroup ? default_group : undefined;
-  }, [src, isgroup, isnotification]);
+  }, [src, isgroup]);
 
   const avatarProps = { ...props, isgroup: undefined, isnotification: undefined };
 
@@ -51,6 +50,7 @@ const OIMAvatar: React.FC<IOIMAvatarProps> = (props) => {
     if (isgroup) {
       setErrorHolder(default_group);
     }
+    return false;
   };
 
   return (
@@ -71,7 +71,7 @@ const OIMAvatar: React.FC<IOIMAvatarProps> = (props) => {
         props.className,
       )}
       src={errorHolder ?? getAvatarUrl}
-      onError={errorHandler as any}
+      onError={errorHandler}
     >
       {text}
     </AntdAvatar>

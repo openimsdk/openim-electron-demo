@@ -101,7 +101,8 @@ const RegisterForm = ({ loginMethod, setFormType }: RegisterFormProps) => {
     if (registerForm === 0) {
       const pattern = /^1\d{10}$/;
       if (fields.phoneNumber && !pattern.test(fields.phoneNumber)) {
-        return message.error(t("toast.inputCorrectPhoneNumber"));
+        message.error(t("toast.inputCorrectPhoneNumber"));
+        return;
       }
       sendSms(
         {

@@ -143,28 +143,21 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
       console.error(error);
     }
   },
-  updateRecvFriendApplication: async (application: FriendApplicationItem) => {
+  updateRecvFriendApplication: (application: FriendApplicationItem) => {
     let tmpList = [...get().recvFriendApplicationList];
-    let isHandleResultUpdate = false;
     const idx = tmpList.findIndex((a) => a.fromUserID === application.fromUserID);
     if (idx < 0) {
       tmpList = [...tmpList, application];
     } else {
-      isHandleResultUpdate = true;
       tmpList[idx] = { ...application };
     }
-    if (idx < 0 || isHandleResultUpdate) {
-      const unHandleFriendApplicationCount = tmpList.filter(
-        (application) =>
-          application.handleResult === 0,
-      ).length;
-      set(() => ({
-        recvFriendApplicationList: tmpList,
-        unHandleFriendApplicationCount,
-      }));
-      return;
-    }
-    set(() => ({ recvFriendApplicationList: tmpList }));
+    const unHandleFriendApplicationCount = tmpList.filter(
+      (application) => application.handleResult === 0,
+    ).length;
+    set(() => ({
+      recvFriendApplicationList: tmpList,
+      unHandleFriendApplicationCount,
+    }));
   },
   getSendFriendApplicationListByReq: async () => {
     try {
@@ -192,25 +185,18 @@ export const useContactStore = create<ContactStore>()((set, get) => ({
       console.error(error);
     }
   },
-  updateRecvGroupApplication: async (application: GroupApplicationItem) => {
+  updateRecvGroupApplication: (application: GroupApplicationItem) => {
     let tmpList = [...get().recvGroupApplicationList];
-    let isHandleResultUpdate = false;
     const idx = tmpList.findIndex((a) => a.userID === application.userID);
     if (idx < 0) {
       tmpList = [...tmpList, application];
     } else {
-      isHandleResultUpdate = true;
       tmpList[idx] = { ...application };
     }
-    if (idx < 0 || application.handleResult === ApplicationHandleResult.Unprocessed) {
-      const unHandleGroupApplicationCount = tmpList.filter(
-        (application) =>
-          application.handleResult === 0
-      ).length;
-      set(() => ({ recvGroupApplicationList: tmpList, unHandleGroupApplicationCount }));
-      return;
-    }
-    set(() => ({ recvGroupApplicationList: tmpList }));
+    const unHandleGroupApplicationCount = tmpList.filter(
+      (application) => application.handleResult === ApplicationHandleResult.Unprocessed,
+    ).length;
+    set(() => ({ recvGroupApplicationList: tmpList, unHandleGroupApplicationCount }));
   },
   getSendGroupApplicationListByReq: async () => {
     try {

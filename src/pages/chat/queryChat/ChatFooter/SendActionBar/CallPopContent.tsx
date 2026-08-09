@@ -1,5 +1,4 @@
 import { SessionType } from "@openim/wasm-client-sdk";
-import { PublicUserItem } from "@openim/wasm-client-sdk/lib/types/entity";
 import { t } from "i18next";
 import { memo } from "react";
 import { v4 as uuidV4 } from "uuid";
@@ -24,7 +23,8 @@ const callList = [
 
 const CallPopContent = ({ closeAllPop }: { closeAllPop?: () => void }) => {
   const prepareCall = (idx: number) => {
-    const conversation = useConversationStore.getState().currentConversation!;
+    const conversation = useConversationStore.getState().currentConversation;
+    if (!conversation?.userID) return;
     const mediaType = idx ? "audio" : "video";
     emitter.emit("OPEN_RTC_MODAL", {
       invitation: {

@@ -32,6 +32,12 @@ const keyCodes = {
   backspace: 8,
 };
 
+interface KeyDownData {
+  keyCode: number;
+  shiftKey: boolean;
+  preventDefault: () => void;
+}
+
 const Index: ForwardRefRenderFunction<CKEditorRef, CKEditorProps> = (
   { value, placeholder, onChange, onEnter },
   ref,
@@ -59,7 +65,7 @@ const Index: ForwardRefRenderFunction<CKEditorRef, CKEditorProps> = (
   const listenKeydown = (editor: ClassicEditor) => {
     editor.editing.view.document.on(
       "keydown",
-      (evt, data) => {
+      (evt, data: KeyDownData) => {
         if (data.keyCode === 13 && !data.shiftKey) {
           data.preventDefault();
           evt.stop();

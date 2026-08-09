@@ -17,7 +17,7 @@ const WindowControlBar = () => {
     <div className="absolute right-3 top-3.5 z-[99999999] flex h-fit items-center">
       <div
         className="app-no-drag flex h-[14px] cursor-pointer items-center"
-        onClick={() => window.electronAPI?.ipcInvoke("minimizeWindow")}
+        onClick={() => void window.electronAPI?.ipcInvoke("minimizeWindow")}
       >
         <img
           className="app-no-drag cursor-pointer"
@@ -31,14 +31,14 @@ const WindowControlBar = () => {
         width={13}
         src={win_max}
         alt="win_max"
-        onClick={() => window.electronAPI?.ipcInvoke("maxmizeWindow")}
+        onClick={() => void window.electronAPI?.ipcInvoke("maxmizeWindow")}
       />
       <img
         className="app-no-drag cursor-pointer"
         width={12}
         src={win_close}
         alt="win_close"
-        onClick={() => window.electronAPI?.ipcInvoke("closeWindow")}
+        onClick={() => void window.electronAPI?.ipcInvoke("closeWindow")}
       />
     </div>
   );
